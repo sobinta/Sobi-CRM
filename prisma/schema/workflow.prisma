@@ -1,0 +1,44 @@
+// ============================================================
+// Workflow Engine — staged processes with approvals, SLAs, and
+// required fields/documents per stage. Layered over the Pipeline
+// primitives; definitions are versioned via ConfigVersion.
+// ============================================================
+
+model WorkflowDefinition {
+  id          String   @id @default(cuid())
+  tenantId    String
+  key         String
+  name        String
+  /// Which entity/module this workflow drives.
+  entityType  String
+  /// Ordered stages: [{ key, name, tone, requiredFields[], requiredDocs[],
+  ///   approval?: { roleKey }, slaHours? }]
+  stages      Json     @default("[]")
+  enabled     Boolean  @default(true)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  @@unique([tenantId, key])
+  @@index([tenantId, entityType])
+}
+
+model ApprovalRequest {
+  id           String    @id @default(cuid())
+  tenantId     String
+  entityType   String
+  entityId     String
+  workflowKey  String
+  stageKey     String
+  /// pending | approved | rejected
+  status       String    @default("pending")
+  requestedBy  String? // membership id
+  decidedBy    String?
+  decidedAt    DateTime?
+  note         String?
+  createdAt    DateTime  @default(now())
+
+  @@index([tenantId, status])
+  @@index([tenantId, entityType, entityId])
+}

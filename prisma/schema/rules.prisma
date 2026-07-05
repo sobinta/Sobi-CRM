@@ -1,0 +1,38 @@
+// ============================================================
+// Business Rules Engine.
+// One evaluator, many consumers: forms (visibility/validation/
+// calculation), workflow (gates/approvals), automation (conditions),
+// permissions (record constraints), modules (eligibility).
+// ============================================================
+
+enum RuleKind {
+  VALIDATION
+  ELIGIBILITY
+  APPROVAL
+  CALCULATION
+  VISIBILITY
+  COMPLIANCE
+  CONSTRAINT
+}
+
+model RuleDefinition {
+  id          String   @id @default(cuid())
+  tenantId    String
+  key         String
+  name        String
+  kind        RuleKind
+  /// Entity this rule applies to (null = global).
+  entityType  String?
+  /// Condition AST (JSON, evaluated by the safe expression evaluator).
+  condition   Json     @default("{}")
+  /// Effect payload — meaning depends on kind (message, field, value, …).
+  effect      Json     @default("{}")
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  @@unique([tenantId, key])
+  @@index([tenantId, entityType])
+  @@index([tenantId, kind])
+}

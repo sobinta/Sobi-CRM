@@ -1,0 +1,73 @@
+// ============================================================
+// Metadata Kernel — the no-code foundation.
+// Built-in entities register their metadata in code (same shape as
+// runtime-created); views/forms/permissions/search/APIs read one
+// metadata source regardless of origin.
+// ============================================================
+
+/// Definition of an entity (built-in or custom). Custom entities also back
+/// generic CustomRecord rows; built-ins reference real tables by `tableKey`.
+model EntityDefinition {
+  id          String   @id @default(cuid())
+  tenantId    String?  // null = platform built-in (shared); set = tenant custom
+  key         String // "contact", "deal", or a custom "asset"
+  namePlural  String
+  nameSingular String
+  icon        String? // lucide icon name
+  /// "builtin" (backed by a real table) or "custom" (backed by CustomRecord)
+  source      String   @default("custom")
+  /// Field definitions (array of FieldDefinition JSON).
+  fields      Json     @default("[]")
+  /// Ownership/config metadata.
+  config      Json     @default("{}")
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  views   ViewDefinition[]
+  records CustomRecord[]
+
+  @@unique([tenantId, key])
+  @@index([tenantId])
+}
+
+/// A saved view (list/kanban/calendar/table) over an entity.
+model ViewDefinition {
+  id         String   @id @default(cuid())
+  tenantId   String
+  entityDefId String
+  key        String
+  name       String
+  /// "table" | "kanban" | "calendar" | "timeline"
+  kind       String   @default("table")
+  /// Columns, filters, sort, group-by, kanban stage field, etc.
+  config     Json     @default("{}")
+  isDefault  Boolean  @default(false)
+  createdById String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  entityDef EntityDefinition @relation(fields: [entityDefId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entityDefId])
+}
+
+/// Generic record store for custom (metadata-defined) entities.
+model CustomRecord {
+  id          String   @id @default(cuid())
+  tenantId    String
+  entityDefId String
+  /// Field values keyed by field key.
+  data        Json     @default("{}")
+  ownerId     String? // membership id
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  entityDef EntityDefinition @relation(fields: [entityDefId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entityDefId])
+  @@index([tenantId, ownerId])
+}

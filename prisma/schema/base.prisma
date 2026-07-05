@@ -1,0 +1,11 @@
+// Platform base — datasource and client generator.
+// Domain models live in sibling files: core.prisma, crm.prisma, mod-*.prisma, …
+
+generator client {
+  provider = "prisma-client"
+  output   = "../../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}

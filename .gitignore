@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local env
+.env
+
+# file storage
+/storage
+
+
+# prisma generated client (regenerated via postinstall)
+/src/generated
+
+# claude local
+.claude/

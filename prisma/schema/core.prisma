@@ -1,0 +1,124 @@
+// ============================================================
+// Core platform schema — tenancy, identity, membership, teams.
+// RBAC (roles/permissions) lives in rbac.prisma.
+// ============================================================
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+  TRIAL
+}
+
+enum MembershipStatus {
+  INVITED
+  ACTIVE
+  SUSPENDED
+}
+
+enum UserKind {
+  INTERNAL // staff: admins, managers, employees
+  EXTERNAL // partners, collaborators
+  CLIENT // customer/portal users
+}
+
+/// A customer of the platform. The isolation boundary for all data.
+model Tenant {
+  id        String       @id @default(cuid())
+  name      String
+  slug      String       @unique
+  status    TenantStatus @default(TRIAL)
+  /// Free-form settings (branding overrides, locale default, retention…)
+  settings  Json         @default("{}")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  deletedAt DateTime?
+
+  memberships   Membership[]
+  teams         Team[]
+  roles         Role[]
+  events        Event[]
+  auditLogs     AuditLog[]
+  jobs          Job[]
+  features      FeatureGrant[]
+  moduleStates  ModuleState[]
+
+  @@index([status])
+}
+
+/// A person. Global identity; may belong to multiple tenants via Membership.
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  /// Argon2 hash. Null for SSO-only or not-yet-activated accounts.
+  passwordHash  String?
+  emailVerified Boolean   @default(false)
+  image         String?
+  locale        String    @default("en")
+  isSuperAdmin  Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  memberships Membership[]
+  sessions    Session[]
+  accounts    Account[]
+
+  @@index([email])
+}
+
+/// Links a User to a Tenant with a status and kind. The unit RBAC binds to.
+model Membership {
+  id       String           @id @default(cuid())
+  tenantId String
+  userId   String
+  kind     UserKind         @default(INTERNAL)
+  status   MembershipStatus @default(ACTIVE)
+  title    String?
+  /// Denormalized display name at time of invite; kept in sync from User.
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  deletedAt DateTime?
+
+  tenant      Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roles       MembershipRole[]
+  teamMembers TeamMember[]
+
+  @@unique([tenantId, userId])
+  @@index([tenantId])
+  @@index([userId])
+}
+
+/// A group of members for ownership/visibility scoping.
+model Team {
+  id        String    @id @default(cuid())
+  tenantId  String
+  name      String
+  parentId  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  tenant  Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  parent  Team?        @relation("TeamHierarchy", fields: [parentId], references: [id])
+  children Team[]      @relation("TeamHierarchy")
+  members TeamMember[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model TeamMember {
+  id           String   @id @default(cuid())
+  teamId       String
+  membershipId String
+  isLead       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  team       Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  membership Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, membershipId])
+  @@index([membershipId])
+}

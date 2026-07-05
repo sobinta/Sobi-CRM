@@ -1,0 +1,64 @@
+// ============================================================
+// Feature Management + Module activation.
+// Module activation is modeled as a feature grant so there is a
+// single evaluation path (hasFeature). ModuleState holds per-module
+// config/enable independent of plan gating.
+// ============================================================
+
+enum FeatureKind {
+  MODULE
+  FEATURE
+  BETA
+  EXPERIMENTAL
+  REGIONAL
+}
+
+enum FeatureScope {
+  TENANT
+  ROLE
+  PLAN
+}
+
+/// Catalog of features/flags the platform knows about (global).
+model Feature {
+  id          String      @id @default(cuid())
+  key         String      @unique // e.g. "module.insurance", "beta.ai-employees"
+  kind        FeatureKind @default(FEATURE)
+  name        String
+  description String?
+  createdAt   DateTime    @default(now())
+}
+
+/// A grant enabling a feature for a scope (tenant/role/plan).
+model FeatureGrant {
+  id       String       @id @default(cuid())
+  tenantId String
+  key      String
+  scope    FeatureScope @default(TENANT)
+  scopeId  String? // role id or plan id when scope != TENANT
+  enabled  Boolean      @default(true)
+  config   Json         @default("{}")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, key, scope, scopeId])
+  @@index([tenantId])
+}
+
+/// Per-tenant module activation + configuration.
+model ModuleState {
+  id        String   @id @default(cuid())
+  tenantId  String
+  moduleKey String // "insurance", "loans", "realestate", …
+  enabled   Boolean  @default(false)
+  config    Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, moduleKey])
+  @@index([tenantId])
+}

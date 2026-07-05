@@ -1,0 +1,57 @@
+// ============================================================
+// Auth schema — sessions and credential/OAuth accounts.
+// Shaped to be compatible with Better Auth's core tables while
+// keeping our own User model as the identity root.
+// ============================================================
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  /// The tenant this session is currently acting within (tenant switcher).
+  activeTenantId String?
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+/// Credential or OAuth provider account linked to a User.
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  providerId            String // "credential", "google", "microsoft", …
+  accountId             String // provider's user id, or user id for credentials
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?
+  password              String? // Better Auth stores credential hash here
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+/// Email verification / password reset / OTP tokens.
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}

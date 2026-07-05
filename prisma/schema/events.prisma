@@ -1,0 +1,64 @@
+// ============================================================
+// Event log + job queue — the platform spine.
+// Every engine emits typed events here; subscribers (automation,
+// notifications, analytics, audit, timeline, feed) react to them.
+// Jobs back reminders, SLA checks, automation timers, exports.
+// ============================================================
+
+/// Immutable business-event record. Feeds Timeline, Feed, Analytics,
+/// Automation, and Observability.
+model Event {
+  id         String   @id @default(cuid())
+  tenantId   String
+  /// Dotted event type, e.g. "lead.converted", "policy.approved".
+  type       String
+  /// Subject of the event (polymorphic).
+  entityType String?
+  entityId   String?
+  /// Membership id of the actor (null for system/automation).
+  actorId    String?
+  /// Arbitrary structured payload.
+  payload    Json     @default("{}")
+  occurredAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, occurredAt])
+  @@index([tenantId, type])
+  @@index([tenantId, entityType, entityId])
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+/// A unit of deferred/scheduled work. Polled by the in-process runner.
+model Job {
+  id          String    @id @default(cuid())
+  tenantId    String?
+  /// Handler key registered in the job runner, e.g. "notifications.reminder".
+  kind        String
+  payload     Json      @default("{}")
+  status      JobStatus @default(PENDING)
+  /// When the job becomes eligible to run.
+  runAt       DateTime  @default(now())
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(3)
+  lastError   String?
+  /// Optional idempotency / dedupe key.
+  dedupeKey   String?
+  lockedAt    DateTime?
+  lockedBy    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([dedupeKey])
+  @@index([status, runAt])
+  @@index([tenantId])
+}

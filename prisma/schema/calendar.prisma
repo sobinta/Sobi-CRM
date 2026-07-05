@@ -1,0 +1,46 @@
+// ============================================================
+// Calendar — appointments, meetings, deadlines, follow-ups.
+// ============================================================
+
+model CalendarEvent {
+  id          String    @id @default(cuid())
+  tenantId    String
+  title       String
+  description String?
+  /// appointment | meeting | deadline | followup | task
+  type        String    @default("appointment")
+  startAt     DateTime
+  endAt       DateTime
+  allDay      Boolean   @default(false)
+  location    String?
+  /// Tone token for the calendar chip.
+  tone        String    @default("brand")
+  /// Optional link to a business record.
+  entityType  String?
+  entityId    String?
+  ownerId     String? // membership id (organizer)
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  attendees EventAttendee[]
+
+  @@index([tenantId, startAt])
+  @@index([tenantId, ownerId])
+  @@index([tenantId, entityType, entityId])
+}
+
+model EventAttendee {
+  id           String  @id @default(cuid())
+  tenantId     String
+  eventId      String
+  membershipId String
+  /// invited | accepted | declined | tentative
+  response     String  @default("invited")
+
+  event CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, membershipId])
+  @@index([tenantId, membershipId])
+}

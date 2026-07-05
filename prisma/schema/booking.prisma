@@ -1,0 +1,67 @@
+// ============================================================
+// Booking engine — shared by service modules (barber, salon,
+// restaurant). Services + staff + resources + appointments with
+// conflict detection and visit history.
+// ============================================================
+
+model Service {
+  id          String    @id @default(cuid())
+  tenantId    String
+  /// Which module owns this service catalog.
+  moduleKey   String
+  name        String
+  durationMin Int       @default(30)
+  price       Decimal   @default(0) @db.Decimal(10, 2)
+  currency    String    @default("EUR")
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+
+  appointments Appointment[]
+
+  @@index([tenantId, moduleKey])
+}
+
+model StaffMember {
+  id        String    @id @default(cuid())
+  tenantId  String
+  moduleKey String
+  name      String
+  role      String?
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  appointments Appointment[]
+
+  @@index([tenantId, moduleKey])
+}
+
+model Appointment {
+  id          String    @id @default(cuid())
+  tenantId    String
+  moduleKey   String
+  serviceId   String?
+  staffId     String?
+  /// Free-text or linked contact.
+  customerName String
+  contactId   String?
+  startAt     DateTime
+  endAt       DateTime
+  /// booked | completed | no_show | cancelled | walk_in
+  status      String    @default("booked")
+  notes       String?
+  /// party size for restaurant reservations.
+  partySize   Int?
+  ownerId     String?
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  service Service?     @relation(fields: [serviceId], references: [id])
+  staff   StaffMember? @relation(fields: [staffId], references: [id])
+
+  @@index([tenantId, moduleKey, startAt])
+  @@index([tenantId, staffId, startAt])
+}

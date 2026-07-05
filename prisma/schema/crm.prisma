@@ -1,0 +1,239 @@
+// ============================================================
+// CRM core — contacts, companies, leads, deals, plus the shared
+// polymorphic primitives (notes, activities, tags, relationships)
+// used across every module via the CRM/Timeline engines.
+// ============================================================
+
+model Company {
+  id          String    @id @default(cuid())
+  tenantId    String
+  name        String
+  domain      String?
+  industry    String?
+  size        String?
+  phone       String?
+  website     String?
+  address     String?
+  ownerId     String? // membership id
+  customFields Json     @default("{}")
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  contacts Contact[]
+  deals    Deal[]
+
+  @@index([tenantId])
+  @@index([tenantId, ownerId])
+  @@index([tenantId, name])
+}
+
+model Contact {
+  id          String    @id @default(cuid())
+  tenantId    String
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  jobTitle    String?
+  companyId   String?
+  ownerId     String?
+  /// Lifecycle: lead | prospect | customer | inactive
+  lifecycle   String    @default("lead")
+  source      String?
+  customFields Json     @default("{}")
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  company Company? @relation(fields: [companyId], references: [id])
+  leads   Lead[]
+  deals   Deal[]
+
+  @@index([tenantId])
+  @@index([tenantId, ownerId])
+  @@index([tenantId, companyId])
+  @@index([tenantId, email])
+}
+
+model Lead {
+  id          String    @id @default(cuid())
+  tenantId    String
+  title       String
+  contactId   String?
+  companyName String?
+  email       String?
+  phone       String?
+  /// new | working | qualified | unqualified | converted
+  status      String    @default("new")
+  source      String?
+  /// 0-100 lead score
+  score       Int       @default(0)
+  estimatedValue Decimal? @db.Decimal(14, 2)
+  ownerId     String?
+  convertedDealId String?
+  customFields Json     @default("{}")
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  contact Contact? @relation(fields: [contactId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([tenantId, ownerId])
+}
+
+// ---- Pipelines (shared Pipeline Engine primitives) ----
+
+model Pipeline {
+  id        String   @id @default(cuid())
+  tenantId  String
+  /// Which module/entity this pipeline drives: "deal", "policy", "loan"…
+  entityType String  @default("deal")
+  key       String
+  name      String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  stages Stage[]
+  deals  Deal[]
+
+  @@unique([tenantId, entityType, key])
+  @@index([tenantId, entityType])
+}
+
+model Stage {
+  id         String   @id @default(cuid())
+  tenantId   String
+  pipelineId String
+  key        String
+  name       String
+  /// Ordering within the pipeline.
+  position   Int      @default(0)
+  /// Chip tone token for the status grammar.
+  tone       String   @default("neutral")
+  /// Win probability 0-100 (for weighted forecasting).
+  probability Int     @default(0)
+  /// Marks terminal won/lost stages.
+  isWon      Boolean  @default(false)
+  isLost     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  pipeline Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  deals    Deal[]
+
+  @@unique([pipelineId, key])
+  @@index([tenantId, pipelineId])
+}
+
+model Deal {
+  id          String    @id @default(cuid())
+  tenantId    String
+  title       String
+  pipelineId  String
+  stageId     String
+  value       Decimal   @default(0) @db.Decimal(14, 2)
+  currency    String    @default("EUR")
+  contactId   String?
+  companyId   String?
+  ownerId     String?
+  expectedCloseAt DateTime?
+  closedAt    DateTime?
+  /// open | won | lost
+  status      String    @default("open")
+  customFields Json     @default("{}")
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  pipeline Pipeline @relation(fields: [pipelineId], references: [id])
+  stage    Stage    @relation(fields: [stageId], references: [id])
+  contact  Contact? @relation(fields: [contactId], references: [id])
+  company  Company? @relation(fields: [companyId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, pipelineId, stageId])
+  @@index([tenantId, ownerId])
+  @@index([tenantId, status])
+}
+
+// ---- Shared polymorphic primitives ----
+
+model Tag {
+  id       String @id @default(cuid())
+  tenantId String
+  name     String
+  tone     String @default("neutral")
+
+  links EntityTag[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model EntityTag {
+  id         String @id @default(cuid())
+  tenantId   String
+  tagId      String
+  entityType String
+  entityId   String
+
+  tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([tagId, entityType, entityId])
+  @@index([tenantId, entityType, entityId])
+}
+
+model Note {
+  id         String    @id @default(cuid())
+  tenantId   String
+  entityType String
+  entityId   String
+  body       String
+  authorId   String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  @@index([tenantId, entityType, entityId])
+}
+
+model Activity {
+  id         String   @id @default(cuid())
+  tenantId   String
+  entityType String
+  entityId   String
+  /// call | email | meeting | note | stage_change | task | system
+  kind       String
+  title      String
+  body       String?
+  actorId    String?
+  /// Arbitrary structured detail (e.g. from/to stage).
+  meta       Json     @default("{}")
+  occurredAt DateTime @default(now())
+
+  @@index([tenantId, entityType, entityId, occurredAt])
+}
+
+model Relationship {
+  id         String   @id @default(cuid())
+  tenantId   String
+  fromType   String
+  fromId     String
+  toType     String
+  toId       String
+  /// Relationship kind, module-registered: "works_at", "referred_by"…
+  kind       String
+  meta       Json     @default("{}")
+  createdAt  DateTime @default(now())
+
+  @@unique([tenantId, fromType, fromId, toType, toId, kind])
+  @@index([tenantId, fromType, fromId])
+  @@index([tenantId, toType, toId])
+}

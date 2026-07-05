@@ -1,0 +1,66 @@
+// ============================================================
+// Insurance module — policies, claims, carriers, commissions.
+// Composes Pipeline (policy stages) + Documents + Finance.
+// ============================================================
+
+model InsuranceCarrier {
+  id        String    @id @default(cuid())
+  tenantId  String
+  name      String
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  policies Policy[]
+
+  @@index([tenantId])
+}
+
+model Policy {
+  id            String    @id @default(cuid())
+  tenantId      String
+  policyNumber  String
+  product       String // "auto" | "home" | "life" | "health" | ...
+  contactId     String?
+  carrierId     String?
+  premium       Decimal   @default(0) @db.Decimal(14, 2)
+  currency      String    @default("EUR")
+  /// draft | active | lapsed | cancelled | renewed
+  status        String    @default("draft")
+  startAt       DateTime?
+  /// Expiry drives renewal reminders.
+  expiresAt     DateTime?
+  commission    Decimal   @default(0) @db.Decimal(14, 2)
+  ownerId       String?
+  createdById   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  carrier InsuranceCarrier? @relation(fields: [carrierId], references: [id])
+  claims  Claim[]
+
+  @@index([tenantId, status])
+  @@index([tenantId, expiresAt])
+  @@index([tenantId, ownerId])
+}
+
+model Claim {
+  id          String    @id @default(cuid())
+  tenantId    String
+  policyId    String
+  reference   String
+  description String?
+  amount      Decimal   @default(0) @db.Decimal(14, 2)
+  /// open | in_review | approved | rejected | paid
+  status      String    @default("open")
+  filedAt     DateTime  @default(now())
+  ownerId     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  policy Policy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+  @@index([tenantId, policyId])
+}

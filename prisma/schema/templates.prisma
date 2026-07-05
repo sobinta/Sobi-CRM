@@ -1,0 +1,43 @@
+// ============================================================
+// Universal Template Engine.
+// One registry for every reusable template kind: documents, emails,
+// reports, invoices, contracts, dashboards, forms, workflows,
+// automations, AI prompts, notifications.
+// ============================================================
+
+enum TemplateKind {
+  DOCUMENT
+  EMAIL
+  REPORT
+  INVOICE
+  CONTRACT
+  DASHBOARD
+  FORM
+  WORKFLOW
+  AUTOMATION
+  PROMPT
+  NOTIFICATION
+}
+
+model Template {
+  id          String       @id @default(cuid())
+  tenantId    String
+  kind        TemplateKind
+  key         String
+  name        String
+  description String?
+  locale      String       @default("en")
+  /// Body for text templates (email/document) or definition for structured
+  /// ones (dashboard/form/workflow).
+  body        String?
+  definition  Json         @default("{}")
+  /// Declared variables for interpolation/validation.
+  variables   Json         @default("[]")
+  isSystem    Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  @@unique([tenantId, kind, key, locale])
+  @@index([tenantId, kind])
+}

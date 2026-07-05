@@ -1,0 +1,90 @@
+// ============================================================
+// AI Operating System.
+// Providers → Prompt Library → Skills → Tools → Action Center →
+// Human Approval → AI Audit. AI proposes; humans approve writes.
+// ============================================================
+
+model AiSetting {
+  id          String   @id @default(cuid())
+  tenantId    String   @unique
+  /// openai | gemini | openrouter | local | mock
+  provider    String   @default("mock")
+  model       String?
+  /// Which AI features are enabled for this tenant.
+  enabledSkills String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Prompt {
+  id          String   @id @default(cuid())
+  tenantId    String
+  key         String
+  name        String
+  /// Template body with {{variables}}.
+  body        String
+  version     Int      @default(1)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, key, version])
+  @@index([tenantId, key])
+}
+
+model AiAction {
+  id          String    @id @default(cuid())
+  tenantId    String
+  /// The skill that proposed this action.
+  skill       String
+  /// Human-readable summary of what will happen.
+  summary     String
+  /// The proposed write, executed only on approval.
+  proposal    Json      @default("{}")
+  /// pending | approved | rejected | executed
+  status      String    @default("pending")
+  entityType  String?
+  entityId    String?
+  proposedBy  String? // membership id (or "ai")
+  decidedBy   String?
+  decidedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([tenantId, status])
+  @@index([tenantId, entityType, entityId])
+}
+
+model AiLog {
+  id          String   @id @default(cuid())
+  tenantId    String
+  skill       String
+  provider    String
+  /// Redacted input context summary.
+  inputSummary String?
+  outputSummary String?
+  tokensIn    Int      @default(0)
+  tokensOut   Int      @default(0)
+  actorId     String?
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, skill])
+}
+
+model AiEmployee {
+  id          String   @id @default(cuid())
+  tenantId    String
+  key         String
+  name        String
+  /// The persona / role, e.g. "AI Sales Assistant".
+  persona     String
+  /// Skills + tools this employee may use.
+  skills      String[] @default([])
+  /// always_ask | auto (with audit)
+  approvalPolicy String @default("always_ask")
+  enabled     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, key])
+}

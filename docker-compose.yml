@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: coreline-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: coreline
+      POSTGRES_PASSWORD: coreline_dev
+      POSTGRES_DB: coreline
+    ports:
+      - "5433:5432"
+    volumes:
+      - coreline_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coreline -d coreline"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mail:
+    image: axllent/mailpit:latest
+    container_name: coreline-mail
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+volumes:
+  coreline_pgdata:

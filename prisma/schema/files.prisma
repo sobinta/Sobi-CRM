@@ -1,0 +1,67 @@
+// ============================================================
+// Document & File Engine.
+// Secure files with versions, categories, expiry, and per-record
+// required-document checklists. Access is always permission-checked
+// via signed routes — never direct static paths.
+// ============================================================
+
+model FileObject {
+  id          String    @id @default(cuid())
+  tenantId    String
+  name        String
+  /// Storage key (path within the storage provider).
+  storageKey  String
+  mimeType    String
+  size        Int
+  category    String?
+  /// Polymorphic attachment to any record.
+  entityType  String?
+  entityId    String?
+  /// active | archived | expired
+  status      String    @default("active")
+  expiresAt   DateTime?
+  ownerId     String?
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  versions FileVersion[]
+
+  @@index([tenantId, entityType, entityId])
+  @@index([tenantId, status])
+}
+
+model FileVersion {
+  id         String   @id @default(cuid())
+  tenantId   String
+  fileId     String
+  version    Int
+  storageKey String
+  size       Int
+  createdById String?
+  createdAt  DateTime @default(now())
+
+  file FileObject @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@unique([fileId, version])
+  @@index([tenantId, fileId])
+}
+
+/// A required-document checklist attached to a record (or a template stage).
+model DocumentChecklistItem {
+  id          String    @id @default(cuid())
+  tenantId    String
+  entityType  String
+  entityId    String
+  label       String
+  required    Boolean   @default(true)
+  /// Linked file once provided.
+  fileId      String?
+  status      String    @default("pending") // pending | provided | waived
+  position    Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([tenantId, entityType, entityId])
+}

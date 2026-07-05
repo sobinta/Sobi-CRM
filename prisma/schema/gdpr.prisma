@@ -1,0 +1,56 @@
+// ============================================================
+// GDPR — consent tracking, data subject requests (export/deletion),
+// retention policies. Privacy-by-design: every request is auditable.
+// ============================================================
+
+model ConsentRecord {
+  id         String   @id @default(cuid())
+  tenantId   String
+  /// Subject: a contact or member.
+  entityType String
+  entityId   String
+  /// marketing | processing | data_sharing | ...
+  purpose    String
+  granted    Boolean  @default(true)
+  /// Where/how consent was captured.
+  source     String?
+  grantedAt  DateTime @default(now())
+  revokedAt  DateTime?
+
+  @@index([tenantId, entityType, entityId])
+}
+
+model DataRequest {
+  id          String    @id @default(cuid())
+  tenantId    String
+  /// export | deletion
+  kind        String
+  /// Subject reference.
+  subjectType String
+  subjectId   String
+  subjectLabel String?
+  /// pending | processing | completed | rejected
+  status      String    @default("pending")
+  requestedBy String?
+  completedAt DateTime?
+  /// For exports: where the bundle was written / a result note.
+  result      String?
+  createdAt   DateTime  @default(now())
+
+  @@index([tenantId, status])
+}
+
+model RetentionPolicy {
+  id          String   @id @default(cuid())
+  tenantId    String
+  /// Data category the policy governs.
+  category    String
+  /// Retain for N days, then anonymize/delete.
+  retainDays  Int
+  action      String   @default("anonymize") // anonymize | delete
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, category])
+}

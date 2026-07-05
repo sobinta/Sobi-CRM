@@ -1,0 +1,30 @@
+// ============================================================
+// Version Management — generic draft/published/archived history for
+// every configurable object (forms, workflows, dashboards, templates,
+// automations, entity definitions, rules). One service, one UI.
+// ============================================================
+
+enum VersionStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model ConfigVersion {
+  id         String        @id @default(cuid())
+  tenantId   String
+  /// "form" | "workflow" | "dashboard" | "template" | "automation" | "entity" | "rule"
+  objectType String
+  objectId   String
+  version    Int
+  status     VersionStatus @default(DRAFT)
+  /// Full snapshot of the object at this version.
+  snapshot   Json          @default("{}")
+  label      String?
+  authorId   String? // membership id
+  publishedAt DateTime?
+  createdAt  DateTime      @default(now())
+
+  @@unique([tenantId, objectType, objectId, version])
+  @@index([tenantId, objectType, objectId])
+}

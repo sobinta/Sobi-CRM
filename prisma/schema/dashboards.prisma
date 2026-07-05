@@ -1,0 +1,44 @@
+// ============================================================
+// Dashboard Builder + Reporting definitions.
+// A dashboard is a saved grid of widgets. Scope determines who
+// sees it: personal, role, tenant, or shared. Layouts are JSONB
+// (react-grid-layout format) and versioned via ConfigVersion.
+// ============================================================
+
+model Dashboard {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  /// personal | role | tenant | shared
+  scope       String   @default("personal")
+  /// Owner membership id for personal dashboards.
+  ownerId     String?
+  /// react-grid-layout items + widget config.
+  layout      Json     @default("[]")
+  isTemplate  Boolean  @default(false)
+  isDefault   Boolean  @default(false)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  @@index([tenantId, scope])
+  @@index([tenantId, ownerId])
+}
+
+model ReportDefinition {
+  id          String   @id @default(cuid())
+  tenantId    String
+  key         String
+  name        String
+  /// sales | pipeline | activity | conversion | tasks | finance | custom
+  category    String
+  /// Query/filter config for the report.
+  config      Json     @default("{}")
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, key])
+  @@index([tenantId, category])
+}

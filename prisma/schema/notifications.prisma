@@ -1,0 +1,58 @@
+// ============================================================
+// Notifications & Communication.
+// In-app notification center + channel abstraction (email now,
+// SMS/WhatsApp/Telegram as stubs). Communication logs the history
+// of outbound/inbound messages per record.
+// ============================================================
+
+model Notification {
+  id           String    @id @default(cuid())
+  tenantId     String
+  /// Recipient membership id.
+  membershipId String
+  /// assignment | reminder | mention | system | overdue | alert
+  kind         String
+  title        String
+  body         String?
+  /// Deep link into the app.
+  href         String?
+  entityType   String?
+  entityId     String?
+  readAt       DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([tenantId, membershipId, readAt])
+  @@index([tenantId, membershipId, createdAt])
+}
+
+model NotificationPreference {
+  id           String  @id @default(cuid())
+  tenantId     String
+  membershipId String
+  kind         String
+  inApp        Boolean @default(true)
+  email        Boolean @default(true)
+
+  @@unique([membershipId, kind])
+  @@index([tenantId, membershipId])
+}
+
+model Communication {
+  id         String   @id @default(cuid())
+  tenantId   String
+  /// email | sms | whatsapp | telegram | call | note
+  channel    String
+  direction  String   @default("outbound") // inbound | outbound
+  subject    String?
+  body       String?
+  /// Recipient/sender label.
+  party      String?
+  status     String   @default("sent") // queued | sent | delivered | failed
+  entityType String?
+  entityId   String?
+  actorId    String?
+  createdAt  DateTime @default(now())
+
+  @@index([tenantId, entityType, entityId])
+  @@index([tenantId, channel])
+}

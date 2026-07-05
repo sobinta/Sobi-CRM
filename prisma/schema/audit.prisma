@@ -1,0 +1,40 @@
+// ============================================================
+// Audit log — security-relevant, tamper-evident action record.
+// Distinct from Event: Event is business signal for reaction;
+// AuditLog is the compliance/security trail (who did what).
+// ============================================================
+
+enum AuditCategory {
+  AUTH
+  DATA
+  FILE
+  PERMISSION
+  EXPORT
+  ADMIN
+  SECURITY
+  AI
+}
+
+model AuditLog {
+  id         String        @id @default(cuid())
+  tenantId   String
+  category   AuditCategory
+  /// e.g. "user.login", "deal.update", "file.download", "role.grant".
+  action     String
+  actorId    String? // membership id, null for system
+  actorLabel String? // denormalized name/email at time of action
+  entityType String?
+  entityId   String?
+  /// State snapshots for data changes (redacted for sensitive fields).
+  before     Json?
+  after      Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime      @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, category])
+  @@index([tenantId, entityType, entityId])
+}

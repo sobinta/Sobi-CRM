@@ -1,0 +1,73 @@
+// ============================================================
+// RBAC schema — per-tenant roles, permission grants, field rules.
+// Permission keys are strings: "<module>.<entity>.<action>".
+// The can() service composes: role grants → ownership → team
+// visibility → record constraints → admin override.
+// ============================================================
+
+model Role {
+  id          String   @id @default(cuid())
+  tenantId    String
+  key         String // e.g. "owner", "admin", "manager", "employee", "client"
+  name        String
+  description String?
+  /// System roles are seeded and cannot be deleted.
+  isSystem    Boolean  @default(false)
+  /// Admin roles bypass record-level checks (admin override).
+  isAdmin     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  tenant      Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  permissions RolePermission[]
+  members     MembershipRole[]
+  fieldRules  FieldRule[]
+
+  @@unique([tenantId, key])
+  @@index([tenantId])
+}
+
+/// A single permission grant on a role. Presence = allowed.
+model RolePermission {
+  id     String @id @default(cuid())
+  roleId String
+  /// "<module>.<entity>.<action>", supports wildcards like "crm.*.read".
+  permission String
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permission])
+  @@index([roleId])
+}
+
+model MembershipRole {
+  id           String @id @default(cuid())
+  membershipId String
+  roleId       String
+
+  membership Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([membershipId, roleId])
+  @@index([roleId])
+}
+
+enum FieldAccess {
+  HIDDEN
+  READONLY
+}
+
+/// Field-level permission override for a role on an entity's field.
+model FieldRule {
+  id         String      @id @default(cuid())
+  roleId     String
+  entityType String // "contact", "deal", "policy", …
+  field      String
+  access     FieldAccess
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, entityType, field])
+  @@index([roleId])
+}

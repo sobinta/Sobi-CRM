@@ -1,0 +1,87 @@
+// ============================================================
+// Automation Engine + Integrations.
+// Automations: event/schedule trigger → rule conditions → actions.
+// Runs are logged (→ Observability). Webhooks + API keys are the
+// Integration Engine v1 (outbound events + authenticated public API).
+// ============================================================
+
+model Automation {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  enabled     Boolean  @default(true)
+  /// Trigger: { kind: "event"|"schedule", eventType?, cron? }
+  trigger     Json     @default("{}")
+  /// Condition AST evaluated by the Business Rules expression engine.
+  condition   Json?
+  /// Ordered action list: [{ type, config }]
+  actions     Json     @default("[]")
+  runCount    Int      @default(0)
+  lastRunAt   DateTime?
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  runs AutomationRun[]
+
+  @@index([tenantId, enabled])
+}
+
+model AutomationRun {
+  id           String   @id @default(cuid())
+  tenantId     String
+  automationId String
+  /// success | failed | skipped
+  status       String
+  /// Trigger event type or "schedule".
+  trigger      String
+  /// Per-action outcomes + any error.
+  detail       Json     @default("{}")
+  durationMs   Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  automation Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, automationId, createdAt])
+  @@index([tenantId, status])
+}
+
+// ---- Integration Engine ----
+
+model Webhook {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  url         String
+  /// Event types this webhook subscribes to.
+  events      String[]
+  /// HMAC signing secret.
+  secret      String
+  enabled     Boolean  @default(true)
+  failureCount Int     @default(0)
+  lastStatus  Int?
+  lastFiredAt DateTime?
+  createdById String?
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId, enabled])
+}
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  tenantId    String
+  name        String
+  /// Only a hash is stored; the plaintext is shown once at creation.
+  keyHash     String    @unique
+  /// Display prefix, e.g. "clk_ab12".
+  prefix      String
+  scopes      String[]
+  lastUsedAt  DateTime?
+  revokedAt   DateTime?
+  createdById String?
+  createdAt   DateTime  @default(now())
+
+  @@index([tenantId])
+}
