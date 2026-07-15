@@ -37,6 +37,10 @@ export const TENANT_SCOPED = new Set<string>([
   "Note",
   "Activity",
   "Relationship",
+  "Conversation",
+  "Contract",
+  "Campaign",
+  "CampaignEmail",
   // Phase 7 operations
   "FileObject",
   "FileVersion",
@@ -75,6 +79,8 @@ export const TENANT_SCOPED = new Set<string>([
   "ConsentRecord",
   "DataRequest",
   "RetentionPolicy",
+  // Phase F
+  "KnowledgeArticle",
   // NB: EntityDefinition is intentionally NOT here — built-ins have a null
   // tenantId and are shared across tenants; its queries filter explicitly.
 ]);
@@ -96,6 +102,7 @@ export const SOFT_DELETE = new Set<string>([
   "Lead",
   "Deal",
   "Note",
+  "Contract",
   // Phase 7 operations
   "FileObject",
   "Task",
@@ -111,6 +118,8 @@ export const SOFT_DELETE = new Set<string>([
   "Service",
   "StaffMember",
   "Appointment",
+  // Phase F
+  "KnowledgeArticle",
 ]);
 
 /**

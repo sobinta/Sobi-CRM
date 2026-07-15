@@ -42,6 +42,12 @@ model Contact {
   /// Lifecycle: lead | prospect | customer | inactive
   lifecycle   String    @default("lead")
   source      String?
+  /// Link back to the originating lead + chatbot conversation (360 view).
+  leadId         String?
+  conversationId String?
+  /// AI "customer knowledge" summary.
+  aiSummary   String?
+  aiSummaryAt DateTime?
   customFields Json     @default("{}")
   createdById String?
   createdAt   DateTime  @default(now())
@@ -71,9 +77,15 @@ model Lead {
   source      String?
   /// 0-100 lead score
   score       Int       @default(0)
+  /// AI scoring rationale + when it was scored.
+  scoreRationale String?
+  scoredAt    DateTime?
+  /// Chatbot conversation this lead came from (if any).
+  conversationId String?
   estimatedValue Decimal? @db.Decimal(14, 2)
   ownerId     String?
   convertedDealId String?
+  convertedAt DateTime?
   customFields Json     @default("{}")
   createdById String?
   createdAt   DateTime  @default(now())
@@ -236,4 +248,23 @@ model Relationship {
   @@unique([tenantId, fromType, fromId, toType, toId, kind])
   @@index([tenantId, fromType, fromId])
   @@index([tenantId, toType, toId])
+}
+
+// ---- Chatbot conversations (Arkan parity) ----
+
+model Conversation {
+  id         String   @id @default(cuid())
+  tenantId   String
+  /// The chatbot's own conversation id (capture_lead tool).
+  externalId String?
+  contactId  String?
+  leadId     String?
+  channel    String   @default("website") // website | telegram | manual
+  /// Array of { role: "user"|"assistant", content, at }.
+  messages   Json     @default("[]")
+  startedAt  DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([tenantId, externalId])
+  @@index([tenantId, contactId])
 }

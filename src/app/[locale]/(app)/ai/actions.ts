@@ -11,6 +11,8 @@ import {
   suggestNextStep,
   draftEmail,
 } from "@/engines/ai/skills";
+import { scoreLead, summarizeConversation } from "@/engines/ai/lead-skills";
+import { suggestContentForLead } from "@/engines/ai/content-skills";
 
 export async function approveActionAction(id: string) {
   await withActionContext(() => approveAction(id));
@@ -40,4 +42,21 @@ export async function suggestNextStepAction(contactId: string) {
 export async function draftEmailAction(contactId: string, intent: string) {
   const text = await withActionContext(() => draftEmail(contactId, intent));
   return { text };
+}
+
+export async function scoreLeadAction(leadId: string) {
+  const res = await withActionContext(() => scoreLead(leadId));
+  revalidatePath("/[locale]/(app)/crm/leads", "page");
+  return res ?? { score: 0, rationale: "" };
+}
+
+export async function summarizeConversationAction(contactId: string) {
+  const summary = await withActionContext(() => summarizeConversation(contactId));
+  revalidatePath("/[locale]/(app)/crm/contacts/[id]", "page");
+  return { summary };
+}
+
+export async function suggestContentForLeadAction(leadId: string) {
+  const suggestion = await withActionContext(() => suggestContentForLead(leadId));
+  return suggestion;
 }

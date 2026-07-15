@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
-import { Mail, Phone, Briefcase, Building2 } from "lucide-react";
+import { Mail, Phone, Briefcase, Building2, BrainCircuit } from "lucide-react";
 import { withPlatformContext } from "@/core/auth/with-context";
+import { db } from "@/core/db";
 import { getContact } from "@/engines/crm/contact-service";
 import { getTimeline } from "@/engines/timeline/timeline";
 import { contactEntity } from "@/engines/crm/entities";
@@ -22,12 +23,23 @@ export default async function ContactDetailPage({
   const data = await withPlatformContext(async () => {
     const contact = await getContact(id);
     if (!contact) return null;
-    const timeline = await getTimeline("contact", id);
-    return { contact, timeline };
+    const [timeline, conversation] = await Promise.all([
+      getTimeline("contact", id),
+      db.conversation.findFirst({
+        where: {
+          OR: [
+            { contactId: id },
+            ...(contact.conversationId ? [{ externalId: contact.conversationId }] : []),
+          ],
+        },
+        orderBy: { startedAt: "desc" },
+      }),
+    ]);
+    return { contact, timeline, conversation };
   });
 
   if (!data || !data.contact) notFound();
-  const { contact, timeline } = data;
+  const { contact, timeline, conversation } = data;
   const chip = resolveOptionChip(contactEntity, "lifecycle", contact.lifecycle);
 
   return (
@@ -64,11 +76,33 @@ export default async function ContactDetailPage({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-accent" /> AI assistant
+                <BrainCircuit className="h-4 w-4 text-accent" /> شناخت مشتری (AI)
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ContactAiPanel contactId={contact.id} />
+              {contact.aiSummary ? (
+                <div className="whitespace-pre-wrap text-sm text-ink">
+                  {contact.aiSummary}
+                </div>
+              ) : (
+                <p className="text-sm text-ink-faint">
+                  هنوز خلاصه‌ای ساخته نشده. از دستیار AI استفاده کنید.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-accent" /> دستیار AI
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ContactAiPanel
+                contactId={contact.id}
+                hasConversation={Boolean(conversation)}
+              />
             </CardContent>
           </Card>
 

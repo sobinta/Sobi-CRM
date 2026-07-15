@@ -1,5 +1,5 @@
 /* ============================================================
-   Coreline design tokens
+   SOBI CRM design tokens
    Three tiers: brand → semantic → component, plus motion.
    All colors OKLCH. Tenant branding overrides the brand tier
    (Theme Builder writes CSS custom properties on <html>).

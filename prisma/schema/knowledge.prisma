@@ -1,0 +1,20 @@
+// ============================================================
+// Knowledge base — short internal articles (service offerings, FAQs,
+// playbooks) that the AI content-suggestion skill matches against
+// leads/contacts to draft a relevant, personalized follow-up.
+// ============================================================
+
+model KnowledgeArticle {
+  id        String   @id @default(cuid())
+  tenantId  String
+  title     String
+  /// Plain-text / simple markdown body.
+  body      String
+  tags      String[] @default([])
+  createdById String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@index([tenantId])
+}

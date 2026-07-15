@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { signIn } from "@/core/auth/client";
+import { DEMO_LOGIN_ENABLED, signInDemoAndRedirect } from "@/core/auth/demo-login";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,18 +15,17 @@ export function LoginForm() {
   const locale = useLocale();
   const [error, setError] = useState<string>();
   const [pending, setPending] = useState(false);
+  const [demoPending, setDemoPending] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(undefined);
     setPending(true);
     const form = new FormData(e.currentTarget);
-
     const res = await signIn.email({
       email: String(form.get("email")),
       password: String(form.get("password")),
     });
-
     if (res.error) {
       setPending(false);
       setError(
@@ -34,6 +34,16 @@ export function LoginForm() {
       return;
     }
     window.location.assign(`/${locale}/crm`);
+  }
+
+  async function onDemoLogin() {
+    setError(undefined);
+    setDemoPending(true);
+    const res = await signInDemoAndRedirect(locale);
+    if (!res.ok) {
+      setDemoPending(false);
+      setError(t("genericError"));
+    }
   }
 
   return (
@@ -85,6 +95,26 @@ export function LoginForm() {
           {pending ? t("signingIn") : t("signIn")}
         </Button>
       </form>
+
+      {DEMO_LOGIN_ENABLED && (
+        <>
+          <div className="my-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-line" />
+            <span className="text-xs text-ink-faint">{t("orDivider")}</span>
+            <div className="h-px flex-1 bg-line" />
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="lg"
+            className="w-full"
+            onClick={onDemoLogin}
+            disabled={demoPending || pending}
+          >
+            {demoPending ? t("signingInDemo") : t("demoLogin")}
+          </Button>
+        </>
+      )}
 
       <p className="mt-6 text-center text-sm text-ink-muted">
         {t("noAccount")}{" "}

@@ -12,7 +12,7 @@ export default async function PublicLeadPage({
   if (!tenant) notFound();
 
   return (
-    <div>
+    <div className="mx-auto max-w-lg px-4 py-12">
       <div className="mb-6 text-center">
         <h1 className="text-xl font-semibold tracking-tight text-ink">
           {tenant.name}

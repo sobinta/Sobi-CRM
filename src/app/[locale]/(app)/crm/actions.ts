@@ -9,6 +9,8 @@ import {
   deleteContact,
 } from "@/engines/crm/contact-service";
 import { createDeal, moveDealToStage } from "@/engines/crm/deal-service";
+import { createCompany } from "@/engines/crm/company-service";
+import { convertLead } from "@/engines/crm/lead-service";
 import { addNote } from "@/engines/timeline/timeline";
 
 const contactSchema = z.object({
@@ -75,4 +77,41 @@ export async function addNoteAction(
   await withActionContext(() => addNote(entityType, entityId, body.trim()));
   revalidatePath(`/[locale]/(app)/crm`, "layout");
   return { ok: true as const };
+}
+
+const companySchema = z.object({
+  name: z.string().trim().min(1),
+  industry: z.string().optional(),
+  website: z.string().optional(),
+  phone: z.string().optional(),
+  size: z.string().optional(),
+});
+
+export async function createCompanyAction(input: unknown) {
+  const parsed = companySchema.safeParse(input);
+  if (!parsed.success) return { ok: false as const };
+  const company = await withActionContext(() =>
+    createCompany({
+      name: parsed.data.name,
+      industry: parsed.data.industry || null,
+      website: parsed.data.website || null,
+      phone: parsed.data.phone || null,
+      size: parsed.data.size || null,
+    }),
+  );
+  revalidatePath("/[locale]/(app)/crm/companies", "page");
+  return { ok: true as const, id: company.id };
+}
+
+export async function convertLeadAction(
+  leadId: string,
+  opts: { createDeal: boolean; dealAmount?: number },
+) {
+  const res = await withActionContext(() =>
+    convertLead({ leadId, createDeal: opts.createDeal, dealAmount: opts.dealAmount }),
+  );
+  revalidatePath("/[locale]/(app)/crm/leads", "page");
+  return res
+    ? { ok: true as const, contactId: res.contactId }
+    : { ok: false as const };
 }

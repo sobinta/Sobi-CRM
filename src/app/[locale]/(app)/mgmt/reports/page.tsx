@@ -21,14 +21,22 @@ export default async function ReportsPage({
         title="Reports"
         description="Pre-built reports across sales, pipeline, and operations."
         actions={
-          table ? (
-            <a
-              href={`/api/v1/reports/${activeKey}/export`}
-              className="inline-flex h-8.5 items-center gap-1.5 rounded-md bg-brand px-3.5 text-sm font-medium text-ink-on-brand hover:bg-brand-hover"
+          <div className="flex items-center gap-2">
+            <Link
+              href="/mgmt/reports/insights"
+              className="text-sm text-ink-muted hover:text-ink"
             >
-              <Download className="h-4 w-4" /> Export CSV
-            </a>
-          ) : null
+              بینش‌های نموداری ←
+            </Link>
+            {table ? (
+              <a
+                href={`/api/v1/reports/${activeKey}/export`}
+                className="inline-flex h-8.5 items-center gap-1.5 rounded-md bg-brand px-3.5 text-sm font-medium text-ink-on-brand hover:bg-brand-hover"
+              >
+                <Download className="h-4 w-4" /> Export CSV
+              </a>
+            ) : null}
+          </div>
         }
       >
         <div className="flex gap-1.5 px-6 py-2">

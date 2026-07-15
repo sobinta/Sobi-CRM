@@ -11,7 +11,7 @@ import { logger } from "@/core/observability/logger";
  * Subscribes to events; for each event, delivers a signed POST to every
  * enabled webhook subscribed to that event type. Delivery is best-effort and
  * records status/failure. Signature = HMAC-SHA256 of the raw body with the
- * webhook secret (header: X-Coreline-Signature).
+ * webhook secret (header: X-Sobi-Signature).
  */
 
 async function deliver(event: PlatformEvent): Promise<void> {
@@ -43,8 +43,8 @@ async function deliver(event: PlatformEvent): Promise<void> {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Coreline-Signature": signature,
-            "X-Coreline-Event": event.type,
+            "X-Sobi-Signature": signature,
+            "X-Sobi-Event": event.type,
           },
           body,
           signal: AbortSignal.timeout(5000),

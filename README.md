@@ -1,6 +1,6 @@
-# Coreline — a modular Business Operating System
+# SOBI CRM — a modular Business Operating System
 
-Coreline is a multi-tenant, metadata-driven, AI-native **Business Operating
+SOBI CRM is a multi-tenant, metadata-driven, AI-native **Business Operating
 System**. CRM is its flagship capability, built on a shared platform where each
 tenant activates only the industry modules relevant to their business.
 
@@ -64,7 +64,8 @@ src/
   engines/    Reusable Business Engines — crm, pipeline, booking, workflow,
               forms, documents, files, finance, notifications, dashboards,
               reporting, analytics, timeline, feed, graph, search,
-              automation, integrations, ai, entity-builder, portal
+              automation, integrations, ai, entity-builder, portal,
+              contracts, campaigns, knowledge
   modules/    Thin business modules composing engines (insurance, …)
   components/ Design system: ui/ primitives, patterns/, layout/
   app/        Next.js routes — [locale]/(auth|app|public), api/v1
@@ -89,3 +90,9 @@ catalogue, event catalogue, AI OS, and deployment guide.
   with no API key via a graceful mock provider.
 - **Activation-aware workspaces** — enabling a module in Administration makes its
   workspace appear in the rail, permission-filtered.
+- **Full CRM sales cycle** — website/chatbot lead intake → deliberate
+  conversion into Contact + Company + Deal → an auto-numbered, publicly
+  shareable **contract** (Jalali numbering, online acceptance) → AI-scored
+  leads, AI content suggestions from an internal **knowledge base**, and
+  human-reviewed AI-personalized **email campaigns**. See
+  [`docs/AI-OS.md`](docs/AI-OS.md).

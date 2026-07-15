@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Coreline",
-    short_name: "Coreline",
+    name: "SOBI CRM",
+    short_name: "SOBI CRM",
     description: "The operating system for your business.",
     start_url: "/",
     display: "standalone",
@@ -11,9 +11,9 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#1f6e75",
     icons: [
       {
-        src: "/icon.svg",
-        sizes: "any",
-        type: "image/svg+xml",
+        src: "/Favicon.png",
+        sizes: "32x32",
+        type: "image/png",
         purpose: "any",
       },
     ],

@@ -42,6 +42,13 @@ export type EventType =
   | "policy.renewed"
   | "loan.submitted"
   | "loan.decided"
+  // contracts
+  | "contract.created"
+  | "contract.sent"
+  | "contract.viewed"
+  | "contract.accepted"
+  // campaigns
+  | "campaign.email_sent"
   // ai
   | "ai.action_proposed"
   | "ai.action_approved";

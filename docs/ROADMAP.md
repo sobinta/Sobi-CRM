@@ -12,12 +12,15 @@ implementation is the next step.
   the format; add the storefront and install flow.
 - **SaaS billing** — `Plan` / feature-gating / self-onboarding exist; wire a
   Stripe adapter, trials, and usage limits.
-- **Semantic search & RAG** — the `SearchProvider` interface has a pgvector
-  seam; add embeddings + a knowledge base.
+- **Semantic search & RAG** — a keyword/tag-scored **Knowledge Base**
+  (`engines/knowledge`) ships today, feeding the AI content-suggestion skill;
+  the `SearchProvider` interface still has an open pgvector seam for
+  embeddings-based ranking once the article set outgrows keyword matching.
 
 ## AI
-- Knowledge Base + RAG, AI Memory, multi-step tool-calling **agents**, and
-  per-module **AI Employees** (schema present) with collaboration.
+- A bounded tool-calling **agent loop** ships today (4 CRM query tools, the
+  "Chat with CRM" assistant); AI Memory, true multi-step planning agents, and
+  per-module **AI Employees** (schema present) with collaboration are next.
 - Node-canvas automation builder (linear recipes ship today).
 
 ## Integrations

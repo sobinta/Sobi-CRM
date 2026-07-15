@@ -42,6 +42,9 @@ export const workspaces: WorkspaceDef[] = [
       { key: "companies", labelKey: "companies", href: "/crm/companies" },
       { key: "leads", labelKey: "leads", href: "/crm/leads" },
       { key: "deals", labelKey: "deals", href: "/crm/deals" },
+      { key: "contracts", labelKey: "contracts", href: "/crm/contracts" },
+      { key: "campaigns", labelKey: "campaigns", href: "/crm/campaigns" },
+      { key: "knowledge", labelKey: "knowledge", href: "/crm/knowledge" },
       { key: "graph", labelKey: "graph", href: "/crm/graph" },
     ],
   },
@@ -79,7 +82,10 @@ export const workspaces: WorkspaceDef[] = [
     labelKey: "ai",
     icon: Sparkles,
     href: "/ai",
-    nav: [{ key: "dashboard", labelKey: "dashboard", href: "/ai" }],
+    nav: [
+      { key: "dashboard", labelKey: "dashboard", href: "/ai" },
+      { key: "assistant", labelKey: "assistant", href: "/ai/assistant" },
+    ],
   },
   {
     key: "studio",

@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Coreline",
+    "name": "SOBI CRM",
     "tagline": "Das Betriebssystem für Ihr Unternehmen"
   },
   "common": {
@@ -71,6 +71,7 @@
     "automations": "Automatisierungen",
     "themeBuilder": "Design-Editor",
     "health": "Systemstatus",
+    "assistant": "Assistent",
     "forms": "Formular-Editor",
     "entities": "Entitäten-Editor",
     "workflows": "Workflows",
@@ -82,10 +83,12 @@
     "applications": "Anträge",
     "properties": "Objekte",
     "campaigns": "Kampagnen",
+    "knowledge": "Wissensdatenbank",
     "cases": "Fälle",
     "appointments": "Termine",
     "services": "Leistungen",
-    "reservations": "Reservierungen"
+    "reservations": "Reservierungen",
+    "contracts": "Verträge"
   },
   "shell": {
     "commandHint": "Drücken Sie {shortcut} zum Suchen",
@@ -111,7 +114,7 @@
     "signInTitle": "Willkommen zurück",
     "signInSubtitle": "Melden Sie sich in Ihrem Arbeitsbereich an",
     "signUpTitle": "Arbeitsbereich erstellen",
-    "signUpSubtitle": "Richten Sie Coreline in einer Minute für Ihr Unternehmen ein",
+    "signUpSubtitle": "Richten Sie SOBI CRM in einer Minute für Ihr Unternehmen ein",
     "noAccount": "Noch kein Konto?",
     "haveAccount": "Bereits ein Konto?",
     "createOne": "Erstellen",
@@ -121,6 +124,121 @@
     "creating": "Arbeitsbereich wird erstellt…",
     "invalidCredentials": "Falsche E-Mail oder falsches Passwort.",
     "genericError": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
-    "emailInUse": "Ein Konto mit dieser E-Mail existiert bereits."
+    "emailInUse": "Ein Konto mit dieser E-Mail existiert bereits.",
+    "orDivider": "oder",
+    "demoLogin": "Mit Demo-Arbeitsbereich fortfahren",
+    "signingInDemo": "Demo-Arbeitsbereich wird geöffnet…"
+  },
+  "landing": {
+    "nav": {
+      "features": "Funktionen",
+      "howItWorks": "So funktioniert's",
+      "modules": "Module",
+      "pricing": "Preise",
+      "faq": "FAQ",
+      "signIn": "Anmelden",
+      "tryDemo": "Demo testen",
+      "startFree": "Kostenlos starten"
+    },
+    "hero": {
+      "badge": "KI-natives CRM · funktioniert ohne API-Schlüssel",
+      "headline1": "Aus jedem Lead wird",
+      "headline2": "ein abgeschlossener, unterschriebener Deal.",
+      "subhead": "SOBI CRM begleitet einen Lead von der ersten Nachricht bis zum unterschriebenen Vertrag — Konvertierung, KI-Bewertung, Verträge und Kampagnen in einem verbundenen System.",
+      "ctaPrimary": "Leads jetzt organisieren",
+      "ctaSecondary": "Live-Demo entdecken",
+      "check1": "Keine Kreditkarte",
+      "check2": "Lokale Demo-Daten",
+      "check3": "Bearbeitbare Ergebnisse"
+    },
+    "problem": {
+      "eyebrow": "VOM LEAD ZUM ABGESCHLOSSENEN DEAL",
+      "headline1": "Ein Lead ist nur wertvoll,",
+      "headline2": "wenn er die Nachverfolgung übersteht.",
+      "subhead": "Nachrichten gehen in Postfächern unter. Follow-ups werden vergessen. Verträge liegen in irgendjemandes E-Mail. SOBI CRM gibt jedem Lead einen verlässlichen Weg zum Abschluss.",
+      "points": [
+        { "title": "Leads erkalten in gemeinsamen Postfächern" },
+        { "title": "Follow-ups gehen zwischen Personen verloren" },
+        { "title": "Verträge liegen in E-Mails, nicht im System" },
+        { "title": "Niemand sieht, was gerade wirklich abschlussreif ist" }
+      ],
+      "flowRawLabel": "ROHER LEAD",
+      "flowRaw": "„Wir betreiben 40 Lkw und brauchen bessere Dispositionsübersicht…“",
+      "flowStructuredLabel": "STRUKTURIERTE KONVERTIERUNG",
+      "flowStructured": "Kontakt + Unternehmen + Deal erstellt",
+      "flowFollowupLabel": "UNTERSCHRIEBENES ERGEBNIS",
+      "flowFollowup": "Vertrag zur Online-Annahme versendet"
+    },
+    "steps": {
+      "eyebrow": "EIN DURCHDACHTER WORKFLOW",
+      "headline": "Vier Schritte von der ersten Nachricht zum unterschriebenen Deal.",
+      "items": [
+        { "title": "Erfassen", "desc": "Website-Formular und Chatbot-Anfragen landen in einer gemeinsamen Lead-Warteschlange." },
+        { "title": "Konvertieren", "desc": "Eine bewusste Konvertierung macht aus einem Lead einen Kontakt, ein Unternehmen und einen Deal." },
+        { "title": "Abschließen", "desc": "KI entwirft den Vertrag; Kunden prüfen, drucken und akzeptieren online." },
+        { "title": "Wachsen", "desc": "KI-personalisierte Kampagnen und Reporting halten die Pipeline in Bewegung." }
+      ]
+    },
+    "analytics": {
+      "eyebrow": "EINE LIVE-BETRIEBSANSICHT",
+      "headline": "Sehen Sie, was wirklich abschlussreif ist.",
+      "body": "Conversion-Trichter, Lead-Quellen und Monatsumsatz auf einen Blick — keine Tabellenkalkulation nötig.",
+      "cta": "Dashboard öffnen"
+    },
+    "solutions": {
+      "eyebrow": "GEBAUT FÜR IHRE BRANCHE",
+      "headline": "Ein CRM-Kern, angepasst an Ihre Branche.",
+      "tabs": [
+        { "key": "insurance", "label": "Versicherung", "headline": "Policen, Verlängerungen und Schäden in einer Pipeline.", "body": "Versicherer und Produkte neben jeder Police, mit Erinnerungen vor Ablauf.", "quote": "Wir verpassen keine Verlängerungsfristen mehr, weil die Erinnerung direkt an der Police hängt.", "author": "Fiktive Demo-Person" },
+        { "key": "realEstate", "label": "Immobilien", "headline": "Kunden zu Immobilien zuordnen, nicht nur zu Kontakten.", "body": "Besichtigungen, Angebote und Verträge bleiben an Kunde und Objekt verknüpft.", "quote": "Jedes Angebot hat die komplette Besichtigungshistorie dabei.", "author": "Fiktive Demo-Person" },
+        { "key": "immigration", "label": "Einwanderung", "headline": "Fälle, Fristen und Unterlagen gemeinsam verfolgt.", "body": "Jeder Fall führt Visumsart, Behördeneinreichungen und Dokumenten-Checkliste an einem Ort.", "quote": "Fristen standen früher in irgendjemandes Kalender. Jetzt stehen sie am Fall selbst.", "author": "Fiktive Demo-Person" },
+        { "key": "barber", "label": "Friseursalon", "headline": "Termine und Laufkundschaft in einem gemeinsamen Buch.", "body": "Personal, Stühle und Besuchshistorie in einer Buchungsansicht.", "quote": "Laufkundschaft und Termine teilen sich endlich einen Kalender.", "author": "Fiktive Demo-Person" },
+        { "key": "salon", "label": "Kosmetikstudio", "headline": "Behandlungsserien und Einwilligung, richtig gehandhabt.", "body": "Vorher/Nachher-Fotos und unterschriebene Einwilligungen liegen im Kundenprofil.", "quote": "Einwilligungsformulare waren Papier in einer Schublade. Jetzt sind sie im Kundenprofil.", "author": "Fiktive Demo-Person" },
+        { "key": "restaurant", "label": "Restaurant", "headline": "Reservierungen, Allergien und Catering-Leads zusammen.", "body": "Gästeprofile führen Allergiehinweise und Historie; Catering-Leads laufen durch dieselbe Pipeline.", "quote": "Der Empfang weiß endlich, was die Küche wissen muss.", "author": "Fiktive Demo-Person" },
+        { "key": "agency", "label": "Vertrieb & Agentur", "headline": "Kampagnen und Ziele neben der Pipeline.", "body": "Angebote, Performance und personalisierte Kampagnen teilen dieselben Kontakt- und Deal-Daten.", "quote": "Unsere Kampagnen-Follow-ups wissen endlich, welche Deals wirklich offen sind.", "author": "Fiktive Demo-Person" }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "EINFACHE DEMO-PREISE",
+      "headline": "Mit Klarheit starten. Mit dem Team wachsen.",
+      "disclaimer": "Die unten genannten Preise sind für diese Produktdemo illustrativ und stellen kein reales kommerzielles Angebot dar.",
+      "monthly": "Monatlich",
+      "annual": "Jährlich",
+      "save": "20% sparen",
+      "tiers": [
+        { "name": "Kostenlos", "desc": "Zum Testen strukturierter Lead-Nachverfolgung.", "price": "0 €", "priceNote": "/ Nutzer / Monat", "cta": "Kostenlos starten", "features": ["5 Leads / Monat", "Basis-Konvertierung", "Lead-Bewertung", "7 Tage Verlauf"] },
+        { "name": "Pro", "desc": "Für Teams, die den vollen Vertriebszyklus fahren.", "price": "19 €", "priceNote": "/ Nutzer / Monat · jährlich abgerechnet", "cta": "Pro starten", "features": ["Unbegrenzte Leads", "KI-Bewertung & Inhaltsvorschläge", "Verträge & Online-Annahme", "E-Mail-Export"] },
+        { "name": "Team", "desc": "Für Teams mit gemeinsamer Verantwortung.", "price": "34 €", "priceNote": "/ Nutzer / Monat · jährlich abgerechnet", "cta": "Team starten", "recommended": true, "features": ["Alles aus Pro", "Team-Arbeitsbereich", "Rollenverwaltung", "Kampagnen"] },
+        { "name": "Enterprise", "desc": "Für regulierte, vernetzte Organisationen.", "price": "Individuell", "priceNote": "", "cta": "Vertrieb kontaktieren", "features": ["Alles aus Team", "SSO-fähige Architektur", "Audit-Protokolle", "Individuelle Aufbewahrung"] }
+      ]
+    },
+    "faq": {
+      "eyebrow": "FRAGEN & ANTWORTEN",
+      "headline": "Was Teams vor dem Start fragen.",
+      "items": [
+        { "q": "Brauche ich einen KI-API-Schlüssel?", "a": "Nein. Jede KI-Funktion hat einen soliden Fallback ohne Schlüssel — Lead-Bewertung, Inhaltsvorschläge und Entwürfe funktionieren trotzdem; ein echter Anbieter verbessert nur die Qualität." },
+        { "q": "Ist meine Daten von anderen Mandanten isoliert?", "a": "Ja. Die Mandantentrennung wird auf Datenebene erzwungen, nicht nur pro Bildschirm — ein Arbeitsbereich kann strukturell nicht auf die Daten eines anderen zugreifen." },
+        { "q": "Kann ich nur die Module aktivieren, die ich brauche?", "a": "Ja. Versicherung, Immobilien, Einwanderung und die Buchungsmodule sind jeweils pro Arbeitsbereich zubuchbar." },
+        { "q": "Was passiert mit Demo-Daten?", "a": "Der Demo-Arbeitsbereich nutzt realistische Beispieldaten, die Sie frei bearbeiten, konvertieren und löschen können — nichts davon ist ein echter Kunde." },
+        { "q": "Wurde die Vertragsvorlage juristisch geprüft?", "a": "Es ist ein generierter Ausgangspunkt, keine Rechtsberatung — lassen Sie jeden Vertrag von Ihrem eigenen Anwalt prüfen, bevor Sie ihn an einen echten Kunden senden." }
+      ]
+    },
+    "cta": {
+      "headline1": "Machen Sie das Ergebnis so",
+      "headline2": "klar wie das Gespräch.",
+      "subhead": "Entdecken Sie einen vollständigen Demo-Arbeitsbereich mit bereits verbundenen Leads, Deals, Verträgen und Kampagnen.",
+      "primary": "Demo-Arbeitsbereich betreten",
+      "secondary": "Kostenlosen Arbeitsbereich erstellen"
+    },
+    "footer": {
+      "tagline": "Jeder Lead, bis zum Abschluss begleitet.",
+      "columns": [
+        { "title": "Produkt", "links": ["Funktionen", "Preise", "Module"] },
+        { "title": "Branchen", "links": ["Versicherung", "Immobilien", "Einwanderung", "Dienstleister"] },
+        { "title": "Unternehmen", "links": ["Über uns", "Kontakt"] },
+        { "title": "Rechtliches", "links": ["Datenschutz", "AGB", "Sicherheit"] }
+      ],
+      "copyright": "© 2026 SOBI CRM. Produktdemonstration."
+    }
   }
 }

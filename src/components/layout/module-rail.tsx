@@ -11,9 +11,10 @@ import {
 } from "@/components/ui/tooltip";
 import { ThemeToggle } from "./theme-toggle";
 import { LocaleSwitcher } from "./locale-switcher";
+import { LogoMark } from "@/components/brand/logo";
 
 /**
- * The Module Rail — Coreline's signature element.
+ * The Module Rail — SOBI CRM's signature element.
  * A slim vertical rail listing the tenant's activated workspaces.
  */
 export function ModuleRail() {
@@ -30,10 +31,10 @@ export function ModuleRail() {
       {/* Logo mark */}
       <Link
         href="/crm"
-        className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-brand text-ink-on-brand focus-visible:outline-2 focus-visible:outline-focus-ring"
+        className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg focus-visible:outline-2 focus-visible:outline-focus-ring"
         aria-label={tApp("name")}
       >
-        <LogoMark />
+        <LogoMark size={30} />
       </Link>
 
       {/* Workspaces */}
@@ -80,21 +81,5 @@ export function ModuleRail() {
         <ThemeToggle />
       </div>
     </nav>
-  );
-}
-
-function LogoMark() {
-  // Interlocking "modules" mark — three stacked planes
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 18 18"
-      fill="none"
-      aria-hidden="true"
-    >
-      <rect x="2" y="2" width="9" height="9" rx="2" fill="currentColor" opacity="0.55" />
-      <rect x="7" y="7" width="9" height="9" rx="2" fill="currentColor" />
-    </svg>
   );
 }

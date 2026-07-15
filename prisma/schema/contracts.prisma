@@ -1,0 +1,38 @@
+// ============================================================
+// Contracts — generated from a deal/contact, shared publicly for
+// online review + acceptance, with a live status lifecycle.
+// ============================================================
+
+model Contract {
+  id             String    @id @default(cuid())
+  tenantId       String
+  /// Auto-numbered, e.g. "CTR-1404-0001" (Jalali year + sequential).
+  contractNo     String
+  title          String
+  dealId         String?
+  contactId      String?
+  companyId      String?
+  /// Markdown body (the rendered contract text).
+  bodyMd         String
+  amount         Decimal   @default(0) @db.Decimal(14, 2)
+  currency       String    @default("IRT")
+  startDate      DateTime?
+  durationLabel  String?
+  /// draft | sent | viewed | accepted | canceled
+  status         String    @default("draft")
+  /// Public, unguessable token for the share link.
+  shareToken     String    @unique
+  sentAt         DateTime?
+  viewedAt       DateTime?
+  acceptedAt     DateTime?
+  acceptedByName String?
+  createdById    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@unique([tenantId, contractNo])
+  @@index([tenantId, status])
+  @@index([tenantId, dealId])
+  @@index([tenantId, contactId])
+}

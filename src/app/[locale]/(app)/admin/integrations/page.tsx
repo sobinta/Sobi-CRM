@@ -37,7 +37,7 @@ export default async function IntegrationsPage() {
     <div>
       <PageHeader
         title="Integrations"
-        description="Connect Coreline to other tools via webhooks and the public API."
+        description="Connect SOBI CRM to other tools via webhooks and the public API."
       />
       <IntegrationsClient webhooks={webhooks} apiKeys={apiKeys} />
     </div>

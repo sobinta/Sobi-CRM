@@ -1,6 +1,6 @@
 # Architecture
 
-Coreline is a single Next.js application organized into four layers with a
+SOBI CRM is a single Next.js application organized into four layers with a
 strict, lint-enforced dependency direction: **modules → engines → core**.
 
 ## Layers

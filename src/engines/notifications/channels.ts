@@ -36,16 +36,28 @@ function getTransporter() {
   return transporter;
 }
 
-export const emailChannel: NotificationChannel = {
+/** Raw send — rethrows on failure so callers who need real delivery
+ *  confirmation (e.g. campaigns) can tell success from failure. The
+ *  best-effort `emailChannel.send` below wraps this and swallows errors for
+ *  callers (e.g. in-app notification fan-out) where email is a bonus channel,
+ *  not the outcome itself. */
+async function sendEmailStrict(msg: OutboundMessage): Promise<void> {
+  await getTransporter().sendMail({
+    from: process.env.SMTP_FROM ?? "SOBI CRM <no-reply@sobicrm.local>",
+    to: msg.to,
+    subject: msg.subject,
+    text: msg.body,
+  });
+}
+
+export const emailChannel: NotificationChannel & {
+  sendStrict: (msg: OutboundMessage) => Promise<void>;
+} = {
   key: "email",
+  sendStrict: sendEmailStrict,
   async send(msg) {
     try {
-      await getTransporter().sendMail({
-        from: process.env.SMTP_FROM ?? "Coreline <no-reply@coreline.local>",
-        to: msg.to,
-        subject: msg.subject,
-        text: msg.body,
-      });
+      await sendEmailStrict(msg);
     } catch (err) {
       logger.warn("Email send failed (is Mailpit running?)", {
         error: (err as Error).message,

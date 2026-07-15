@@ -1,0 +1,48 @@
+// ============================================================
+// Personalized email campaigns (human-in-the-loop).
+// A campaign targets a code-driven segment; each recipient gets an
+// individually AI-personalized draft that an admin reviews before
+// it is ever sent.
+// ============================================================
+
+model Campaign {
+  id          String    @id @default(cuid())
+  tenantId    String
+  name        String
+  /// Key of the segment definition (engines/campaigns/segments.ts).
+  segmentKey  String
+  /// The intent/goal given to the AI for personalization.
+  goal        String
+  /// draft | generating | ready | sent
+  status      String    @default("draft")
+  createdById String?
+  sentAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  emails CampaignEmail[]
+
+  @@index([tenantId, status])
+}
+
+model CampaignEmail {
+  id         String    @id @default(cuid())
+  tenantId   String
+  campaignId String
+  contactId  String?
+  leadId     String?
+  toName     String
+  toEmail    String
+  /// Recipient-specific facts fed to the AI (challenge, status, etc).
+  context    Json      @default("{}")
+  subject    String?
+  bodyText   String?
+  /// pending | ready | skipped | sent | failed
+  status     String    @default("pending")
+  error      String?
+  sentAt     DateTime?
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, campaignId])
+  @@index([tenantId, status])
+}

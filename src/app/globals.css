@@ -83,6 +83,18 @@
   --font-ui: var(--font-vazirmatn);
 }
 
+/* Landing page typography: Manrope/DM Sans for en/de, Vazirmatn for fa
+   (same swap as the app's --font-ui, scoped to the marketing page's own
+   font variables since it otherwise uses a distinct typographic system). */
+.landing-root {
+  --landing-font-display: var(--font-manrope), sans-serif;
+  --landing-font-body: var(--font-dm-sans), sans-serif;
+}
+.landing-root:lang(fa) {
+  --landing-font-display: var(--font-vazirmatn), sans-serif;
+  --landing-font-body: var(--font-vazirmatn), sans-serif;
+}
+
 html,
 body {
   height: 100%;

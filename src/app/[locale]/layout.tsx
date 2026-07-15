@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Hanken_Grotesk, IBM_Plex_Mono, Vazirmatn } from "next/font/google";
+import { Hanken_Grotesk, IBM_Plex_Mono, Vazirmatn, Manrope, DM_Sans } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -26,13 +26,31 @@ const vazirmatn = Vazirmatn({
   display: "swap",
 });
 
+// Marketing-landing-page-only typography — scoped via the .landing wrapper
+// class so the rest of the app keeps Hanken Grotesk untouched.
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: {
-    default: "Coreline",
-    template: "%s · Coreline",
+    default: "SOBI CRM",
+    template: "%s · SOBI CRM",
   },
   description: "The operating system for your business.",
-  applicationName: "Coreline",
+  applicationName: "SOBI CRM",
+  icons: {
+    icon: "/Favicon.png",
+    shortcut: "/Favicon.png",
+  },
 };
 
 export function generateStaticParams() {
@@ -59,7 +77,7 @@ export default async function LocaleLayout({
       lang={locale}
       dir={dir}
       suppressHydrationWarning
-      className={`${hanken.variable} ${plexMono.variable} ${vazirmatn.variable} h-full antialiased`}
+      className={`${hanken.variable} ${plexMono.variable} ${vazirmatn.variable} ${manrope.variable} ${dmSans.variable} h-full antialiased`}
     >
       <body className="h-full">
         <NextIntlClientProvider>

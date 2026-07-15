@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * Status Chip — Coreline's status grammar. Every record status across the
+ * Status Chip — SOBI CRM's status grammar. Every record status across the
  * product renders as a chip: a tone-tinted dot + label. One consistent visual
  * language for state, everywhere.
  */
