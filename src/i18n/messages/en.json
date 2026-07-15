@@ -127,7 +127,15 @@
     "emailInUse": "An account with this email already exists.",
     "orDivider": "or",
     "demoLogin": "Continue with demo workspace",
-    "signingInDemo": "Entering demo workspace…"
+    "signingInDemo": "Entering demo workspace…",
+    "backToHome": "← Back to home",
+    "panelBadge": "AI-native CRM · no API key required",
+    "panelHeadline1": "Everything your business runs on,",
+    "panelHeadline2": "connected in one system.",
+    "panelSubhead": "SOBI CRM carries every lead from first message to signed contract — conversion, AI scoring, contracts, and campaigns, all in one workspace built for how your team actually works.",
+    "panelFeature1": "Full lead-to-contract sales cycle",
+    "panelFeature2": "AI that works with zero API keys",
+    "panelFeature3": "Multi-tenant, multi-industry, multilingual"
   },
   "landing": {
     "nav": {

@@ -32,7 +32,7 @@ export function UserMenu() {
   function signOut() {
     startTransition(async () => {
       await signOutAction();
-      router.replace("/login");
+      router.replace("/");
       router.refresh();
     });
   }

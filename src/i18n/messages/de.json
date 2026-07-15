@@ -127,7 +127,15 @@
     "emailInUse": "Ein Konto mit dieser E-Mail existiert bereits.",
     "orDivider": "oder",
     "demoLogin": "Mit Demo-Arbeitsbereich fortfahren",
-    "signingInDemo": "Demo-Arbeitsbereich wird geöffnet…"
+    "signingInDemo": "Demo-Arbeitsbereich wird geöffnet…",
+    "backToHome": "← Zurück zur Startseite",
+    "panelBadge": "KI-natives CRM · kein API-Schlüssel nötig",
+    "panelHeadline1": "Alles, worauf Ihr Unternehmen läuft,",
+    "panelHeadline2": "verbunden in einem System.",
+    "panelSubhead": "SOBI CRM begleitet jeden Lead von der ersten Nachricht bis zum unterschriebenen Vertrag — Konvertierung, KI-Bewertung, Verträge und Kampagnen, alles in einem Arbeitsbereich für die Art, wie Ihr Team wirklich arbeitet.",
+    "panelFeature1": "Vollständiger Vertriebszyklus von Lead bis Vertrag",
+    "panelFeature2": "KI, die ohne API-Schlüssel funktioniert",
+    "panelFeature3": "Mandantenfähig, branchenübergreifend, mehrsprachig"
   },
   "landing": {
     "nav": {

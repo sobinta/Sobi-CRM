@@ -8,14 +8,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/ui/field-error";
-import { Link } from "@/i18n/navigation";
+import { Logo } from "@/components/brand/logo";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { routing, localeMeta, type AppLocale } from "@/i18n/routing";
 
 export function LoginForm() {
   const t = useTranslations("auth");
   const locale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
   const [error, setError] = useState<string>();
   const [pending, setPending] = useState(false);
   const [demoPending, setDemoPending] = useState(false);
+
+  function switchLocale(next: AppLocale) {
+    router.replace(pathname, { locale: next });
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,6 +56,22 @@ export function LoginForm() {
 
   return (
     <div>
+      <div className="mb-6 flex items-center justify-between">
+        <Logo size={26} />
+        <select
+          aria-label="Language"
+          value={locale}
+          onChange={(e) => switchLocale(e.target.value as AppLocale)}
+          className="rounded-md border border-line bg-surface-raised px-2 py-1 text-xs text-ink"
+        >
+          {routing.locales.map((l) => (
+            <option key={l} value={l}>
+              {localeMeta[l].label}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <header className="mb-8">
         <h1 className="text-xl font-semibold tracking-tight text-ink">
           {t("signInTitle")}
@@ -124,6 +148,12 @@ export function LoginForm() {
           className="font-medium text-brand hover:text-brand-hover"
         >
           {t("createOne")}
+        </Link>
+      </p>
+
+      <p className="mt-4 text-center text-sm">
+        <Link href="/" locale={locale} className="text-ink-muted hover:text-ink">
+          {t("backToHome")}
         </Link>
       </p>
     </div>
