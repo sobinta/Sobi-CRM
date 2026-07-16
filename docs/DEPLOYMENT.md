@@ -7,6 +7,18 @@ Required: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`,
 (`OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `AI_LOCAL_ENDPOINT`) — omit to run AI
 in mock mode. See `.env.example`.
 
+**`DATABASE_URL` vs `DIRECT_URL`** — if your Postgres provider fronts
+connections with a pooler (Supabase's pgbouncer, PgBouncer, RDS Proxy, …),
+set **both**:
+- `DATABASE_URL` — the pooled connection string. Used by the running app
+  (`src/core/db.ts`'s PrismaPg driver adapter) — ideal for serverless
+  platforms with many short-lived function invocations.
+- `DIRECT_URL` — a *non-pooled* direct connection string. Used only by
+  `prisma migrate deploy` (`prisma.config.ts`), since pooler transaction
+  mode doesn't support the multi-statement/advisory-lock behavior schema
+  migrations need. Without a pooler in front of your database (e.g. local
+  Docker Postgres), both variables can be identical.
+
 ## Options
 
 ### Managed platform (recommended)

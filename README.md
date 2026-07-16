@@ -442,7 +442,10 @@ similar):
 
 - `DATABASE_URL` must point to a **reachable managed Postgres** (Neon,
   Supabase, RDS, …) — the local Docker Postgres used in development is not
-  reachable from a deployed environment.
+  reachable from a deployed environment. If your provider fronts connections
+  with a pooler (e.g. Supabase's pgbouncer), also set `DIRECT_URL` to a
+  **non-pooled** connection string — `prisma migrate deploy` requires it,
+  since pooler transaction mode doesn't support schema migrations.
 - Set `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`, and
   `FIELD_ENCRYPTION_KEY` to real production values (never reuse the dev
   placeholders in `.env.example`).

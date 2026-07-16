@@ -6,6 +6,10 @@ generator client {
   output   = "../../src/generated/prisma"
 }
 
+// Prisma 7: schema-level `url`/`directUrl` are no longer supported — the
+// migration-time connection URL lives in prisma.config.ts, and the running
+// app supplies its own connection string via the PrismaPg driver adapter
+// (src/core/db.ts), independent of this file.
 datasource db {
   provider = "postgresql"
 }

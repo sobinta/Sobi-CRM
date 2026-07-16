@@ -423,7 +423,11 @@ Plattformen (Vercel u. Ä.):
 
 - `DATABASE_URL` muss auf eine **erreichbare, verwaltete Postgres-Instanz**
   zeigen (Neon, Supabase, RDS, …) — das lokale Docker-Postgres aus der
-  Entwicklung ist von einer deployten Umgebung aus nicht erreichbar.
+  Entwicklung ist von einer deployten Umgebung aus nicht erreichbar. Wenn
+  Ihr Anbieter Verbindungen über einen Pooler leitet (z. B. Supabases
+  pgbouncer), setzen Sie zusätzlich `DIRECT_URL` auf eine **ungepoolte**
+  Verbindung — `prisma migrate deploy` benötigt sie, da der
+  Transaktionsmodus des Poolers Schema-Migrationen nicht unterstützt.
 - `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL` und
   `FIELD_ENCRYPTION_KEY` auf echte Produktionswerte setzen.
 - Der **lokale Datei-Speichertreiber funktioniert nur auf einem
