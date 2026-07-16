@@ -38,7 +38,7 @@ export default async function AuditPage() {
             description="Sign-ins, permission changes, exports, and admin actions will appear here."
           />
         ) : (
-          <div className="overflow-hidden rounded-xl border border-line">
+          <div className="overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
               <thead className="bg-surface-sunken text-xs text-ink-faint">
                 <tr>

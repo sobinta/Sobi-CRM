@@ -213,11 +213,13 @@
       "monthly": "Monatlich",
       "annual": "Jährlich",
       "save": "20% sparen",
+      "priceNote": "/ Nutzer / Monat",
+      "billedAnnually": "jährlich abgerechnet",
       "tiers": [
-        { "name": "Kostenlos", "desc": "Zum Testen strukturierter Lead-Nachverfolgung.", "price": "0 €", "priceNote": "/ Nutzer / Monat", "cta": "Kostenlos starten", "features": ["5 Leads / Monat", "Basis-Konvertierung", "Lead-Bewertung", "7 Tage Verlauf"] },
-        { "name": "Pro", "desc": "Für Teams, die den vollen Vertriebszyklus fahren.", "price": "19 €", "priceNote": "/ Nutzer / Monat · jährlich abgerechnet", "cta": "Pro starten", "features": ["Unbegrenzte Leads", "KI-Bewertung & Inhaltsvorschläge", "Verträge & Online-Annahme", "E-Mail-Export"] },
-        { "name": "Team", "desc": "Für Teams mit gemeinsamer Verantwortung.", "price": "34 €", "priceNote": "/ Nutzer / Monat · jährlich abgerechnet", "cta": "Team starten", "recommended": true, "features": ["Alles aus Pro", "Team-Arbeitsbereich", "Rollenverwaltung", "Kampagnen"] },
-        { "name": "Enterprise", "desc": "Für regulierte, vernetzte Organisationen.", "price": "Individuell", "priceNote": "", "cta": "Vertrieb kontaktieren", "features": ["Alles aus Team", "SSO-fähige Architektur", "Audit-Protokolle", "Individuelle Aufbewahrung"] }
+        { "name": "Kostenlos", "desc": "Zum Testen strukturierter Lead-Nachverfolgung.", "priceMonthly": "0 €", "priceAnnual": "0 €", "cta": "Kostenlos starten", "features": ["5 Leads / Monat", "Basis-Konvertierung", "Lead-Bewertung", "7 Tage Verlauf"] },
+        { "name": "Pro", "desc": "Für Teams, die den vollen Vertriebszyklus fahren.", "priceMonthly": "19 €", "priceAnnual": "15 €", "cta": "Pro starten", "features": ["Unbegrenzte Leads", "KI-Bewertung & Inhaltsvorschläge", "Verträge & Online-Annahme", "E-Mail-Export"] },
+        { "name": "Team", "desc": "Für Teams mit gemeinsamer Verantwortung.", "priceMonthly": "34 €", "priceAnnual": "27 €", "cta": "Team starten", "recommended": true, "features": ["Alles aus Pro", "Team-Arbeitsbereich", "Rollenverwaltung", "Kampagnen"] },
+        { "name": "Enterprise", "desc": "Für regulierte, vernetzte Organisationen.", "priceMonthly": "Individuell", "priceAnnual": "Individuell", "custom": true, "cta": "Vertrieb kontaktieren", "features": ["Alles aus Team", "SSO-fähige Architektur", "Audit-Protokolle", "Individuelle Aufbewahrung"] }
       ]
     },
     "faq": {

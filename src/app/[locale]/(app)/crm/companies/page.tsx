@@ -31,7 +31,7 @@ export default async function CompaniesPage({
         {data.rows.length === 0 ? (
           <EmptyState icon={Building2} title="شرکتی یافت نشد" description="اولین شرکت را اضافه کنید یا از تبدیل لید بسازید." />
         ) : (
-          <div className="overflow-hidden rounded-xl border border-line">
+          <div className="overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
               <thead className="bg-surface-sunken text-xs text-ink-faint">
                 <tr>

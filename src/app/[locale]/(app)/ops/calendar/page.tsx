@@ -46,7 +46,7 @@ export default async function CalendarPage() {
     <div>
       <PageHeader title="Calendar" description={monthLabel} actions={<NewEventButton />} />
       <div className="px-6 py-4">
-        <div className="overflow-hidden rounded-xl border border-line">
+        <div className="overflow-x-auto rounded-xl border border-line">
           <div className="grid grid-cols-7 border-b border-line bg-surface-sunken text-xs font-medium text-ink-faint">
             {weekdays.map((w) => (
               <div key={w} className="px-2 py-2 text-center">

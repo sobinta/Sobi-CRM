@@ -44,7 +44,7 @@ export default async function ContactsPage({
             description="Add your first contact to start building relationships."
           />
         ) : (
-          <div className="overflow-hidden rounded-xl border border-line">
+          <div className="overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
               <thead className="bg-surface-sunken text-xs text-ink-faint">
                 <tr>

@@ -213,11 +213,13 @@
       "monthly": "Monthly",
       "annual": "Annual",
       "save": "Save 20%",
+      "priceNote": "/ user / mo",
+      "billedAnnually": "billed annually",
       "tiers": [
-        { "name": "Free", "desc": "For trying structured lead follow-up.", "price": "$0", "priceNote": "/ user / mo", "cta": "Start free", "features": ["5 leads / month", "Basic conversion", "Lead scoring", "7-day history"] },
-        { "name": "Pro", "desc": "For teams that run the full sales cycle.", "price": "$19", "priceNote": "/ user / mo · billed annually", "cta": "Start Pro", "features": ["Unlimited leads", "AI scoring & content suggestions", "Contracts & online acceptance", "Email export"] },
-        { "name": "Team", "desc": "For teams that need shared accountability.", "price": "$34", "priceNote": "/ user / mo · billed annually", "cta": "Start Team", "recommended": true, "features": ["Everything in Pro", "Team workspace", "Role management", "Campaigns"] },
-        { "name": "Enterprise", "desc": "For governed, connected organizations.", "price": "Custom", "priceNote": "", "cta": "Contact sales", "features": ["Everything in Team", "SSO-ready architecture", "Audit logs", "Custom retention"] }
+        { "name": "Free", "desc": "For trying structured lead follow-up.", "priceMonthly": "$0", "priceAnnual": "$0", "cta": "Start free", "features": ["5 leads / month", "Basic conversion", "Lead scoring", "7-day history"] },
+        { "name": "Pro", "desc": "For teams that run the full sales cycle.", "priceMonthly": "$19", "priceAnnual": "$15", "cta": "Start Pro", "features": ["Unlimited leads", "AI scoring & content suggestions", "Contracts & online acceptance", "Email export"] },
+        { "name": "Team", "desc": "For teams that need shared accountability.", "priceMonthly": "$34", "priceAnnual": "$27", "cta": "Start Team", "recommended": true, "features": ["Everything in Pro", "Team workspace", "Role management", "Campaigns"] },
+        { "name": "Enterprise", "desc": "For governed, connected organizations.", "priceMonthly": "Custom", "priceAnnual": "Custom", "custom": true, "cta": "Contact sales", "features": ["Everything in Team", "SSO-ready architecture", "Audit logs", "Custom retention"] }
       ]
     },
     "faq": {

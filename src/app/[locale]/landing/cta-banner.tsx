@@ -1,21 +1,14 @@
 "use client";
 
-import { useTransition } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ShieldCheck, ArrowRight } from "lucide-react";
-import { DEMO_LOGIN_ENABLED, signInDemoAndRedirect } from "@/core/auth/demo-login";
+import { DEMO_LOGIN_ENABLED } from "@/core/auth/demo-login";
+import { DemoCtaButton } from "./demo-cta-button";
 
 export function CtaBanner() {
   const t = useTranslations("landing.cta");
-  const locale = useLocale();
-  const [pending, startTransition] = useTransition();
-
-  function enterDemo() {
-    startTransition(async () => {
-      await signInDemoAndRedirect(locale);
-    });
-  }
+  const tAuth = useTranslations("auth");
 
   return (
     <section className="bg-[#183f3b] py-24">
@@ -33,14 +26,14 @@ export function CtaBanner() {
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           {DEMO_LOGIN_ENABLED && (
-            <button
-              type="button"
-              onClick={enterDemo}
-              disabled={pending}
+            <DemoCtaButton
+              pendingLabel={tAuth("signingInDemo")}
               className="flex items-center gap-2 rounded-md bg-[#aee1d3] px-5 py-3 text-sm font-semibold text-[#14211e] hover:bg-[#98d4c4] disabled:opacity-60"
             >
-              {t("primary")} <ArrowRight className="h-4 w-4" />
-            </button>
+              <span className="flex items-center gap-2">
+                {t("primary")} <ArrowRight className="h-4 w-4" />
+              </span>
+            </DemoCtaButton>
           )}
           <Link
             href="/register"

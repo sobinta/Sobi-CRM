@@ -139,7 +139,7 @@ export function DashboardClient({
             <div
               key={item.i}
               className={cn(
-                "group relative overflow-hidden rounded-xl border bg-surface-raised shadow-raised",
+                "group relative overflow-x-auto rounded-xl border bg-surface-raised shadow-raised",
                 editing ? "cursor-move border-brand/40" : "border-line",
               )}
             >

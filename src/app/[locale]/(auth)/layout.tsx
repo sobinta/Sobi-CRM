@@ -12,19 +12,23 @@ export default async function AuthLayout({
   const tApp = await getTranslations("app");
 
   return (
-    <div className="flex min-h-dvh">
-      {/* Brand panel — pine/mint visual language shared with the landing page */}
-      <aside className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-[#183f3b] p-12 lg:flex">
-        <Logo size={30} tone="on-dark" />
+    <div className="flex min-h-dvh flex-col lg:flex-row">
+      {/* Brand panel — pine/mint visual language shared with the landing page.
+          Stacked above the form on mobile instead of disappearing, so the
+          product pitch isn't desktop-only. */}
+      <aside className="relative flex flex-col justify-center overflow-hidden bg-[#183f3b] px-6 py-8 sm:px-10 lg:w-1/2 lg:justify-between lg:p-12">
+        <div className="hidden lg:block">
+          <Logo size={30} tone="on-dark" />
+        </div>
         <span className="sr-only">{tApp("name")}</span>
 
-        <div className="max-w-md">
+        <div className="mx-auto max-w-md lg:mx-0">
           <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white">
             <span className="h-1.5 w-1.5 rounded-full bg-[#aee1d3]" />
             {t("panelBadge")}
           </span>
 
-          <h1 className="mt-5 text-3xl font-semibold leading-tight tracking-tight text-white">
+          <h1 className="mt-5 text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl">
             {t("panelHeadline1")}
             <br />
             <span className="text-[#8ad0b4]">{t("panelHeadline2")}</span>
@@ -45,19 +49,19 @@ export default async function AuthLayout({
           </ul>
         </div>
 
-        {/* Ambient signature: faint module planes */}
+        {/* Ambient signature: faint module planes (desktop only) */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-24 -end-24 h-72 w-72 rounded-3xl border border-white/10 bg-white/[0.03]"
+          className="pointer-events-none absolute -bottom-24 -end-24 hidden h-72 w-72 rounded-3xl border border-white/10 bg-white/[0.03] lg:block"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-8 -end-8 h-72 w-72 rounded-3xl border border-white/10 bg-white/[0.03]"
+          className="pointer-events-none absolute -bottom-8 -end-8 hidden h-72 w-72 rounded-3xl border border-white/10 bg-white/[0.03] lg:block"
         />
       </aside>
 
       {/* Form panel */}
-      <main className="flex flex-1 items-center justify-center px-6 py-12">
+      <main className="flex flex-1 items-center justify-center px-6 py-10 sm:py-12">
         <div className="w-full max-w-sm">{children}</div>
       </main>
     </div>

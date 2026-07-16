@@ -1,0 +1,8 @@
+.next
+.vercel/output
+node_modules
+.env
+.env.*
+storage
+coverage
+*.tsbuildinfo

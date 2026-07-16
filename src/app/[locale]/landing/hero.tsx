@@ -1,9 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Check } from "lucide-react";
+import { DEMO_LOGIN_ENABLED } from "@/core/auth/demo-login";
+import { DemoCtaButton } from "./demo-cta-button";
 
 export async function Hero() {
   const t = await getTranslations("landing.hero");
+  const tAuth = await getTranslations("auth");
 
   return (
     <section className="mx-auto max-w-6xl px-6 pb-20 pt-16">
@@ -34,12 +37,21 @@ export async function Hero() {
             >
               {t("ctaPrimary")}
             </Link>
-            <a
-              href="#how-it-works"
-              className="rounded-md border border-[#dde4e0] bg-white px-5 py-3 text-sm font-semibold text-[#14211e] hover:bg-[#f0f3f1]"
-            >
-              {t("ctaSecondary")}
-            </a>
+            {DEMO_LOGIN_ENABLED ? (
+              <DemoCtaButton
+                pendingLabel={tAuth("signingInDemo")}
+                className="rounded-md border border-[#dde4e0] bg-white px-5 py-3 text-sm font-semibold text-[#14211e] hover:bg-[#f0f3f1] disabled:opacity-60"
+              >
+                {t("ctaSecondary")}
+              </DemoCtaButton>
+            ) : (
+              <a
+                href="#how-it-works"
+                className="rounded-md border border-[#dde4e0] bg-white px-5 py-3 text-sm font-semibold text-[#14211e] hover:bg-[#f0f3f1]"
+              >
+                {t("ctaSecondary")}
+              </a>
+            )}
           </div>
 
           <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#65716d]">

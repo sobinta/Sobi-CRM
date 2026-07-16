@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "src/generated/**",
+    ".vercel/**",
   ]),
   // --- Architectural boundaries (future package seams) ---
   // core → may not import engines/modules; engines → may not import modules;

@@ -12,6 +12,7 @@ import {
 import { ThemeToggle } from "./theme-toggle";
 import { LocaleSwitcher } from "./locale-switcher";
 import { LogoMark } from "@/components/brand/logo";
+import { useMobileNav } from "./mobile-nav-context";
 
 /**
  * The Module Rail — SOBI CRM's signature element.
@@ -22,6 +23,7 @@ export function ModuleRail() {
   const tApp = useTranslations("app");
   const pathname = usePathname();
   const workspaces = useWorkspaces();
+  const { close } = useMobileNav();
 
   return (
     <nav
@@ -31,6 +33,7 @@ export function ModuleRail() {
       {/* Logo mark */}
       <Link
         href="/crm"
+        onClick={close}
         className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg focus-visible:outline-2 focus-visible:outline-focus-ring"
         aria-label={tApp("name")}
       >
@@ -48,6 +51,7 @@ export function ModuleRail() {
               <TooltipTrigger asChild>
                 <Link
                   href={ws.href}
+                  onClick={close}
                   aria-current={active ? "page" : undefined}
                   className={cn(
                     "relative flex h-9 w-9 items-center justify-center rounded-lg outline-none",

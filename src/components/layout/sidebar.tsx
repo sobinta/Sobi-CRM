@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useWorkspaces, findWorkspace } from "./workspaces-context";
+import { useMobileNav } from "./mobile-nav-context";
 import { cn } from "@/lib/utils";
 
 /** Contextual sidebar: navigation for the current workspace. */
@@ -12,6 +13,7 @@ export function Sidebar() {
   const tWs = useTranslations("workspaces");
   const workspaces = useWorkspaces();
   const workspace = findWorkspace(workspaces, pathname);
+  const { close } = useMobileNav();
 
   return (
     <aside className="flex h-full w-56 shrink-0 flex-col border-e border-line bg-surface-sunken/50">
@@ -30,6 +32,7 @@ export function Sidebar() {
             <Link
               key={item.key}
               href={item.href}
+              onClick={close}
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm outline-none",

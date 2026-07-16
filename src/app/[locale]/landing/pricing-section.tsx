@@ -8,8 +8,9 @@ import { Link } from "@/i18n/navigation";
 interface PricingTier {
   name: string;
   desc: string;
-  price: string;
-  priceNote: string;
+  priceMonthly: string;
+  priceAnnual: string;
+  custom?: boolean;
   cta: string;
   recommended?: boolean;
   features: string[];
@@ -18,6 +19,8 @@ interface PricingTier {
 export function PricingSection() {
   const t = useTranslations("landing.pricing");
   const tiers = t.raw("tiers") as PricingTier[];
+  const priceNote = t("priceNote");
+  const billedAnnually = t("billedAnnually");
   const [annual, setAnnual] = useState(true);
 
   return (
@@ -72,9 +75,14 @@ export function PricingSection() {
               <h3 className="font-semibold text-[#14211e]">{tier.name}</h3>
               <p className="mt-1 text-xs text-[#65716d]">{tier.desc}</p>
               <p className="mt-4">
-                <span className="text-3xl font-bold text-[#14211e]">{tier.price}</span>
-                {tier.priceNote && <span className="ms-1 text-xs text-[#8c9692]">{tier.priceNote}</span>}
+                <span className="text-3xl font-bold text-[#14211e]">
+                  {annual ? tier.priceAnnual : tier.priceMonthly}
+                </span>
+                {!tier.custom && <span className="ms-1 text-xs text-[#8c9692]">{priceNote}</span>}
               </p>
+              {annual && tier.priceAnnual !== tier.priceMonthly && (
+                <p className="mt-0.5 text-xs text-[#8c9692]">{billedAnnually}</p>
+              )}
               <Link
                 href="/register"
                 className={
