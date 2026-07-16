@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing, localeMeta, type AppLocale } from "@/i18n/routing";
 import { Logo } from "@/components/brand/logo";
 import { DEMO_LOGIN_ENABLED } from "@/core/auth/demo-login";
 import { DemoCtaButton } from "./demo-cta-button";
+import { useLandingMobileMenu } from "./landing-mobile-menu-context";
 import { Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
@@ -48,7 +48,7 @@ export function LandingNav({ logoSrc }: { logoSrc?: string }) {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { open: menuOpen, toggle: toggleMenu, close: closeMenu } = useLandingMobileMenu();
 
   function switchTo(next: AppLocale) {
     router.replace(pathname, { locale: next });
@@ -99,7 +99,7 @@ export function LandingNav({ logoSrc }: { logoSrc?: string }) {
         {/* Mobile menu trigger */}
         <button
           type="button"
-          onClick={() => setMenuOpen((o) => !o)}
+          onClick={toggleMenu}
           aria-label="Menu"
           aria-expanded={menuOpen}
           className="flex h-9 w-9 items-center justify-center rounded-md text-[#14211e] lg:hidden"
@@ -116,7 +116,7 @@ export function LandingNav({ logoSrc }: { logoSrc?: string }) {
               <a
                 key={l.key}
                 href={l.href}
-                onClick={() => setMenuOpen(false)}
+                onClick={closeMenu}
                 className="rounded-md px-2 py-2.5 hover:bg-[#f0f3f1] hover:text-[#14211e]"
               >
                 {t(l.key)}

@@ -389,16 +389,17 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
   sich die tatsächlichen Zahlen je Tarif (kein rein kosmetischer
   Label-Tausch), plus ein „jährlich abgerechnet"-Hinweis.
 - **Vollständig für Mobilgeräte optimiert**: ein echtes Hamburger-Menü (kein
-  versteckter Nav-Bereich) zeigt unterhalb von `sm` jeden Nav-Link, den
-  Sprachumschalter und die Anmelde-/Demo-/Registrierungs-Aktionen; ebenso
-  für die Anmeldeseite, deren Markenpanel sich auf Mobilgeräten über das
-  Formular stapelt statt zu verschwinden.
+  versteckter Nav-Bereich) zeigt unterhalb von `lg` jeden Nav-Link, den
+  Sprachumschalter und die Anmelde-/Demo-/Registrierungs-Aktionen, plus eine
+  **untere Tableiste** für schnellen Daumenzugriff auf Funktionen, Module,
+  Preise und Demo testen beim Scrollen (deren „Menü"-Button dasselbe
+  vollständige Panel öffnet wie das Hamburger-Icon); ebenso für die
+  Anmeldeseite, deren Markenpanel sich auf Mobilgeräten über das Formular
+  stapelt statt zu verschwinden.
 - Auch der **In-App-Arbeitsbereich** ist mobil optimiert: Module Rail und
-  Sidebar werden zu einer aufklappbaren Schublade (über ein Hamburger-Icon
-  in der Topbar), jede Datentabelle scrollt horizontal statt abzuschneiden,
-  und eine **untere Tableiste** (unterhalb von `lg`) bringt die
-  meistgenutzten Ziele — CRM, Aufgaben, Kalender, KI-Assistent sowie ein
-  „Menü"-Button für alles andere — in Daumenreichweite.
+  Sidebar (auf Desktop immer sichtbar) werden auf Mobilgeräten zu einer
+  aufklappbaren Schublade über ein Hamburger-Icon in der Topbar, und jede
+  Datentabelle scrollt horizontal statt abzuschneiden.
 
 ### Branding & Internationalisierung
 

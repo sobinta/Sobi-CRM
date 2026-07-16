@@ -399,13 +399,15 @@ scaffolds in module activation.
   note.
 - **Fully mobile-optimized**: a real hamburger menu (not a hidden nav) exposes
   every nav link, the language switcher, and sign-in/demo/register actions
-  below the `sm` breakpoint; same for the login page, whose brand panel stacks
-  above the form on mobile instead of disappearing.
+  below the `lg` breakpoint, plus a **bottom tab bar** for quick thumb-reach
+  access to Features, Modules, Pricing, and Try demo while scrolling (with a
+  "Menu" button opening the same full panel as the hamburger); same for the
+  login page, whose brand panel stacks above the form on mobile instead of
+  disappearing.
 - The **in-app workspace** is mobile-optimized too: the module rail + sidebar
-  become a slide-in drawer (opened from a Topbar hamburger), every data table
-  scrolls horizontally instead of clipping, and a **bottom tab bar** (below
-  `lg`) puts the most-used destinations — CRM, Tasks, Calendar, AI Assistant,
-  and a "Menu" button for everything else — within thumb reach.
+  (always visible on desktop) become a slide-in drawer opened from a Topbar
+  hamburger on mobile, and every data table scrolls horizontally instead of
+  clipping.
 
 ### Branding & internationalization
 

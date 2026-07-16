@@ -9,6 +9,8 @@ import { PricingSection } from "./pricing-section";
 import { FaqSection } from "./faq-section";
 import { CtaBanner } from "./cta-banner";
 import { LandingFooter } from "./landing-footer";
+import { LandingMobileMenuProvider } from "./landing-mobile-menu-context";
+import { LandingMobileTabBar } from "./landing-mobile-tab-bar";
 import { getSiteAssetsPublic } from "@/engines/platform-admin/branding-service";
 import { listPricingPlansPublic } from "@/engines/platform-admin/pricing-service";
 import { getContentOverridesPublic, resolveContent } from "@/engines/platform-admin/content-service";
@@ -23,32 +25,35 @@ export async function LandingPage() {
   ]);
 
   return (
-    <div
-      className="landing-root min-h-dvh bg-[#f5f7f5] text-[#14211e]"
-      style={{ fontFamily: "var(--landing-font-body)" }}
-    >
-      <LandingNav logoSrc={assets.logo} />
-      <Hero />
-      <ProblemSection />
-      <StepsSection />
-      <AnalyticsSection />
-      <SolutionsTabs />
-      <PricingSection
-        dbPlans={dbPlans.map((p) => ({
-          key: p.key,
-          recommended: p.recommended,
-          isCustom: p.isCustom,
-          translations: p.translations as never,
-        }))}
-        disclaimerOverride={
-          overrides.has(`${locale}:pricing.disclaimer`)
-            ? resolveContent(overrides, locale, "pricing.disclaimer", "")
-            : undefined
-        }
-      />
-      <FaqSection />
-      <CtaBanner />
-      <LandingFooter />
-    </div>
+    <LandingMobileMenuProvider>
+      <div
+        className="landing-root min-h-dvh bg-[#f5f7f5] pb-14 text-[#14211e] lg:pb-0"
+        style={{ fontFamily: "var(--landing-font-body)" }}
+      >
+        <LandingNav logoSrc={assets.logo} />
+        <Hero />
+        <ProblemSection />
+        <StepsSection />
+        <AnalyticsSection />
+        <SolutionsTabs />
+        <PricingSection
+          dbPlans={dbPlans.map((p) => ({
+            key: p.key,
+            recommended: p.recommended,
+            isCustom: p.isCustom,
+            translations: p.translations as never,
+          }))}
+          disclaimerOverride={
+            overrides.has(`${locale}:pricing.disclaimer`)
+              ? resolveContent(overrides, locale, "pricing.disclaimer", "")
+              : undefined
+          }
+        />
+        <FaqSection />
+        <CtaBanner />
+        <LandingFooter />
+        <LandingMobileTabBar />
+      </div>
+    </LandingMobileMenuProvider>
   );
 }
