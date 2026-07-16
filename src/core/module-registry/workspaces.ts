@@ -134,6 +134,7 @@ export const platformAdminWorkspace: WorkspaceDef = {
     { key: "pricing", labelKey: "pricingPlans", href: "/platform-admin" },
     { key: "content", labelKey: "landingContent", href: "/platform-admin/content" },
     { key: "branding", labelKey: "branding", href: "/platform-admin/branding" },
+    { key: "announcement", labelKey: "announcementBar", href: "/platform-admin/announcement" },
   ],
 };
 

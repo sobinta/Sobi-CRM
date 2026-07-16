@@ -2,16 +2,24 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ShieldCheck, ArrowRight } from "lucide-react";
 import { DEMO_LOGIN_ENABLED } from "@/core/auth/demo-login";
-import { getContentOverridesPublic, resolveContent } from "@/engines/platform-admin/content-service";
+import { getContentOverridesPublic } from "@/engines/platform-admin/content-service";
+import type { EditableContentKey } from "@/engines/platform-admin/content-keys";
+import { EditableField } from "./editable-field";
 import { DemoCtaButton } from "./demo-cta-button";
 
-export async function CtaBanner() {
+export async function CtaBanner({ editMode = false }: { editMode?: boolean }) {
   const t = await getTranslations("landing.cta");
   const tAuth = await getTranslations("auth");
   const locale = await getLocale();
   const overrides = await getContentOverridesPublic();
-  const c = (key: "cta.headline1" | "cta.headline2" | "cta.subhead", fallback: string) =>
-    resolveContent(overrides, locale, key, fallback);
+  const c = (key: EditableContentKey, fallback: string) => (
+    <EditableField
+      contentKey={key}
+      value={overrides.get(`${locale}:${key}`) ?? fallback}
+      hasOverride={overrides.has(`${locale}:${key}`)}
+      editMode={editMode}
+    />
+  );
 
   return (
     <section className="bg-[#183f3b] py-24">

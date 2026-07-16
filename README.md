@@ -148,8 +148,21 @@ one-click **"Continue with demo workspace"** button (see
     upload — Vercel's serverless filesystem is read-only at runtime), applied
     everywhere the SOBI CRM wordmark renders: workspace rail, login/register
     panel, public contract page, and the landing page/footer.
+  - **Announcement Bar** — a promo/notice strip (discount codes, launch
+    announcements) shown at the top of both the public landing page and the
+    in-app workspace, with per-locale text, background/text color, and a
+    scrolling marquee (left↔right or static) via pure CSS animation.
   - Guarded by `requireSuperAdmin()`, a platform-wide flag distinct from the
     tenant-scoped `can()`/`authorize()` permission checks used everywhere else.
+- **Rich text editor** — a full TipTap-based editor (bold/italic/lists/links)
+  powers every super-admin-authored content field (landing content overrides,
+  the hover-to-edit panel below); saved HTML is sanitized server-side
+  (`isomorphic-dompurify`) before it's persisted or rendered.
+- **Hover-to-edit live CMS mode** — a "Back to main site" entry at the bottom
+  of the Module Rail (super admin only) opens the public landing page while
+  still signed in. There, hovering any editable text (hero, CTA banner,
+  pricing disclaimer) reveals a pencil that opens the rich text editor
+  in-place — no need to hunt down the matching field in the admin panel first.
 
 ### CRM core
 
@@ -406,10 +419,10 @@ scaffolds in module activation.
   disappearing.
 - The **in-app workspace** is mobile-optimized too: the Module Rail — always
   visible on desktop, collapsible between icon-only and a labeled expanded
-  state (remembered across sessions) — becomes a slide-in drawer (always
-  shown expanded, for legibility) opened from a Topbar hamburger on mobile.
-  The per-workspace sub-navigation (Dashboard, Contacts, …) runs as a
-  horizontal, scrollable tab strip above the page content on every screen
+  state (remembered across sessions) — becomes a slide-in drawer on mobile
+  (opened from a Topbar hamburger) with the exact same collapse/expand
+  control. The per-workspace sub-navigation (Dashboard, Contacts, …) runs as
+  a horizontal, scrollable tab strip above the page content on every screen
   size, and every data table scrolls horizontally instead of clipping.
 
 ### Branding & internationalization

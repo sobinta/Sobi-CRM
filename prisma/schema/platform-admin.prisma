@@ -45,3 +45,19 @@ model SiteAsset {
   updatedById String?
   updatedAt   DateTime @updatedAt
 }
+
+/// Single-row settings (fixed "singleton" id): the promo/notice bar shown
+/// atop both the public landing page and the in-app workspace shell.
+model AnnouncementBar {
+  id              String   @id @default("singleton")
+  enabled         Boolean  @default(false)
+  /// { en: "text", de: "text", fa: "text" }
+  translations    Json     @default("{}")
+  backgroundColor String   @default("#183f3b")
+  textColor       String   @default("#ffffff")
+  /// "ltr" | "rtl" | "static"
+  animation       String   @default("static")
+  linkUrl         String?
+  updatedById     String?
+  updatedAt       DateTime @updatedAt
+}

@@ -92,7 +92,8 @@
     "contracts": "Contracts",
     "pricingPlans": "Pricing Plans",
     "landingContent": "Landing Content",
-    "branding": "Branding"
+    "branding": "Branding",
+    "announcementBar": "Announcement Bar"
   },
   "shell": {
     "commandHint": "Press {shortcut} to search",
@@ -102,7 +103,8 @@
     "collapseSidebar": "Collapse sidebar",
     "expandSidebar": "Expand sidebar",
     "menu": "Menu",
-    "mobileNav": "Primary"
+    "mobileNav": "Primary",
+    "backToSite": "Back to main site"
   },
   "dashboard": {
     "welcome": "Welcome back, {name}",
@@ -285,6 +287,18 @@
     "saved": "Saved",
     "field": "Field",
     "overrideValue": "Override text",
-    "overridePlaceholder": "Leave empty to use the default copy"
+    "overridePlaceholder": "Leave empty to use the default copy",
+    "announcementTitle": "Announcement Bar",
+    "announcementDesc": "A promo/notice strip shown at the top of the landing page and the in-app workspace.",
+    "announcementEnabled": "Show the announcement bar",
+    "announcementText": "Text",
+    "backgroundColor": "Background color",
+    "textColor": "Text color",
+    "animation": "Animation",
+    "animationStatic": "Static (no scrolling)",
+    "animationLtr": "Scroll left → right",
+    "animationRtl": "Scroll right → left",
+    "linkUrl": "Link URL (optional)",
+    "preview": "Preview"
   }
 }

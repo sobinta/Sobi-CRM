@@ -5,6 +5,10 @@ import { resolveSession } from "@/core/auth/session";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { getTenantBranding } from "@/core/branding/get-branding";
 import { brandTokenCss, isCustomBranding } from "@/core/branding/brand-tokens";
+import {
+  getAnnouncementBarPublic,
+  resolveAnnouncementText,
+} from "@/engines/platform-admin/announcement-service";
 import { AppShell } from "@/components/layout/app-shell";
 import type { SessionUser } from "@/components/layout/session-context";
 // Side-effect import: subscribes the automation + webhook engines to the bus.
@@ -42,6 +46,18 @@ export default async function AppLayout({
     ? `:root{${brandTokenCss(branding)}}`
     : null;
 
+  const announcementRow = await getAnnouncementBarPublic();
+  const announcement =
+    announcementRow?.enabled
+      ? {
+          text: resolveAnnouncementText(announcementRow.translations, locale),
+          backgroundColor: announcementRow.backgroundColor,
+          textColor: announcementRow.textColor,
+          animation: announcementRow.animation as "ltr" | "rtl" | "static",
+          linkUrl: announcementRow.linkUrl,
+        }
+      : null;
+
   const user: SessionUser = {
     name: s.name,
     email: s.email,
@@ -67,7 +83,11 @@ export default async function AppLayout({
           dangerouslySetInnerHTML={{ __html: brandCss }}
         />
       )}
-      <AppShell user={user} enabledModuleKeys={enabledModuleKeys ?? []}>
+      <AppShell
+        user={user}
+        enabledModuleKeys={enabledModuleKeys ?? []}
+        announcement={announcement}
+      >
         {children}
       </AppShell>
     </>

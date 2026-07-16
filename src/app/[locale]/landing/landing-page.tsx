@@ -11,17 +11,27 @@ import { CtaBanner } from "./cta-banner";
 import { LandingFooter } from "./landing-footer";
 import { LandingMobileMenuProvider } from "./landing-mobile-menu-context";
 import { LandingMobileTabBar } from "./landing-mobile-tab-bar";
+import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { getSiteAssetsPublic } from "@/engines/platform-admin/branding-service";
 import { listPricingPlansPublic } from "@/engines/platform-admin/pricing-service";
-import { getContentOverridesPublic, resolveContent } from "@/engines/platform-admin/content-service";
+import { getContentOverridesPublic } from "@/engines/platform-admin/content-service";
+import {
+  getAnnouncementBarPublic,
+  resolveAnnouncementText,
+} from "@/engines/platform-admin/announcement-service";
 
-/** Public marketing page shown at "/" when there's no active session. */
-export async function LandingPage() {
+/**
+ * Public marketing page shown at "/" when there's no active session — or, for
+ * a super admin, the live site itself with `editMode` enabling hover-to-edit
+ * on the content pulled from the platform-admin overrides.
+ */
+export async function LandingPage({ editMode = false }: { editMode?: boolean }) {
   const locale = await getLocale();
-  const [assets, dbPlans, overrides] = await Promise.all([
+  const [assets, dbPlans, overrides, announcementRow] = await Promise.all([
     getSiteAssetsPublic(),
     listPricingPlansPublic(),
     getContentOverridesPublic(),
+    getAnnouncementBarPublic(),
   ]);
 
   return (
@@ -30,8 +40,17 @@ export async function LandingPage() {
         className="landing-root min-h-dvh bg-[#f5f7f5] pb-14 text-[#14211e] lg:pb-0"
         style={{ fontFamily: "var(--landing-font-body)" }}
       >
+        {announcementRow?.enabled && (
+          <AnnouncementBar
+            text={resolveAnnouncementText(announcementRow.translations, locale)}
+            backgroundColor={announcementRow.backgroundColor}
+            textColor={announcementRow.textColor}
+            animation={announcementRow.animation as "ltr" | "rtl" | "static"}
+            linkUrl={announcementRow.linkUrl}
+          />
+        )}
         <LandingNav logoSrc={assets.logo} />
-        <Hero />
+        <Hero editMode={editMode} />
         <ProblemSection />
         <StepsSection />
         <AnalyticsSection />
@@ -43,14 +62,12 @@ export async function LandingPage() {
             isCustom: p.isCustom,
             translations: p.translations as never,
           }))}
-          disclaimerOverride={
-            overrides.has(`${locale}:pricing.disclaimer`)
-              ? resolveContent(overrides, locale, "pricing.disclaimer", "")
-              : undefined
-          }
+          disclaimerValue={overrides.get(`${locale}:pricing.disclaimer`)}
+          disclaimerHasOverride={overrides.has(`${locale}:pricing.disclaimer`)}
+          editMode={editMode}
         />
         <FaqSection />
-        <CtaBanner />
+        <CtaBanner editMode={editMode} />
         <LandingFooter />
         <LandingMobileTabBar />
       </div>

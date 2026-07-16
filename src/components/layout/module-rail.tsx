@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useWorkspaces } from "./workspaces-context";
+import { useSessionUser } from "./session-context";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -14,7 +15,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { LocaleSwitcher } from "./locale-switcher";
 import { LogoMark } from "@/components/brand/logo";
 import { useMobileNav } from "./mobile-nav-context";
-import { ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, Globe } from "lucide-react";
 
 const RAIL_STORAGE_KEY = "sobi:rail-expanded";
 
@@ -41,18 +42,17 @@ function useRailExpanded() {
  * The Module Rail — SOBI CRM's signature element.
  * A vertical rail listing the tenant's activated workspaces. Collapsible:
  * icon-only by default (with tooltips), expandable to show labels directly.
- * `forceExpanded` is used inside the mobile drawer, where showing labels is
- * always the better default regardless of the desktop preference.
+ * Same collapsible behavior on desktop and inside the mobile drawer.
  */
-export function ModuleRail({ forceExpanded = false }: { forceExpanded?: boolean }) {
+export function ModuleRail() {
   const t = useTranslations("workspaces");
   const tApp = useTranslations("app");
   const tShell = useTranslations("shell");
   const pathname = usePathname();
   const workspaces = useWorkspaces();
+  const user = useSessionUser();
   const { close } = useMobileNav();
-  const { expanded: storedExpanded, toggle } = useRailExpanded();
-  const expanded = forceExpanded || storedExpanded;
+  const { expanded, toggle } = useRailExpanded();
 
   return (
     <nav
@@ -141,26 +141,51 @@ export function ModuleRail({ forceExpanded = false }: { forceExpanded?: boolean 
         <ThemeToggle />
       </div>
 
-      {/* Expand/collapse toggle — hidden inside the always-expanded mobile drawer */}
-      {!forceExpanded && (
-        <button
-          type="button"
-          onClick={toggle}
-          aria-label={expanded ? tShell("collapseSidebar") : tShell("expandSidebar")}
-          className={cn(
-            "mt-1 flex h-9 shrink-0 items-center justify-center rounded-lg text-ink-on-rail/55 outline-none",
-            "transition-colors duration-(--motion-fast) hover:bg-white/8 hover:text-ink-on-rail",
-            "focus-visible:outline-2 focus-visible:outline-focus-ring",
-            expanded ? "w-full gap-2.5" : "w-9",
-          )}
-        >
-          {expanded ? (
-            <ChevronsLeft className="h-4 w-4" />
-          ) : (
-            <ChevronsRight className="h-4 w-4" />
-          )}
-        </button>
-      )}
+      {/* Super admin only: jump to the public site (to use the hover-to-edit CMS mode there) */}
+      {user.isSuperAdmin &&
+        (() => {
+          const backLink = (
+            <Link
+              href="/"
+              onClick={close}
+              className={cn(
+                "mt-1 flex h-9 shrink-0 items-center rounded-lg text-ink-on-rail/55 outline-none",
+                "transition-colors duration-(--motion-fast) hover:bg-white/8 hover:text-ink-on-rail",
+                "focus-visible:outline-2 focus-visible:outline-focus-ring",
+                expanded ? "gap-2.5 px-2.5 text-sm" : "w-9 justify-center",
+              )}
+            >
+              <Globe className="h-4.5 w-4.5 shrink-0" />
+              {expanded && <span className="truncate">{tShell("backToSite")}</span>}
+            </Link>
+          );
+          if (expanded) return backLink;
+          return (
+            <Tooltip>
+              <TooltipTrigger asChild>{backLink}</TooltipTrigger>
+              <TooltipContent side="right">{tShell("backToSite")}</TooltipContent>
+            </Tooltip>
+          );
+        })()}
+
+      {/* Expand/collapse toggle */}
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label={expanded ? tShell("collapseSidebar") : tShell("expandSidebar")}
+        className={cn(
+          "mt-1 flex h-9 shrink-0 items-center justify-center rounded-lg text-ink-on-rail/55 outline-none",
+          "transition-colors duration-(--motion-fast) hover:bg-white/8 hover:text-ink-on-rail",
+          "focus-visible:outline-2 focus-visible:outline-focus-ring",
+          expanded ? "w-full gap-2.5" : "w-9",
+        )}
+      >
+        {expanded ? (
+          <ChevronsLeft className="h-4 w-4" />
+        ) : (
+          <ChevronsRight className="h-4 w-4" />
+        )}
+      </button>
     </nav>
   );
 }

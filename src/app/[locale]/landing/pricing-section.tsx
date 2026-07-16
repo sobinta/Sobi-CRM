@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Check } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { PlanTranslation } from "@/engines/platform-admin/pricing-service";
+import { EditableField } from "./editable-field";
 
 interface PricingTier {
   name: string;
@@ -42,10 +43,14 @@ function toTier(plan: DbPricingPlan, locale: string): PricingTier | null {
 
 export function PricingSection({
   dbPlans,
-  disclaimerOverride,
+  disclaimerValue,
+  disclaimerHasOverride = false,
+  editMode = false,
 }: {
   dbPlans?: DbPricingPlan[];
-  disclaimerOverride?: string;
+  disclaimerValue?: string;
+  disclaimerHasOverride?: boolean;
+  editMode?: boolean;
 }) {
   const t = useTranslations("landing.pricing");
   const locale = useLocale();
@@ -71,7 +76,13 @@ export function PricingSection({
           {t("headline")}
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-center text-sm text-[#65716d]">
-          {disclaimerOverride ?? t("disclaimer")}
+          <EditableField
+            as="span"
+            contentKey="pricing.disclaimer"
+            value={disclaimerValue ?? t("disclaimer")}
+            hasOverride={disclaimerHasOverride}
+            editMode={editMode}
+          />
         </p>
 
         <div className="mx-auto mt-8 flex w-fit items-center gap-1 rounded-lg border border-[#dde4e0] bg-white p-1">

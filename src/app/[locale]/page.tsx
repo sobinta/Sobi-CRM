@@ -9,8 +9,8 @@ export default async function RootPage({
 }) {
   const { locale } = await params;
   const session = await resolveSession();
-  if (session) {
+  if (session && !session.isSuperAdmin) {
     redirect({ href: "/crm", locale });
   }
-  return <LandingPage />;
+  return <LandingPage editMode={session?.isSuperAdmin ?? false} />;
 }

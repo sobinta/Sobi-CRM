@@ -92,7 +92,8 @@
     "contracts": "قراردادها",
     "pricingPlans": "پلن‌های قیمت‌گذاری",
     "landingContent": "محتوای لندینگ",
-    "branding": "برندینگ"
+    "branding": "برندینگ",
+    "announcementBar": "نوار اعلان"
   },
   "shell": {
     "commandHint": "برای جستجو {shortcut} را فشار دهید",
@@ -102,7 +103,8 @@
     "collapseSidebar": "بستن نوار کناری",
     "expandSidebar": "باز کردن نوار کناری",
     "menu": "منو",
-    "mobileNav": "اصلی"
+    "mobileNav": "اصلی",
+    "backToSite": "بازگشت به سایت اصلی"
   },
   "dashboard": {
     "welcome": "خوش آمدید، {name}",
@@ -285,6 +287,18 @@
     "saved": "ذخیره شد",
     "field": "فیلد",
     "overrideValue": "متن جایگزین",
-    "overridePlaceholder": "برای استفاده از متن پیش‌فرض، خالی بگذارید"
+    "overridePlaceholder": "برای استفاده از متن پیش‌فرض، خالی بگذارید",
+    "announcementTitle": "نوار اعلان",
+    "announcementDesc": "یک نوار تبلیغاتی/اطلاعیه که بالای لندینگ‌پیج و فضای کاری داخل برنامه نمایش داده می‌شود.",
+    "announcementEnabled": "نمایش نوار اعلان",
+    "announcementText": "متن",
+    "backgroundColor": "رنگ پس‌زمینه",
+    "textColor": "رنگ متن",
+    "animation": "انیمیشن",
+    "animationStatic": "ثابت (بدون اسکرول)",
+    "animationLtr": "اسکرول چپ به راست",
+    "animationRtl": "اسکرول راست به چپ",
+    "linkUrl": "آدرس لینک (اختیاری)",
+    "preview": "پیش‌نمایش"
   }
 }

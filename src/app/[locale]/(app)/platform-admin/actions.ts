@@ -18,6 +18,11 @@ import {
   clearSiteAsset,
   type AssetSlot,
 } from "@/engines/platform-admin/branding-service";
+import {
+  setAnnouncementBar,
+  type AnnouncementBarInput,
+} from "@/engines/platform-admin/announcement-service";
+import { sanitizeRichText } from "@/lib/sanitize-html";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -68,10 +73,12 @@ export async function setContentOverrideAction(
   value: string,
 ): Promise<ActionResult> {
   try {
-    if (value.trim().length === 0) {
+    const clean = sanitizeRichText(value);
+    const isEmpty = clean.replace(/<[^>]+>/g, "").trim().length === 0;
+    if (isEmpty) {
       await withActionContext(() => clearContentOverride(key, locale));
     } else {
-      await withActionContext(() => setContentOverride(key, locale, value));
+      await withActionContext(() => setContentOverride(key, locale, clean));
     }
     revalidatePlatformSurfaces();
     return { ok: true };
@@ -86,6 +93,18 @@ export async function clearContentOverrideAction(
 ): Promise<ActionResult> {
   try {
     await withActionContext(() => clearContentOverride(key, locale));
+    revalidatePlatformSurfaces();
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+export async function setAnnouncementBarAction(
+  input: AnnouncementBarInput,
+): Promise<ActionResult> {
+  try {
+    await withActionContext(() => setAnnouncementBar(input));
     revalidatePlatformSurfaces();
     return { ok: true };
   } catch (e) {

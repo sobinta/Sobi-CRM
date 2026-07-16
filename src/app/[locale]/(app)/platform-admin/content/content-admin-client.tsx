@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import { routing, localeMeta, type AppLocale } from "@/i18n/routing";
 import {
@@ -62,7 +62,7 @@ export function ContentAdminClient({
           const composite = `${activeLocale}:${key}`;
           return (
             <div
-              key={key}
+              key={composite}
               className="rounded-xl border border-line bg-surface-raised p-4"
             >
               <div className="mb-2 flex items-center justify-between gap-2">
@@ -73,12 +73,12 @@ export function ContentAdminClient({
                   </span>
                 )}
               </div>
-              <Textarea
-                rows={2}
+              <RichTextEditor
+                minHeight={72}
                 placeholder={t("overridePlaceholder")}
                 value={values[composite] ?? ""}
-                onChange={(e) => {
-                  setValues((prev) => ({ ...prev, [composite]: e.target.value }));
+                onChange={(html) => {
+                  setValues((prev) => ({ ...prev, [composite]: html }));
                   setSavedKey(undefined);
                 }}
               />

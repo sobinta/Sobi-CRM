@@ -100,6 +100,29 @@ body {
   height: 100%;
 }
 
+/* Announcement bar marquee — two duplicated copies of the text scroll as one
+   continuous strip. Direction is which way the text appears to travel. */
+@keyframes marquee-ltr {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0%); }
+}
+@keyframes marquee-rtl {
+  from { transform: translateX(0%); }
+  to { transform: translateX(-50%); }
+}
+.announcement-marquee-ltr {
+  animation: marquee-ltr 18s linear infinite;
+}
+.announcement-marquee-rtl {
+  animation: marquee-rtl 18s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .announcement-marquee-ltr,
+  .announcement-marquee-rtl {
+    animation: none;
+  }
+}
+
 body {
   background: var(--surface);
   color: var(--ink);

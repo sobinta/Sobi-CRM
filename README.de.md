@@ -159,9 +159,25 @@ Demo-Arbeitsbereich fortfahren"** (siehe [Demo-Modus](#demo-modus)).
     schreibgeschützt), angewendet überall dort, wo das SOBI-CRM-Wortzeichen
     erscheint: Arbeitsbereichs-Rail, Anmelde-/Registrierungs-Panel,
     öffentliche Vertragsseite und Landingpage/Footer.
+  - **Ankündigungsleiste** — ein Aktions-/Hinweisstreifen (Rabattcodes,
+    Ankündigungen) oben auf der öffentlichen Landingpage und im
+    In-App-Arbeitsbereich, mit sprachspezifischem Text, Hintergrund-/
+    Textfarbe und einer scrollenden Laufschrift (links↔rechts oder statisch)
+    per reinem CSS.
   - Abgesichert durch `requireSuperAdmin()`, ein plattformweites Flag,
     getrennt von den mandantenbezogenen `can()`/`authorize()`-Prüfungen, die
     sonst überall im Produkt verwendet werden.
+- **Rich-Text-Editor** — ein vollständiger TipTap-Editor (fett/kursiv/Listen/
+  Links) treibt jedes vom Super-Admin verfasste Textfeld an (Landingpage-
+  Überschreibungen, das Hover-Bearbeitungspanel unten); gespeichertes HTML
+  wird serverseitig bereinigt (`isomorphic-dompurify`), bevor es persistiert
+  oder gerendert wird.
+- **Hover-Bearbeitung im Live-CMS-Modus** — ein „Zurück zur Hauptseite"-Eintrag
+  unten im Module Rail (nur Super-Admin) öffnet die öffentliche Landingpage,
+  während man weiterhin angemeldet bleibt. Dort zeigt das Überfahren mit der
+  Maus über jeden bearbeitbaren Text (Hero, CTA-Banner, Preis-Disclaimer)
+  einen Stift, der den Rich-Text-Editor direkt vor Ort öffnet — ohne das
+  passende Feld zuerst im Admin-Panel suchen zu müssen.
 
 ### CRM-Kern
 
@@ -400,11 +416,11 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
   auf Desktop immer sichtbar, ein- und ausklappbar zwischen reiner
   Icon-Ansicht und einer beschrifteten, erweiterten Ansicht (Einstellung
   bleibt sitzungsübergreifend gespeichert) — wird auf Mobilgeräten zu einer
-  aufklappbaren Schublade (dort immer erweitert, für bessere Lesbarkeit)
-  über ein Hamburger-Icon in der Topbar. Die Unternavigation je Arbeitsbereich
-  (Dashboard, Kontakte, …) läuft auf jeder Bildschirmgröße als horizontale,
-  scrollbare Tableiste oberhalb des Seiteninhalts, und jede Datentabelle
-  scrollt horizontal statt abzuschneiden.
+  aufklappbaren Schublade mit demselben Ein-/Ausklapp-Steuerelement (geöffnet
+  über ein Hamburger-Icon in der Topbar). Die Unternavigation je
+  Arbeitsbereich (Dashboard, Kontakte, …) läuft auf jeder Bildschirmgröße als
+  horizontale, scrollbare Tableiste oberhalb des Seiteninhalts, und jede
+  Datentabelle scrollt horizontal statt abzuschneiden.
 
 ### Branding & Internationalisierung
 
