@@ -6,7 +6,7 @@ import { useWorkspaces, findWorkspace } from "./workspaces-context";
 import { useMobileNav } from "./mobile-nav-context";
 import { cn } from "@/lib/utils";
 
-/** Contextual sidebar: navigation for the current workspace. */
+/** Horizontal sub-navigation for the current workspace, above the page content. */
 export function Sidebar() {
   const pathname = usePathname();
   const t = useTranslations("nav");
@@ -16,13 +16,11 @@ export function Sidebar() {
   const { close } = useMobileNav();
 
   return (
-    <aside className="flex h-full w-56 shrink-0 flex-col border-e border-line bg-surface-sunken/50">
-      <div className="flex h-14 items-center px-4">
-        <h2 className="text-sm font-semibold tracking-tight text-ink">
-          {tWs(workspace.labelKey)}
-        </h2>
-      </div>
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 pb-4">
+    <div className="flex h-12 shrink-0 items-center gap-3 border-b border-line bg-surface px-3 sm:px-4">
+      <span className="shrink-0 border-e border-line pe-3 text-xs font-semibold tracking-wide text-ink-faint uppercase">
+        {tWs(workspace.labelKey)}
+      </span>
+      <nav className="flex flex-1 items-center gap-1 overflow-x-auto">
         {workspace.nav.map((item) => {
           const active =
             pathname === item.href ||
@@ -35,7 +33,7 @@ export function Sidebar() {
               onClick={close}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm outline-none",
+                "shrink-0 rounded-md px-3 py-1.5 text-sm whitespace-nowrap outline-none",
                 "transition-colors duration-(--motion-fast)",
                 "focus-visible:outline-2 focus-visible:outline-focus-ring",
                 active
@@ -48,6 +46,6 @@ export function Sidebar() {
           );
         })}
       </nav>
-    </aside>
+    </div>
   );
 }

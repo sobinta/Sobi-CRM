@@ -22,18 +22,17 @@ export function AppShell({
     <WorkspacesProvider enabledModuleKeys={enabledModuleKeys} isSuperAdmin={user.isSuperAdmin}>
     <MobileNavProvider>
       <div className="flex h-dvh overflow-hidden">
-        {/* Rail + sidebar: always visible on lg+; a slide-in drawer below lg */}
+        {/* Module Rail: always visible on lg+ (collapsible); a slide-in drawer below lg */}
         <div className="hidden lg:flex">
           <ModuleRail />
-          <Sidebar />
         </div>
         <MobileNavOverlay>
-          <ModuleRail />
-          <Sidebar />
+          <ModuleRail forceExpanded />
         </MobileNavOverlay>
 
         <div className="flex min-w-0 flex-1 flex-col">
           <Topbar />
+          <Sidebar />
           <main className="flex-1 overflow-y-auto">{children}</main>
         </div>
       </div>

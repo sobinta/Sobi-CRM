@@ -396,10 +396,15 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
   vollständige Panel öffnet wie das Hamburger-Icon); ebenso für die
   Anmeldeseite, deren Markenpanel sich auf Mobilgeräten über das Formular
   stapelt statt zu verschwinden.
-- Auch der **In-App-Arbeitsbereich** ist mobil optimiert: Module Rail und
-  Sidebar (auf Desktop immer sichtbar) werden auf Mobilgeräten zu einer
-  aufklappbaren Schublade über ein Hamburger-Icon in der Topbar, und jede
-  Datentabelle scrollt horizontal statt abzuschneiden.
+- Auch der **In-App-Arbeitsbereich** ist mobil optimiert: Das Module Rail —
+  auf Desktop immer sichtbar, ein- und ausklappbar zwischen reiner
+  Icon-Ansicht und einer beschrifteten, erweiterten Ansicht (Einstellung
+  bleibt sitzungsübergreifend gespeichert) — wird auf Mobilgeräten zu einer
+  aufklappbaren Schublade (dort immer erweitert, für bessere Lesbarkeit)
+  über ein Hamburger-Icon in der Topbar. Die Unternavigation je Arbeitsbereich
+  (Dashboard, Kontakte, …) läuft auf jeder Bildschirmgröße als horizontale,
+  scrollbare Tableiste oberhalb des Seiteninhalts, und jede Datentabelle
+  scrollt horizontal statt abzuschneiden.
 
 ### Branding & Internationalisierung
 

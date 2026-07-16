@@ -404,10 +404,13 @@ scaffolds in module activation.
   "Menu" button opening the same full panel as the hamburger); same for the
   login page, whose brand panel stacks above the form on mobile instead of
   disappearing.
-- The **in-app workspace** is mobile-optimized too: the module rail + sidebar
-  (always visible on desktop) become a slide-in drawer opened from a Topbar
-  hamburger on mobile, and every data table scrolls horizontally instead of
-  clipping.
+- The **in-app workspace** is mobile-optimized too: the Module Rail — always
+  visible on desktop, collapsible between icon-only and a labeled expanded
+  state (remembered across sessions) — becomes a slide-in drawer (always
+  shown expanded, for legibility) opened from a Topbar hamburger on mobile.
+  The per-workspace sub-navigation (Dashboard, Contacts, …) runs as a
+  horizontal, scrollable tab strip above the page content on every screen
+  size, and every data table scrolls horizontally instead of clipping.
 
 ### Branding & internationalization
 
