@@ -1,0 +1,47 @@
+// ============================================================
+// Platform admin — cross-tenant content the super admin manages:
+// marketing pricing plans, curated landing-page copy overrides, and
+// brand asset (logo/favicon) replacement. Deliberately NOT tenant-scoped
+// (accessed via rawDb) — this is site-wide marketing content, not
+// per-tenant CRM data.
+// ============================================================
+
+model PricingPlan {
+  id           String   @id @default(cuid())
+  /// Stable slug, e.g. "free" | "pro" | "team" | "enterprise".
+  key          String   @unique
+  order        Int      @default(0)
+  recommended  Boolean  @default(false)
+  /// True for tiers like Enterprise that show a custom-pricing CTA instead
+  /// of a number (priceMonthly/priceAnnual are still shown as-authored,
+  /// e.g. "Custom").
+  isCustom     Boolean  @default(false)
+  /// Per-locale, display-ready content — mirrors the static landing i18n
+  /// tier shape exactly, so admin-entered values (e.g. Persian numerals,
+  /// "19 €" vs "$19") never need reformatting at render time:
+  /// { en: { name, desc, priceMonthly, priceAnnual, cta, features: string[] }, de: {...}, fa: {...} }
+  translations Json     @default("{}")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model LandingContentOverride {
+  id        String   @id @default(cuid())
+  /// Dot-path into the landing i18n namespace, e.g. "hero.headline1".
+  key       String
+  locale    String
+  value     String
+  updatedById String?
+  updatedAt DateTime @updatedAt
+
+  @@unique([key, locale])
+}
+
+model SiteAsset {
+  id          String   @id @default(cuid())
+  /// "logo" | "favicon"
+  slot        String   @unique
+  url         String
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+}

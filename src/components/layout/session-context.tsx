@@ -13,6 +13,7 @@ export interface SessionUser {
   initials: string;
   activeTenantId: string;
   tenants: SessionTenant[];
+  isSuperAdmin: boolean;
 }
 
 const SessionContext = createContext<SessionUser | null>(null);

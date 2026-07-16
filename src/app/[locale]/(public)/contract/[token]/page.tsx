@@ -5,6 +5,7 @@ import {
 } from "@/engines/contracts/contract-service";
 import { renderContractMarkdown } from "@/engines/contracts/render";
 import { Logo } from "@/components/brand/logo";
+import { getSiteAssetsPublic } from "@/engines/platform-admin/branding-service";
 import { AcceptForm } from "./accept-form";
 
 export default async function PublicContractPage({
@@ -13,7 +14,10 @@ export default async function PublicContractPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-  const contract = await getContractByToken(token);
+  const [contract, assets] = await Promise.all([
+    getContractByToken(token),
+    getSiteAssetsPublic(),
+  ]);
   if (!contract || contract.status === "draft") notFound();
 
   // First client view flips sent → viewed. Must be awaited: on a serverless
@@ -48,7 +52,7 @@ export default async function PublicContractPage({
       {/* Brand header */}
       <header className="no-print bg-brand px-6 py-5">
         <div className="mx-auto flex max-w-3xl items-center">
-          <Logo size={26} tone="on-dark" />
+          <Logo size={26} tone="on-dark" src={assets.logo} />
         </div>
       </header>
 

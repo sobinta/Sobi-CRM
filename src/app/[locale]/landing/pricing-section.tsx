@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Check } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import type { PlanTranslation } from "@/engines/platform-admin/pricing-service";
 
 interface PricingTier {
   name: string;
@@ -16,12 +17,46 @@ interface PricingTier {
   features: string[];
 }
 
-export function PricingSection() {
+/** A DB-backed plan, as passed down from the server-rendered landing page. */
+export interface DbPricingPlan {
+  key: string;
+  recommended: boolean;
+  isCustom: boolean;
+  translations: Record<string, PlanTranslation>;
+}
+
+function toTier(plan: DbPricingPlan, locale: string): PricingTier | null {
+  const t = plan.translations[locale] ?? plan.translations.en;
+  if (!t) return null;
+  return {
+    name: t.name,
+    desc: t.desc,
+    priceMonthly: t.priceMonthly,
+    priceAnnual: t.priceAnnual,
+    custom: plan.isCustom,
+    cta: t.cta,
+    recommended: plan.recommended,
+    features: t.features,
+  };
+}
+
+export function PricingSection({
+  dbPlans,
+  disclaimerOverride,
+}: {
+  dbPlans?: DbPricingPlan[];
+  disclaimerOverride?: string;
+}) {
   const t = useTranslations("landing.pricing");
-  const tiers = t.raw("tiers") as PricingTier[];
+  const locale = useLocale();
+  const staticTiers = t.raw("tiers") as PricingTier[];
   const priceNote = t("priceNote");
   const billedAnnually = t("billedAnnually");
   const [annual, setAnnual] = useState(true);
+
+  const tiers = dbPlans && dbPlans.length > 0
+    ? dbPlans.map((p) => toTier(p, locale)).filter((x): x is PricingTier => x !== null)
+    : staticTiers;
 
   return (
     <section id="pricing" className="bg-[#f0f3f1] py-24">
@@ -35,7 +70,9 @@ export function PricingSection() {
         >
           {t("headline")}
         </h2>
-        <p className="mx-auto mt-4 max-w-xl text-center text-sm text-[#65716d]">{t("disclaimer")}</p>
+        <p className="mx-auto mt-4 max-w-xl text-center text-sm text-[#65716d]">
+          {disclaimerOverride ?? t("disclaimer")}
+        </p>
 
         <div className="mx-auto mt-8 flex w-fit items-center gap-1 rounded-lg border border-[#dde4e0] bg-white p-1">
           <button

@@ -1,14 +1,17 @@
-"use client";
-
-import { useTranslations } from "next-intl";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ShieldCheck, ArrowRight } from "lucide-react";
 import { DEMO_LOGIN_ENABLED } from "@/core/auth/demo-login";
+import { getContentOverridesPublic, resolveContent } from "@/engines/platform-admin/content-service";
 import { DemoCtaButton } from "./demo-cta-button";
 
-export function CtaBanner() {
-  const t = useTranslations("landing.cta");
-  const tAuth = useTranslations("auth");
+export async function CtaBanner() {
+  const t = await getTranslations("landing.cta");
+  const tAuth = await getTranslations("auth");
+  const locale = await getLocale();
+  const overrides = await getContentOverridesPublic();
+  const c = (key: "cta.headline1" | "cta.headline2" | "cta.subhead", fallback: string) =>
+    resolveContent(overrides, locale, key, fallback);
 
   return (
     <section className="bg-[#183f3b] py-24">
@@ -18,11 +21,13 @@ export function CtaBanner() {
           className="mt-4 text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl"
           style={{ fontFamily: "var(--landing-font-display)" }}
         >
-          {t("headline1")}
+          {c("cta.headline1", t("headline1"))}
           <br />
-          {t("headline2")}
+          {c("cta.headline2", t("headline2"))}
         </h2>
-        <p className="mt-4 text-base leading-relaxed text-white/60">{t("subhead")}</p>
+        <p className="mt-4 text-base leading-relaxed text-white/60">
+          {c("cta.subhead", t("subhead"))}
+        </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           {DEMO_LOGIN_ENABLED && (

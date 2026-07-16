@@ -45,7 +45,8 @@
     "immigration": "Migration",
     "barber": "Friseur",
     "salon": "Salon",
-    "restaurant": "Restaurant"
+    "restaurant": "Restaurant",
+    "platformAdmin": "Plattform-Admin"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -88,7 +89,10 @@
     "appointments": "Termine",
     "services": "Leistungen",
     "reservations": "Reservierungen",
-    "contracts": "Verträge"
+    "contracts": "Verträge",
+    "pricingPlans": "Preispläne",
+    "landingContent": "Landingpage-Inhalte",
+    "branding": "Branding"
   },
   "shell": {
     "commandHint": "Drücken Sie {shortcut} zum Suchen",
@@ -96,7 +100,9 @@
     "profile": "Profil",
     "signOut": "Abmelden",
     "collapseSidebar": "Seitenleiste einklappen",
-    "expandSidebar": "Seitenleiste ausklappen"
+    "expandSidebar": "Seitenleiste ausklappen",
+    "menu": "Menü",
+    "mobileNav": "Primär"
   },
   "dashboard": {
     "welcome": "Willkommen zurück, {name}",
@@ -250,5 +256,35 @@
       ],
       "copyright": "© 2026 SOBI CRM. Produktdemonstration."
     }
+  },
+  "platformAdmin": {
+    "pricingTitle": "Preispläne",
+    "pricingDesc": "Zeilen der öffentlichen Preisübersicht, je Sprache übersetzt. Leer lassen, um die eingebauten Demo-Pläne zu behalten.",
+    "contentTitle": "Landingpage-Inhalte",
+    "contentDesc": "Bestimmte Landingpage-Texte je Sprache überschreiben. Ein leeres Feld behält den eingebauten Text.",
+    "brandingTitle": "Branding",
+    "brandingDesc": "Logo und Favicon auf extern gehostete Bild-URLs verweisen — wird überall verwendet, wo das SOBI-CRM-Wortzeichen erscheint.",
+    "newPlan": "Neuer Plan",
+    "editPlan": "Plan bearbeiten",
+    "planKey": "Schlüssel",
+    "planKeyHint": "Stabiler Bezeichner, z. B. \"starter\", \"pro\", \"enterprise\".",
+    "order": "Reihenfolge",
+    "recommended": "Empfohlen (auf der Landingpage hervorgehoben)",
+    "custom": "Individueller Preis (Text wird 1:1 angezeigt, z. B. \"Kontakt aufnehmen\")",
+    "name": "Name",
+    "desc": "Beschreibung",
+    "priceMonthly": "Monatspreis",
+    "priceAnnual": "Jahrespreis",
+    "cta": "Button-Text",
+    "features": "Funktionen (eine pro Zeile)",
+    "noPlans": "Noch keine eigenen Pläne — die Landingpage zeigt die eingebauten Standardpläne.",
+    "deletePlanConfirm": "Diesen Plan löschen? Das kann nicht rückgängig gemacht werden.",
+    "logoUrl": "Logo-Bild-URL",
+    "faviconUrl": "Favicon-Bild-URL",
+    "clearOverride": "Überschreibung entfernen",
+    "saved": "Gespeichert",
+    "field": "Feld",
+    "overrideValue": "Überschreibungstext",
+    "overridePlaceholder": "Leer lassen, um den Standardtext zu verwenden"
   }
 }

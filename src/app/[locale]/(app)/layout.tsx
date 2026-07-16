@@ -56,6 +56,7 @@ export default async function AppLayout({
       id: m.tenantId,
       name: m.tenantName,
     })),
+    isSuperAdmin: s.isSuperAdmin,
   };
 
   return (

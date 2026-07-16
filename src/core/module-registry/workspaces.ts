@@ -12,6 +12,7 @@ import {
   Sparkles,
   ShieldCheck,
   Shapes,
+  Crown,
 } from "lucide-react";
 
 export interface NavItemDef {
@@ -118,6 +119,23 @@ export const workspaces: WorkspaceDef[] = [
     ],
   },
 ];
+
+/**
+ * Cross-tenant super-admin surface — not part of `workspaces`, since it isn't
+ * gated by module activation like the others. Appended by `composeWorkspaces`
+ * only when the current user has the platform-wide `isSuperAdmin` flag.
+ */
+export const platformAdminWorkspace: WorkspaceDef = {
+  key: "platform-admin",
+  labelKey: "platformAdmin",
+  icon: Crown,
+  href: "/platform-admin",
+  nav: [
+    { key: "pricing", labelKey: "pricingPlans", href: "/platform-admin" },
+    { key: "content", labelKey: "landingContent", href: "/platform-admin/content" },
+    { key: "branding", labelKey: "branding", href: "/platform-admin/branding" },
+  ],
+};
 
 export function findWorkspaceByPath(pathname: string): WorkspaceDef {
   return (

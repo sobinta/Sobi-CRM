@@ -1,12 +1,17 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Check } from "lucide-react";
 import { DEMO_LOGIN_ENABLED } from "@/core/auth/demo-login";
+import { getContentOverridesPublic, resolveContent } from "@/engines/platform-admin/content-service";
 import { DemoCtaButton } from "./demo-cta-button";
 
 export async function Hero() {
   const t = await getTranslations("landing.hero");
   const tAuth = await getTranslations("auth");
+  const locale = await getLocale();
+  const overrides = await getContentOverridesPublic();
+  const c = (key: "hero.badge" | "hero.headline1" | "hero.headline2" | "hero.subhead" | "hero.ctaPrimary" | "hero.ctaSecondary", fallback: string) =>
+    resolveContent(overrides, locale, key, fallback);
 
   return (
     <section className="mx-auto max-w-6xl px-6 pb-20 pt-16">
@@ -14,20 +19,20 @@ export async function Hero() {
         <div>
           <span className="inline-flex items-center gap-2 rounded-full bg-[#183f3b] px-4 py-1.5 text-xs font-semibold text-white">
             <span className="h-1.5 w-1.5 rounded-full bg-[#aee1d3]" />
-            {t("badge")}
+            {c("hero.badge", t("badge"))}
           </span>
 
           <h1
             className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight text-[#14211e] sm:text-6xl"
             style={{ fontFamily: "var(--landing-font-display)" }}
           >
-            {t("headline1")}
+            {c("hero.headline1", t("headline1"))}
             <br />
-            <span className="text-[#2f7d72]">{t("headline2")}</span>
+            <span className="text-[#2f7d72]">{c("hero.headline2", t("headline2"))}</span>
           </h1>
 
           <p className="mt-6 max-w-md text-lg leading-relaxed text-[#65716d]">
-            {t("subhead")}
+            {c("hero.subhead", t("subhead"))}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -35,21 +40,21 @@ export async function Hero() {
               href="/register"
               className="rounded-md bg-[#183f3b] px-5 py-3 text-sm font-semibold text-white hover:bg-[#132f2c]"
             >
-              {t("ctaPrimary")}
+              {c("hero.ctaPrimary", t("ctaPrimary"))}
             </Link>
             {DEMO_LOGIN_ENABLED ? (
               <DemoCtaButton
                 pendingLabel={tAuth("signingInDemo")}
                 className="rounded-md border border-[#dde4e0] bg-white px-5 py-3 text-sm font-semibold text-[#14211e] hover:bg-[#f0f3f1] disabled:opacity-60"
               >
-                {t("ctaSecondary")}
+                {c("hero.ctaSecondary", t("ctaSecondary"))}
               </DemoCtaButton>
             ) : (
               <a
                 href="#how-it-works"
                 className="rounded-md border border-[#dde4e0] bg-white px-5 py-3 text-sm font-semibold text-[#14211e] hover:bg-[#f0f3f1]"
               >
-                {t("ctaSecondary")}
+                {c("hero.ctaSecondary", t("ctaSecondary"))}
               </a>
             )}
           </div>

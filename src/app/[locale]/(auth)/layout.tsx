@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import { Check } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { getSiteAssetsPublic } from "@/engines/platform-admin/branding-service";
 
 export default async function AuthLayout({
   children,
@@ -10,6 +11,7 @@ export default async function AuthLayout({
 }) {
   const t = await getTranslations("auth");
   const tApp = await getTranslations("app");
+  const assets = await getSiteAssetsPublic();
 
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
@@ -18,7 +20,7 @@ export default async function AuthLayout({
           product pitch isn't desktop-only. */}
       <aside className="relative flex flex-col justify-center overflow-hidden bg-[#183f3b] px-6 py-8 sm:px-10 lg:w-1/2 lg:justify-between lg:p-12">
         <div className="hidden lg:block">
-          <Logo size={30} tone="on-dark" />
+          <Logo size={30} tone="on-dark" src={assets.logo} />
         </div>
         <span className="sr-only">{tApp("name")}</span>
 

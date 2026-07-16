@@ -25,6 +25,7 @@ Operating System with a human-approval gate.
 3. [Feature catalogue](#feature-catalogue)
    - [Platform & multi-tenancy](#platform--multi-tenancy)
    - [Authentication & access](#authentication--access)
+   - [Platform administration](#platform-administration)
    - [CRM core](#crm-core)
    - [Lead conversion & AI scoring](#lead-conversion--ai-scoring)
    - [AI Operating System](#ai-operating-system)
@@ -126,6 +127,29 @@ one-click **"Continue with demo workspace"** button (see
 - **Field-level rules** and a full `AuditLog` (auth, data, file, permission,
   export, admin, security, AI categories) with a viewer in Administration.
 - **One-click demo login** — see [Demo mode](#demo-mode).
+
+### Platform administration
+
+- **Self-service super admin bootstrap** — the very first user to register on
+  a fresh deployment is automatically flagged `isSuperAdmin`; no manual DB
+  edit or seed step required. Re-claimable: if no super admin currently
+  exists, the next registration becomes one.
+- **`/platform-admin` panel** — a cross-tenant surface (distinct from the
+  per-tenant Administration workspace) visible only to the super admin, with
+  its own entry in the Module Rail:
+  - **Pricing Plans** — full CRUD over the plans shown on the public pricing
+    section, translated per locale (name, description, monthly/annual price,
+    button label, feature list), with an "order" and "recommended" flag.
+  - **Landing Content** — per-locale text overrides for the landing page's
+    highest-value copy (hero, CTA banner, pricing disclaimer); an empty field
+    falls back to the built-in translation, so nothing needs a redeploy for a
+    quick copy tweak.
+  - **Branding** — logo/favicon as externally-hosted image URLs (not a file
+    upload — Vercel's serverless filesystem is read-only at runtime), applied
+    everywhere the SOBI CRM wordmark renders: workspace rail, login/register
+    panel, public contract page, and the landing page/footer.
+  - Guarded by `requireSuperAdmin()`, a platform-wide flag distinct from the
+    tenant-scoped `can()`/`authorize()` permission checks used everywhere else.
 
 ### CRM core
 
@@ -366,6 +390,22 @@ scaffolds in module activation.
   `next-intl` setup as the rest of the app.
 - "Try demo" / "Enter demo workspace" buttons trigger the same one-click
   demo login used on the sign-in page.
+- **Pricing plans, hero/CTA copy, and the logo** are all sourced live from the
+  Platform Administration panel (with static fallbacks), so a super admin can
+  tune the sales pitch without a code change — see
+  [Platform administration](#platform-administration).
+- A genuine **monthly/annual pricing toggle** — switching shows different
+  numbers per tier (not a cosmetic-only label swap) plus a "billed annually"
+  note.
+- **Fully mobile-optimized**: a real hamburger menu (not a hidden nav) exposes
+  every nav link, the language switcher, and sign-in/demo/register actions
+  below the `sm` breakpoint; same for the login page, whose brand panel stacks
+  above the form on mobile instead of disappearing.
+- The **in-app workspace** is mobile-optimized too: the module rail + sidebar
+  become a slide-in drawer (opened from a Topbar hamburger), every data table
+  scrolls horizontally instead of clipping, and a **bottom tab bar** (below
+  `lg`) puts the most-used destinations — CRM, Tasks, Calendar, AI Assistant,
+  and a "Menu" button for everything else — within thumb reach.
 
 ### Branding & internationalization
 

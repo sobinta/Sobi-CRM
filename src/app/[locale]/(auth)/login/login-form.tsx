@@ -12,7 +12,7 @@ import { Logo } from "@/components/brand/logo";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing, localeMeta, type AppLocale } from "@/i18n/routing";
 
-export function LoginForm() {
+export function LoginForm({ logoSrc }: { logoSrc?: string }) {
   const t = useTranslations("auth");
   const locale = useLocale();
   const pathname = usePathname();
@@ -57,7 +57,7 @@ export function LoginForm() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <Logo size={26} />
+        <Logo size={26} src={logoSrc} />
         <select
           aria-label="Language"
           value={locale}

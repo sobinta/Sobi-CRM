@@ -40,6 +40,7 @@ export interface ProvisionInput {
 export interface ProvisionResult {
   tenantId: string;
   membershipId: string;
+  isSuperAdmin: boolean;
 }
 
 export async function provisionTenant(
@@ -87,7 +88,22 @@ export async function provisionTenant(
       },
     });
 
-    return { tenantId: tenant.id, membershipId: membership.id };
+    // Platform bootstrap: whoever registers while no super admin exists yet
+    // becomes one. Re-claimable if a super admin account is later removed.
+    const existingSuperAdmin = await tx.user.findFirst({
+      where: { isSuperAdmin: true },
+      select: { id: true },
+    });
+    let isSuperAdmin = false;
+    if (!existingSuperAdmin) {
+      await tx.user.update({
+        where: { id: input.userId },
+        data: { isSuperAdmin: true },
+      });
+      isSuperAdmin = true;
+    }
+
+    return { tenantId: tenant.id, membershipId: membership.id, isSuperAdmin };
   });
 
   // Emit within a minimal context so the event is attributed correctly.
@@ -98,7 +114,7 @@ export async function provisionTenant(
       userId: input.userId,
       permissions: new Set(["*"]),
       isAdmin: true,
-      isSuperAdmin: false,
+      isSuperAdmin: result.isSuperAdmin,
       locale: input.locale ?? "en",
     },
     () =>

@@ -27,6 +27,7 @@ Freigabe-Instanz.
 3. [Funktionskatalog](#funktionskatalog)
    - [Plattform & Mandantenfähigkeit](#plattform--mandantenfähigkeit)
    - [Authentifizierung & Zugriff](#authentifizierung--zugriff)
+   - [Plattformverwaltung](#plattformverwaltung)
    - [CRM-Kern](#crm-kern)
    - [Lead-Konvertierung & KI-Bewertung](#lead-konvertierung--ki-bewertung)
    - [KI-Betriebssystem](#ki-betriebssystem)
@@ -134,6 +135,33 @@ Demo-Arbeitsbereich fortfahren"** (siehe [Demo-Modus](#demo-modus)).
   Datei-, Berechtigungs-, Export-, Admin-, Sicherheits-, KI-Kategorien) mit
   einem Viewer in der Administration.
 - **Ein-Klick-Demo-Login** — siehe [Demo-Modus](#demo-modus).
+
+### Plattformverwaltung
+
+- **Selbstständiges Super-Admin-Bootstrapping** — der allererste Nutzer, der
+  sich auf einer frischen Installation registriert, wird automatisch als
+  `isSuperAdmin` markiert — kein manueller DB-Eingriff oder Seed-Schritt
+  nötig. Erneut vergebbar: Existiert aktuell kein Super-Admin, wird die
+  nächste Registrierung einer.
+- **`/platform-admin`-Panel** — eine mandantenübergreifende Oberfläche
+  (getrennt vom mandantenspezifischen Verwaltungsbereich), sichtbar nur für
+  den Super-Admin, mit eigenem Eintrag im Module Rail:
+  - **Preispläne** — vollständiges CRUD über die auf der öffentlichen
+    Preisseite gezeigten Pläne, je Sprache übersetzt (Name, Beschreibung,
+    Monats-/Jahrespreis, Button-Text, Funktionsliste), mit Reihenfolge- und
+    „Empfohlen"-Flag.
+  - **Landingpage-Inhalte** — sprachspezifische Textüberschreibungen für die
+    wichtigsten Landingpage-Texte (Hero, CTA-Banner, Preis-Disclaimer); ein
+    leeres Feld fällt auf die eingebaute Übersetzung zurück — kein Redeploy
+    für eine schnelle Textänderung nötig.
+  - **Branding** — Logo/Favicon als extern gehostete Bild-URLs (kein
+    Datei-Upload — Vercels serverloses Dateisystem ist zur Laufzeit
+    schreibgeschützt), angewendet überall dort, wo das SOBI-CRM-Wortzeichen
+    erscheint: Arbeitsbereichs-Rail, Anmelde-/Registrierungs-Panel,
+    öffentliche Vertragsseite und Landingpage/Footer.
+  - Abgesichert durch `requireSuperAdmin()`, ein plattformweites Flag,
+    getrennt von den mandantenbezogenen `can()`/`authorize()`-Prüfungen, die
+    sonst überall im Produkt verwendet werden.
 
 ### CRM-Kern
 
@@ -354,6 +382,23 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 - Vollständig lokalisiert (Englisch/Deutsch/Persisch, RTL für Persisch).
 - „Demo testen" / „Demo-Arbeitsbereich betreten" lösen denselben
   Ein-Klick-Demo-Login wie auf der Anmeldeseite aus.
+- **Preispläne, Hero-/CTA-Texte und das Logo** stammen alle live aus dem
+  Plattformverwaltungs-Panel (mit statischen Fallbacks) — siehe
+  [Plattformverwaltung](#plattformverwaltung).
+- Ein echter **Monats-/Jahres-Preis-Umschalter** — beim Umschalten ändern
+  sich die tatsächlichen Zahlen je Tarif (kein rein kosmetischer
+  Label-Tausch), plus ein „jährlich abgerechnet"-Hinweis.
+- **Vollständig für Mobilgeräte optimiert**: ein echtes Hamburger-Menü (kein
+  versteckter Nav-Bereich) zeigt unterhalb von `sm` jeden Nav-Link, den
+  Sprachumschalter und die Anmelde-/Demo-/Registrierungs-Aktionen; ebenso
+  für die Anmeldeseite, deren Markenpanel sich auf Mobilgeräten über das
+  Formular stapelt statt zu verschwinden.
+- Auch der **In-App-Arbeitsbereich** ist mobil optimiert: Module Rail und
+  Sidebar werden zu einer aufklappbaren Schublade (über ein Hamburger-Icon
+  in der Topbar), jede Datentabelle scrollt horizontal statt abzuschneiden,
+  und eine **untere Tableiste** (unterhalb von `lg`) bringt die
+  meistgenutzten Ziele — CRM, Aufgaben, Kalender, KI-Assistent sowie ein
+  „Menü"-Button für alles andere — in Daumenreichweite.
 
 ### Branding & Internationalisierung
 

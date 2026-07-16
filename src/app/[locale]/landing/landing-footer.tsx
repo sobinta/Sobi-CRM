@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Logo } from "@/components/brand/logo";
+import { getSiteAssetsPublic } from "@/engines/platform-admin/branding-service";
 
 interface FooterColumn {
   title: string;
@@ -9,13 +10,14 @@ interface FooterColumn {
 export async function LandingFooter() {
   const t = await getTranslations("landing.footer");
   const columns = t.raw("columns") as FooterColumn[];
+  const assets = await getSiteAssetsPublic();
 
   return (
     <footer className="bg-white py-14">
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
           <div>
-            <Logo size={24} />
+            <Logo size={24} src={assets.logo} />
             <p className="mt-2 text-sm text-[#65716d]">{t("tagline")}</p>
           </div>
           {columns.map((col) => (

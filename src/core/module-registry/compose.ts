@@ -1,4 +1,4 @@
-import { workspaces, type WorkspaceDef } from "./workspaces";
+import { workspaces, platformAdminWorkspace, type WorkspaceDef } from "./workspaces";
 import { getModuleManifest, manifestToWorkspace } from "./manifest";
 import "./module-manifests"; // register all module manifests (client-safe)
 
@@ -7,9 +7,11 @@ import "./module-manifests"; // register all module manifests (client-safe)
  * activated modules. Module workspaces slot in after the CRM/Sales core and
  * before Operations. Given only the enabled module keys (serializable), so the
  * server can drive this without shipping icon components across the boundary.
+ * Platform Admin is appended last, only for the platform's super admin.
  */
 export function composeWorkspaces(
   enabledModuleKeys: string[],
+  isSuperAdmin = false,
 ): WorkspaceDef[] {
   const moduleWorkspaces: WorkspaceDef[] = enabledModuleKeys
     .map((key) => getModuleManifest(key))
@@ -18,5 +20,10 @@ export function composeWorkspaces(
 
   // Core order: CRM, then modules, then the rest.
   const [crm, ...rest] = workspaces;
-  return [crm, ...moduleWorkspaces, ...rest];
+  return [
+    crm,
+    ...moduleWorkspaces,
+    ...rest,
+    ...(isSuperAdmin ? [platformAdminWorkspace] : []),
+  ];
 }

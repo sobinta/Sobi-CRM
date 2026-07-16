@@ -45,7 +45,8 @@
     "immigration": "Immigration",
     "barber": "Barber",
     "salon": "Salon",
-    "restaurant": "Restaurant"
+    "restaurant": "Restaurant",
+    "platformAdmin": "Platform Admin"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -88,7 +89,10 @@
     "appointments": "Appointments",
     "services": "Services",
     "reservations": "Reservations",
-    "contracts": "Contracts"
+    "contracts": "Contracts",
+    "pricingPlans": "Pricing Plans",
+    "landingContent": "Landing Content",
+    "branding": "Branding"
   },
   "shell": {
     "commandHint": "Press {shortcut} to search",
@@ -96,7 +100,9 @@
     "profile": "Profile",
     "signOut": "Sign out",
     "collapseSidebar": "Collapse sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "menu": "Menu",
+    "mobileNav": "Primary"
   },
   "dashboard": {
     "welcome": "Welcome back, {name}",
@@ -250,5 +256,35 @@
       ],
       "copyright": "© 2026 SOBI CRM. Product demonstration."
     }
+  },
+  "platformAdmin": {
+    "pricingTitle": "Pricing Plans",
+    "pricingDesc": "Rows shown on the public pricing section, translated per locale. Leave empty to keep the built-in demo plans.",
+    "contentTitle": "Landing Content",
+    "contentDesc": "Override specific landing-page strings per locale. Leave a field empty to keep the built-in copy.",
+    "brandingTitle": "Branding",
+    "brandingDesc": "Point the logo and favicon at externally-hosted image URLs — used everywhere the SOBI CRM wordmark appears.",
+    "newPlan": "New plan",
+    "editPlan": "Edit plan",
+    "planKey": "Key",
+    "planKeyHint": "Stable identifier, e.g. \"starter\", \"pro\", \"enterprise\".",
+    "order": "Order",
+    "recommended": "Recommended (highlighted on the landing page)",
+    "custom": "Custom pricing (shows the text as-is, e.g. \"Contact us\")",
+    "name": "Name",
+    "desc": "Description",
+    "priceMonthly": "Monthly price",
+    "priceAnnual": "Annual price",
+    "cta": "Button label",
+    "features": "Features (one per line)",
+    "noPlans": "No custom plans yet — the landing page is showing its built-in defaults.",
+    "deletePlanConfirm": "Delete this plan? This can't be undone.",
+    "logoUrl": "Logo image URL",
+    "faviconUrl": "Favicon image URL",
+    "clearOverride": "Clear override",
+    "saved": "Saved",
+    "field": "Field",
+    "overrideValue": "Override text",
+    "overridePlaceholder": "Leave empty to use the default copy"
   }
 }
