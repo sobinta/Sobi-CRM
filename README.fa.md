@@ -436,7 +436,9 @@ src/
   `FIELD_ENCRYPTION_KEY` را روی مقادیر واقعی پروداکشن تنظیم کنید.
 - **درایور ذخیره‌ی فایل روی دیسک محلی فقط روی یک میزبان دائمی تک‌نمونه
   کار می‌کند** — در پلتفرم‌های سرورلس، پیش از تکیه بر آپلود فایل،
-  `FILE_STORAGE_DRIVER` را به پیاده‌سازی سازگار با S3 تغییر دهید.
+  درایور داخلی را با `FILE_STORAGE_DRIVER=s3` و تنظیمات bucket فعال کنید.
+- در production، `FILE_STORAGE_DRIVER=s3` و `RATE_LIMIT_BACKEND=redis` الزامی
+  هستند؛ eventها از outbox پایدار PostgreSQL و jobهای دارای lease/retry استفاده می‌کنند.
 - `npx prisma migrate deploy` باید پیش از (یا به‌عنوان بخشی از) اولین
   دیپلوی روی دیتابیس پروداکشن اجرا شود.
 

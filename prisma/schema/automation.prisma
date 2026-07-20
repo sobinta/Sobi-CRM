@@ -40,10 +40,14 @@ model AutomationRun {
   /// Per-action outcomes + any error.
   detail       Json     @default("{}")
   durationMs   Int      @default(0)
+  /// Durable event id; null for future schedule/manual runs.
+  eventId      String?
   createdAt    DateTime @default(now())
 
   automation Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  event Event? @relation(fields: [tenantId, eventId], references: [tenantId, id], onDelete: Cascade)
 
+  @@unique([automationId, eventId])
   @@index([tenantId, automationId, createdAt])
   @@index([tenantId, status])
 }
@@ -66,7 +70,33 @@ model Webhook {
   createdById String?
   createdAt   DateTime @default(now())
 
+  deliveries WebhookDelivery[]
+
+  @@unique([tenantId, id])
   @@index([tenantId, enabled])
+}
+
+/// Durable, independently retryable delivery of one event to one endpoint.
+model WebhookDelivery {
+  id          String   @id @default(cuid())
+  tenantId    String
+  webhookId   String
+  eventId     String
+  /// pending | delivering | succeeded | failed
+  status      String   @default("pending")
+  attempts    Int      @default(0)
+  lastStatus  Int?
+  lastError   String?
+  deliveredAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  webhook Webhook @relation(fields: [tenantId, webhookId], references: [tenantId, id], onDelete: Cascade)
+  event Event @relation(fields: [tenantId, eventId], references: [tenantId, id], onDelete: Cascade)
+
+  @@unique([webhookId, eventId])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, eventId])
 }
 
 model ApiKey {

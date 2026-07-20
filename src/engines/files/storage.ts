@@ -1,26 +1,27 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+  type S3ClientConfig,
+} from "@aws-sdk/client-s3";
 
-/**
- * Storage provider abstraction. Local disk in dev; the interface matches an
- * S3-compatible object store so a cloud provider drops in without touching
- * callers. Files are never served from a public path — only via the signed,
- * permission-checked download route.
- */
-
+/** Files are private and are only returned by the permission-checked route. */
 export interface StorageProvider {
   put(key: string, data: Buffer): Promise<void>;
   get(key: string): Promise<Buffer>;
   delete(key: string): Promise<void>;
 }
 
-class LocalStorage implements StorageProvider {
-  private root: string;
-  constructor() {
+export class LocalStorage implements StorageProvider {
+  private readonly root: string;
+  constructor(root = process.env.FILE_STORAGE_LOCAL_PATH ?? "./storage") {
     this.root = path.resolve(
       /* turbopackIgnore: true */
-      process.env.FILE_STORAGE_LOCAL_PATH ?? "./storage",
+      root,
     );
   }
   private full(key: string) {
@@ -31,9 +32,9 @@ class LocalStorage implements StorageProvider {
     return candidate;
   }
   async put(key: string, data: Buffer) {
-    const p = this.full(key);
-    await fs.mkdir(path.dirname(p), { recursive: true });
-    await fs.writeFile(p, data);
+    const target = this.full(key);
+    await fs.mkdir(path.dirname(target), { recursive: true });
+    await fs.writeFile(target, data);
   }
   async get(key: string) {
     return fs.readFile(this.full(key));
@@ -43,7 +44,87 @@ class LocalStorage implements StorageProvider {
   }
 }
 
-export const storage: StorageProvider = new LocalStorage();
+type S3Sender = Pick<S3Client, "send">;
+
+export class S3Storage implements StorageProvider {
+  constructor(
+    private readonly bucket: string,
+    private readonly client: S3Sender,
+  ) {}
+
+  async put(key: string, data: Buffer): Promise<void> {
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        Body: data,
+        ServerSideEncryption: "AES256",
+      }),
+    );
+  }
+
+  async get(key: string): Promise<Buffer> {
+    const result = await this.client.send(
+      new GetObjectCommand({ Bucket: this.bucket, Key: key }),
+    );
+    if (!result.Body) throw new Error("Stored object has no body.");
+    return Buffer.from(await result.Body.transformToByteArray());
+  }
+
+  async delete(key: string): Promise<void> {
+    await this.client.send(
+      new DeleteObjectCommand({ Bucket: this.bucket, Key: key }),
+    );
+  }
+}
+
+type StorageEnvironment = Readonly<Record<string, string | undefined>>;
+
+function s3Config(env: StorageEnvironment): S3ClientConfig {
+  const region = env.FILE_STORAGE_S3_REGION;
+  if (!region) throw new Error("FILE_STORAGE_S3_REGION is required.");
+  const config: S3ClientConfig = {
+    region,
+    endpoint: env.FILE_STORAGE_S3_ENDPOINT || undefined,
+    forcePathStyle: env.FILE_STORAGE_S3_FORCE_PATH_STYLE === "true",
+  };
+  const accessKeyId = env.FILE_STORAGE_S3_ACCESS_KEY_ID;
+  const secretAccessKey = env.FILE_STORAGE_S3_SECRET_ACCESS_KEY;
+  if (accessKeyId || secretAccessKey) {
+    if (!accessKeyId || !secretAccessKey) {
+      throw new Error("Both S3 access key and secret key are required together.");
+    }
+    config.credentials = { accessKeyId, secretAccessKey };
+  }
+  return config;
+}
+
+export function createStorageProvider(
+  env: StorageEnvironment = process.env,
+  client?: S3Sender,
+): StorageProvider {
+  const driver = env.FILE_STORAGE_DRIVER ?? "local";
+  if (driver === "local") {
+    return new LocalStorage(env.FILE_STORAGE_LOCAL_PATH ?? "./storage");
+  }
+  if (driver !== "s3") throw new Error(`Unsupported file storage driver: ${driver}`);
+  const bucket = env.FILE_STORAGE_S3_BUCKET;
+  if (!bucket) throw new Error("FILE_STORAGE_S3_BUCKET is required.");
+  return new S3Storage(bucket, client ?? new S3Client(s3Config(env)));
+}
+
+let selectedStorage: StorageProvider | undefined;
+function provider(): StorageProvider {
+  selectedStorage ??= createStorageProvider();
+  return selectedStorage;
+}
+
+/** Lazy proxy avoids connecting to external infrastructure during build. */
+export const storage: StorageProvider = {
+  put: (key, data) => provider().put(key, data),
+  get: (key) => provider().get(key),
+  delete: (key) => provider().delete(key),
+};
 
 /** Build a tenant-scoped storage key. */
 export function makeStorageKey(tenantId: string, filename: string): string {

@@ -503,7 +503,10 @@ Plattformen (Vercel u. Ä.):
   `FIELD_ENCRYPTION_KEY` auf echte Produktionswerte setzen.
 - Der **lokale Datei-Speichertreiber funktioniert nur auf einem
   persistenten Einzel-Host** — auf serverlosen Plattformen vor
-  Datei-Uploads auf die S3-kompatible Implementierung umstellen.
+  Datei-Uploads den integrierten S3-Treiber mit `FILE_STORAGE_DRIVER=s3` aktivieren.
+- In Produktion sind `FILE_STORAGE_DRIVER=s3` und `RATE_LIMIT_BACKEND=redis`
+  verpflichtend; Events laufen über eine persistente PostgreSQL-Outbox und
+  Jobs verwenden Lease, Deduplizierung und begrenzte Wiederholungen.
 - `npx prisma migrate deploy` muss vor (oder als Teil) dem ersten Deploy
   gegen die Produktionsdatenbank laufen.
 

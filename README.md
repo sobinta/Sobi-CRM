@@ -331,8 +331,9 @@ Action Center → Human Approval → AI Audit`.
 ### Integrations
 
 - **Outbound webhooks** — signed (`HMAC-SHA256`, `X-Sobi-Signature` /
-  `X-Sobi-Event` headers), per-tenant subscriptions by event type,
-  best-effort delivery with status/failure recording, HTTPS enforcement,
+  `X-Sobi-Event` / stable `X-Sobi-Delivery` headers), per-tenant subscriptions
+  by event type, durable independently retried delivery with status recording,
+  HTTPS enforcement,
   private/metadata-network blocking, DNS pinning, and no redirect following.
 - **Scoped API keys** for the public REST API (`/api/v1/...`) with hashed
   throttle identifiers.
@@ -376,7 +377,8 @@ scaffolds in module activation.
 
 ### Security, audit & GDPR
 
-- Argon2 password hashing, DB sessions (httpOnly, SameSite), rate limiting.
+- Argon2 password hashing, DB sessions (httpOnly, SameSite), Redis-backed
+  distributed rate limiting in production.
 - Per-request nonce CSP (`strict-dynamic`, no production inline scripts),
   HSTS, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and
   `Permissions-Policy` security headers.
@@ -512,9 +514,10 @@ similar):
 - Set `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`, and
   `FIELD_ENCRYPTION_KEY` to real production values (never reuse the dev
   placeholders in `.env.example`).
-- The **local-disk file storage driver only works on a single persistent
-  host** — on serverless platforms, swap `FILE_STORAGE_DRIVER` to the
-  S3-compatible implementation before relying on file uploads.
+- Production requires the built-in S3-compatible storage driver and Redis;
+  local disk and the memory limiter remain development-only fallbacks.
+- Business events use a PostgreSQL outbox; automation and webhook jobs have
+  atomic multi-worker claims, crash leases, deduplication, and bounded retry.
 - `npx prisma migrate deploy` must run against the production database
   before (or as part of) the first deploy.
 

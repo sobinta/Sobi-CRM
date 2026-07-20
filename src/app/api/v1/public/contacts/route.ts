@@ -17,23 +17,34 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "missing_api_key" }, { status: 401 });
   }
 
+  const address =
+    req.headers.get("x-forwarded-for")?.split(",", 1)[0]?.trim() ??
+    req.headers.get("x-real-ip") ??
+    "unknown";
+  const [keyLimit, addressLimit] = await Promise.all([
+    limit(rateLimitKey("api-key", token), { max: 60, windowMs: 60_000 }),
+    limit(rateLimitKey("api-address", address), {
+      max: 300,
+      windowMs: 60_000,
+    }),
+  ]);
+  const rl = !keyLimit.ok ? keyLimit : addressLimit;
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: rl.unavailable ? "rate_limit_unavailable" : "rate_limited" },
+      {
+        status: rl.unavailable ? 503 : 429,
+        headers: { "Retry-After": String(Math.max(1, Math.ceil(rl.resetMs / 1000))) },
+      },
+    );
+  }
+
   const resolved = await verifyApiKey(token);
   if (!resolved) {
     return NextResponse.json({ error: "invalid_api_key" }, { status: 401 });
   }
   if (!hasApiScope(resolved.scopes, "contacts:read")) {
     return NextResponse.json({ error: "insufficient_scope" }, { status: 403 });
-  }
-
-  const rl = limit(rateLimitKey("api", token), { max: 60, windowMs: 60_000 });
-  if (!rl.ok) {
-    return NextResponse.json(
-      { error: "rate_limited" },
-      {
-        status: 429,
-        headers: { "Retry-After": String(Math.max(1, Math.ceil(rl.resetMs / 1000))) },
-      },
-    );
   }
 
   const contacts = await runWithContext(

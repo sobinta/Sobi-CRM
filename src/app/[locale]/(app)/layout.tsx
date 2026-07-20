@@ -12,7 +12,6 @@ import {
 import { AppShell } from "@/components/layout/app-shell";
 import type { SessionUser } from "@/components/layout/session-context";
 // Side-effect import: subscribes the automation + webhook engines to the bus.
-import "@/engines/subscribers-bootstrap";
 
 export default async function AppLayout({
   children,

@@ -4,7 +4,9 @@
 - `npm run test` — Vitest unit suite: the sandboxed expression evaluator
   (incl. prototype-pollution guards), permission matching, tenant-query
   scoping/model classification/relation guards, the `can()` matrix, and
-  AES-GCM field encryption. The PostgreSQL suite is skipped here by design.
+  AES-GCM field encryption, provider-backed rate limiting, retry backoff,
+  durable-consumer catalog, and S3 provider selection. The PostgreSQL suite is
+  skipped here by design.
 - `npm run test:rls` — destructive-test-safe PostgreSQL integration suite on
   random temporary tenant rows. Requires a migrated database and all four
   least-privilege URLs from `.env`; proves ORM/raw read isolation, pool reuse,
@@ -30,7 +32,9 @@
    save); `⌘K` and search a contact by name; export a report as CSV.
 6. **Automation & integrations** — create an automation
    (`deal.won → create task`), trigger it, and see the run logged; add a webhook
-   and API key, then call `/api/v1/public/contacts` with the key.
+   and API key, then call `/api/v1/public/contacts` with the key. Run the job
+   tick and confirm an `AutomationRun` and `WebhookDelivery` are persisted;
+   retry a failed endpoint and confirm `X-Sobi-Delivery` stays stable.
 7. **Modules & portal** — activate a module in Administration and confirm its
    workspace appears in the rail; submit the public lead form at
    `/p/<slug>/lead` and confirm a website lead is created.
@@ -66,3 +70,5 @@ database. `RUN_DATABASE_INTEGRATION_TESTS=true` is set only by `test:rls`.
 Security unit coverage includes SSRF address policy/DNS pinning, upload
 envelope and magic-byte checks, API scopes, public-token shape/expiry,
 production environment validation, safe public error mapping, and CSP policy.
+Use the Compose Redis/MinIO services to smoke-test distributed throttling and
+S3 uploads; production must never fall back to memory or local disk.

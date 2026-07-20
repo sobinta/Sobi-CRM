@@ -1,21 +1,11 @@
 import { Prisma } from "@/core/db";
 import { systemDb } from "@/core/db/system";
+import { repairUndispatchedEvents } from "@/core/event-bus/outbox";
 import {
   runWithContext,
   systemTenantContext,
 } from "@/core/tenancy/context";
-
-/**
- * DB-backed job runner.
- *
- * Handlers register by kind. enqueue() writes a Job row; runDueJobs() claims
- * due PENDING jobs (with a lock so overlapping ticks don't double-run),
- * executes them, and records success/failure with bounded retries.
- *
- * Invoked from an internal API route on an interval / cron in dev, and
- * swappable for a hosted queue in production. The interface is intentionally
- * queue-agnostic.
- */
+import type { Job } from "@/generated/prisma/client";
 
 export interface JobContext {
   jobId: string;
@@ -24,7 +14,6 @@ export interface JobContext {
 }
 
 export type JobHandler = (ctx: JobContext) => Promise<void>;
-
 const registry = new Map<string, JobHandler>();
 
 export function registerJob(kind: string, handler: JobHandler): void {
@@ -53,107 +42,148 @@ export async function enqueue(input: EnqueueInput): Promise<string | null> {
       },
     });
     return job.id;
-  } catch (err) {
-    // Unique dedupeKey collision → job already queued; that's fine.
-    if ((err as { code?: string }).code === "P2002") return null;
-    throw err;
+  } catch (error) {
+    if ((error as { code?: string }).code === "P2002") return null;
+    throw error;
   }
 }
 
-const LOCK_ID = `runner-${process.pid}-${Math.random().toString(36).slice(2, 8)}`;
+const LOCK_ID = `runner-${process.pid}-${Math.random().toString(36).slice(2, 10)}`;
 
-/** Run all due jobs. Returns a summary. Safe to call concurrently. */
+export function jobRetryDelayMs(
+  attempt: number,
+  random: () => number = Math.random,
+): number {
+  const base = Math.min(15 * 60_000, 15_000 * 2 ** Math.max(0, attempt - 1));
+  return Math.round(base * (0.8 + random() * 0.4));
+}
+
+function leaseMs(): number {
+  const configured = Number(process.env.JOB_LEASE_MS ?? 5 * 60_000);
+  return Number.isFinite(configured)
+    ? Math.max(30_000, Math.min(configured, 60 * 60_000))
+    : 5 * 60_000;
+}
+
+async function claimDueJobs(limit: number): Promise<Job[]> {
+  const now = new Date();
+  const staleBefore = new Date(now.getTime() - leaseMs());
+  return systemDb.$queryRaw<Job[]>(Prisma.sql`
+    WITH candidates AS (
+      SELECT "id"
+      FROM "Job"
+      WHERE
+        ("status" = 'PENDING'::"JobStatus" AND "runAt" <= ${now})
+        OR
+        ("status" = 'RUNNING'::"JobStatus" AND "lockedAt" <= ${staleBefore})
+      ORDER BY "runAt" ASC
+      FOR UPDATE SKIP LOCKED
+      LIMIT ${limit}
+    )
+    UPDATE "Job" AS job
+    SET
+      "status" = 'RUNNING'::"JobStatus",
+      "lockedAt" = ${now},
+      "lockedBy" = ${LOCK_ID},
+      "updatedAt" = ${now}
+    FROM candidates
+    WHERE job."id" = candidates."id"
+    RETURNING job.*
+  `);
+}
+
+function safeError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.slice(0, 2_000);
+}
+
+async function withLeaseHeartbeat<T>(jobId: string, task: () => Promise<T>): Promise<T> {
+  const interval = Math.max(10_000, Math.floor(leaseMs() / 3));
+  const timer = setInterval(() => {
+    void systemDb.job.updateMany({
+      where: { id: jobId, status: "RUNNING", lockedBy: LOCK_ID },
+      data: { lockedAt: new Date() },
+    }).catch(() => undefined);
+  }, interval);
+  timer.unref?.();
+  try {
+    return await task();
+  } finally {
+    clearInterval(timer);
+  }
+}
+
 export async function runDueJobs(limit = 25): Promise<{
+  repairedEvents: number;
   claimed: number;
   succeeded: number;
   failed: number;
 }> {
-  const now = new Date();
-
-  // Claim a batch atomically via a locking update.
-  const due = await systemDb.job.findMany({
-    where: { status: "PENDING", runAt: { lte: now }, lockedAt: null },
-    orderBy: { runAt: "asc" },
-    take: limit,
-  });
-
+  const repairedEvents = await repairUndispatchedEvents();
+  const jobs = await claimDueJobs(Math.max(1, Math.min(limit, 100)));
   let succeeded = 0;
   let failed = 0;
 
-  for (const job of due) {
-    // Optimistic lock: only proceed if still unlocked.
-    const claim = await systemDb.job.updateMany({
-      where: { id: job.id, lockedAt: null, status: "PENDING" },
-      data: { status: "RUNNING", lockedAt: now, lockedBy: LOCK_ID },
-    });
-    if (claim.count === 0) continue;
-
+  for (const job of jobs) {
     const handler = registry.get(job.kind);
     if (!handler) {
-      await systemDb.job.update({
-        where: { id: job.id },
+      await systemDb.job.updateMany({
+        where: { id: job.id, status: "RUNNING", lockedBy: LOCK_ID },
         data: {
           status: "FAILED",
-          lastError: `No handler registered for kind "${job.kind}".`,
+          attempts: { increment: 1 },
+          lastError: `No handler registered for kind "${job.kind}".`.slice(0, 2_000),
           lockedAt: null,
           lockedBy: null,
         },
       });
-      failed++;
+      failed += 1;
       continue;
     }
 
     try {
-      const handlerContext = {
+      const handlerContext: JobContext = {
         jobId: job.id,
         tenantId: job.tenantId,
         payload: job.payload as Record<string, unknown>,
       };
-      if (job.tenantId) {
+      await withLeaseHeartbeat(job.id, async () => {
+        if (!job.tenantId) return handler(handlerContext);
         const actor = await systemDb.membership.findFirst({
-          where: {
-            tenantId: job.tenantId,
-            status: "ACTIVE",
-            deletedAt: null,
-          },
+          where: { tenantId: job.tenantId, status: "ACTIVE", deletedAt: null },
           orderBy: { createdAt: "asc" },
           select: { id: true, userId: true },
         });
-        if (!actor) {
-          throw new Error("Tenant job has no active system actor.");
-        }
-        await runWithContext(
+        if (!actor) throw new Error("Tenant job has no active system actor.");
+        return runWithContext(
           systemTenantContext(job.tenantId, actor.id, actor.userId),
           () => handler(handlerContext),
         );
-      } else {
-        await handler(handlerContext);
-      }
-      await systemDb.job.update({
-        where: { id: job.id },
+      });
+      const update = await systemDb.job.updateMany({
+        where: { id: job.id, status: "RUNNING", lockedBy: LOCK_ID },
         data: { status: "SUCCEEDED", lockedAt: null, lockedBy: null },
       });
-      succeeded++;
-    } catch (err) {
+      if (update.count) succeeded += 1;
+    } catch (error) {
       const attempts = job.attempts + 1;
       const exhausted = attempts >= job.maxAttempts;
-      await systemDb.job.update({
-        where: { id: job.id },
+      await systemDb.job.updateMany({
+        where: { id: job.id, status: "RUNNING", lockedBy: LOCK_ID },
         data: {
           status: exhausted ? "FAILED" : "PENDING",
           attempts,
-          lastError: (err as Error).message,
-          // simple backoff: retry in attempts minutes
+          lastError: safeError(error),
           runAt: exhausted
             ? job.runAt
-            : new Date(Date.now() + attempts * 60_000),
+            : new Date(Date.now() + jobRetryDelayMs(attempts)),
           lockedAt: null,
           lockedBy: null,
         },
       });
-      failed++;
+      failed += 1;
     }
   }
 
-  return { claimed: due.length, succeeded, failed };
+  return { repairedEvents, claimed: jobs.length, succeeded, failed };
 }

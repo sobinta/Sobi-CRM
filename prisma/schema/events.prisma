@@ -20,12 +20,18 @@ model Event {
   /// Arbitrary structured payload.
   payload    Json     @default("{}")
   occurredAt DateTime @default(now())
+  /// Set only after all durable consumer jobs have been enqueued.
+  dispatchedAt DateTime?
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  automationRuns AutomationRun[]
+  webhookDeliveries WebhookDelivery[]
 
+  @@unique([tenantId, id])
   @@index([tenantId, occurredAt])
   @@index([tenantId, type])
   @@index([tenantId, entityType, entityId])
+  @@index([dispatchedAt, occurredAt])
 }
 
 enum JobStatus {

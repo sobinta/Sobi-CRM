@@ -18,11 +18,13 @@ export async function acceptContractAction(input: unknown) {
     requestHeaders.get("x-forwarded-for")?.split(",", 1)[0]?.trim() ??
     requestHeaders.get("x-real-ip") ??
     "unknown";
-  const throttle = limit(
+  const throttle = await limit(
     rateLimitKey("contract-accept", `${parsed.data.token}:${address}`),
     { max: 5, windowMs: 15 * 60_000 },
   );
-  if (!throttle.ok) return { ok: false as const };
+  if (!throttle.ok) {
+    return { ok: false as const, unavailable: throttle.unavailable === true };
+  }
   const res = await acceptContractPublic(parsed.data.token, parsed.data.name);
   return res;
 }

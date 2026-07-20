@@ -59,6 +59,7 @@ export const TENANT_SCOPED = new Set<string>([
   "Automation",
   "AutomationRun",
   "Webhook",
+  "WebhookDelivery",
   "ApiKey",
   "WorkflowDefinition",
   "ApprovalRequest",

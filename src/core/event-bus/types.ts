@@ -54,6 +54,7 @@ export type EventType =
   | "ai.action_approved";
 
 export interface PlatformEvent<P = Record<string, unknown>> {
+  id: string;
   type: EventType;
   tenantId: string;
   entityType?: string;

@@ -24,6 +24,7 @@ const databaseCapabilityRule = {
           !allowed(
             [
               "core/jobs/runner.ts",
+              "core/event-bus/outbox.ts",
               "core/tenancy/rls.integration.test.ts",
               "core/tenancy/provisioning.ts",
               "engines/tasks/jobs.ts",

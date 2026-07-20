@@ -1,11 +1,9 @@
-import { db, Prisma } from "@/core/db";
-import { getContext } from "@/core/tenancy/context";
-import { subscribe } from "@/core/event-bus/bus";
+import { db } from "@/core/db";
+import { requireContext } from "@/core/tenancy/context";
 import { publish } from "@/core/event-bus/bus";
 import { evaluateBoolean, type ExprNode } from "@/core/rules/expression";
 import type { PlatformEvent } from "@/core/event-bus/types";
 import { getAction, eventToConditionContext } from "./actions";
-import { logger } from "@/core/observability/logger";
 
 /**
  * Automation Engine.
@@ -21,9 +19,8 @@ interface ActionSpec {
   config?: Record<string, unknown>;
 }
 
-async function handleEvent(event: PlatformEvent): Promise<void> {
-  const ctx = getContext();
-  if (!ctx) return; // automations require tenant context (set by the publisher)
+export async function processAutomationEvent(event: PlatformEvent): Promise<void> {
+  const ctx = requireContext();
 
   const automations = await db.automation.findMany({
     where: { enabled: true },
@@ -34,12 +31,36 @@ async function handleEvent(event: PlatformEvent): Promise<void> {
     if (trigger.kind !== "event" || trigger.eventType !== event.type) continue;
 
     const started = Date.now();
+    let run: { id: string };
+    try {
+      run = await db.automationRun.create({
+        data: {
+          tenantId: ctx.tenantId,
+          automationId: automation.id,
+          eventId: event.id,
+          status: "running",
+          trigger: event.type,
+          detail: {},
+        },
+        select: { id: true },
+      });
+    } catch (error) {
+      // A unique automation/event reservation is the idempotency boundary.
+      if ((error as { code?: string }).code === "P2002") continue;
+      throw error;
+    }
+
     const conditionCtx = eventToConditionContext(event);
     const condition = automation.condition as ExprNode | null;
     if (condition && !evaluateBoolean(condition, conditionCtx)) {
-      await logRun(automation.id, ctx.tenantId, "skipped", event.type, {
-        reason: "condition not met",
-      }, Date.now() - started);
+      await db.automationRun.update({
+        where: { id: run.id },
+        data: {
+          status: "skipped",
+          detail: { reason: "condition not met" },
+          durationMs: Date.now() - started,
+        },
+      });
       continue;
     }
 
@@ -64,14 +85,14 @@ async function handleEvent(event: PlatformEvent): Promise<void> {
     }
 
     await Promise.all([
-      logRun(
-        automation.id,
-        ctx.tenantId,
-        failed ? "failed" : "success",
-        event.type,
-        { results },
-        Date.now() - started,
-      ),
+      db.automationRun.update({
+        where: { id: run.id },
+        data: {
+          status: failed ? "failed" : "success",
+          detail: { results },
+          durationMs: Date.now() - started,
+        },
+      }),
       db.automation.update({
         where: { id: automation.id },
         data: { runCount: { increment: 1 }, lastRunAt: new Date() },
@@ -84,37 +105,4 @@ async function handleEvent(event: PlatformEvent): Promise<void> {
       }),
     ]);
   }
-}
-
-async function logRun(
-  automationId: string,
-  tenantId: string,
-  status: string,
-  trigger: string,
-  detail: Record<string, unknown>,
-  durationMs: number,
-) {
-  await db.automationRun.create({
-    data: {
-      tenantId,
-      automationId,
-      status,
-      trigger,
-      detail: detail as Prisma.InputJsonValue,
-      durationMs,
-    },
-  });
-}
-
-let subscribed = false;
-/** Wire the engine to the event bus. Idempotent. */
-export function initAutomationEngine(): void {
-  if (subscribed) return;
-  subscribed = true;
-  subscribe("*", (event) => {
-    // Never let an automation failure affect the publisher.
-    void handleEvent(event).catch((err) =>
-      logger.error("Automation engine error", { error: (err as Error).message }),
-    );
-  });
 }

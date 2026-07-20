@@ -24,6 +24,15 @@ function validHttpsUrl(value: string | undefined): boolean {
   }
 }
 
+function validRedisUrl(value: string | undefined): boolean {
+  if (!value) return false;
+  try {
+    return ["redis:", "rediss:"].includes(new URL(value).protocol);
+  } catch {
+    return false;
+  }
+}
+
 function validEncryptionKey(value: string | undefined): boolean {
   if (!value || !/^[A-Za-z0-9+/]+={0,2}$/.test(value)) return false;
   return Buffer.from(value, "base64").length === 32;
@@ -65,6 +74,32 @@ export function productionEnvironmentProblems(env: Environment): string[] {
   }
   if (env.WEBHOOK_ALLOW_PRIVATE_NETWORKS === "true") {
     problems.push("WEBHOOK_ALLOW_PRIVATE_NETWORKS cannot be enabled in production");
+  }
+  if (env.RATE_LIMIT_BACKEND !== "redis") {
+    problems.push("RATE_LIMIT_BACKEND must be redis in production");
+  }
+  if (!validRedisUrl(env.RATE_LIMIT_REDIS_URL)) {
+    problems.push("RATE_LIMIT_REDIS_URL must be a Redis URL");
+  }
+  if (env.FILE_STORAGE_DRIVER !== "s3") {
+    problems.push("FILE_STORAGE_DRIVER must be s3 in production");
+  }
+  if (!env.FILE_STORAGE_S3_BUCKET) {
+    problems.push("FILE_STORAGE_S3_BUCKET is required");
+  }
+  if (!env.FILE_STORAGE_S3_REGION) {
+    problems.push("FILE_STORAGE_S3_REGION is required");
+  }
+  if (env.FILE_STORAGE_S3_ENDPOINT && !validHttpsUrl(env.FILE_STORAGE_S3_ENDPOINT)) {
+    problems.push("FILE_STORAGE_S3_ENDPOINT must use HTTPS in production");
+  }
+  const accessKey = env.FILE_STORAGE_S3_ACCESS_KEY_ID;
+  const secretKey = env.FILE_STORAGE_S3_SECRET_ACCESS_KEY;
+  if (Boolean(accessKey) !== Boolean(secretKey)) {
+    problems.push("S3 access key and secret key must be configured together");
+  }
+  if (env.FILE_STORAGE_S3_ENDPOINT && (!accessKey || !secretKey)) {
+    problems.push("custom S3 endpoints require explicit credentials");
   }
   return problems;
 }

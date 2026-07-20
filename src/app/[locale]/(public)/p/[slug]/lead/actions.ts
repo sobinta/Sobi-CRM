@@ -21,11 +21,13 @@ export async function submitLeadAction(input: unknown) {
     requestHeaders.get("x-forwarded-for")?.split(",", 1)[0]?.trim() ??
     requestHeaders.get("x-real-ip") ??
     "unknown";
-  const throttle = limit(
+  const throttle = await limit(
     rateLimitKey("public-lead", `${parsed.data.tenantSlug}:${address}`),
     { max: 5, windowMs: 10 * 60_000 },
   );
-  if (!throttle.ok) return { ok: false as const };
+  if (!throttle.ok) {
+    return { ok: false as const, unavailable: throttle.unavailable === true };
+  }
   await submitPublicLead({
     tenantSlug: parsed.data.tenantSlug,
     title: `Website enquiry from ${parsed.data.name}`,

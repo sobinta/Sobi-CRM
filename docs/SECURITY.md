@@ -35,10 +35,11 @@ team visibility → record constraints) is covered by unit tests
   production.
 - **Input validation** — Zod on every server action and API route; metadata
   drives generated schemas.
-- **Rate limiting** — a token-bucket limiter (`core/security/rate-limit.ts`)
-  guards the public API, lead intake, and contract access. Keys are hashed so
-  raw credentials/IPs are not retained in process memory. This implementation
-  is single-instance; Redis replacement remains a production scale gate.
+- **Rate limiting** — an atomic fixed-window limiter
+  (`core/security/rate-limit.ts`) guards the public API, lead intake, and
+  contract access. Keys are hashed so raw credentials/IPs are not retained.
+  Development can use memory; production requires Redis and fails closed if
+  the distributed decision is unavailable.
 - **Field encryption** — AES-256-GCM (`core/security/encryption.ts`) for
   sensitive fields (income, national IDs); tamper-evident via the GCM tag.
 - **File access** — files are never served from public paths; downloads go
@@ -49,6 +50,10 @@ team visibility → record constraints) is covered by unit tests
   DNS results must all be public addresses, the validated address is pinned to
   the socket, redirects are not followed, private/metadata networks and URL
   credentials are blocked, and production requires HTTPS.
+- **Durable side effects** — business events are an outbox. Automation and
+  webhook consumers run as deduplicated PostgreSQL jobs with atomic claims,
+  crash leases, and bounded retries. Each webhook/event has a durable delivery
+  row and stable `X-Sobi-Delivery` id for receiver-side deduplication.
 - **API key scopes** — each REST route explicitly requires a normalized scope
   such as `contacts:read`; an authenticated key without that scope gets 403.
 - **Public contract links** — 192-bit random tokens have a bounded expiry,
@@ -71,7 +76,8 @@ be reused in staging or production.
 
 Production startup also rejects missing/placeholder secrets, non-HTTPS public
 URLs, invalid field-encryption keys, shared database capability URLs, and a
-private-network webhook override. Rendered pages use a per-request CSP nonce
+private-network webhook override. It also forbids memory rate limiting and
+local disk storage in production. Rendered pages use a per-request CSP nonce
 with `strict-dynamic`; production scripts do not receive `unsafe-inline` or
 `unsafe-eval`.
 

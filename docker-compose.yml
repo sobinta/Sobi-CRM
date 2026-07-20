@@ -29,5 +29,44 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
+  redis:
+    image: redis:7-alpine
+    container_name: coreline-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - coreline_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: coreline-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: coreline_minio
+      MINIO_ROOT_PASSWORD: coreline_minio_dev_secret
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - coreline_minio_data:/data
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "until mc alias set local http://minio:9000 coreline_minio coreline_minio_dev_secret;
+      do sleep 1; done; mc mb --ignore-existing local/sobi-files; mc anonymous set none local/sobi-files"
+
 volumes:
   coreline_pgdata:
+  coreline_redisdata:
+  coreline_minio_data:

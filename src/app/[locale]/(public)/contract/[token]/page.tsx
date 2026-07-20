@@ -23,7 +23,7 @@ export default async function PublicContractPage({
     requestHeaders.get("x-forwarded-for")?.split(",", 1)[0]?.trim() ??
     requestHeaders.get("x-real-ip") ??
     "unknown";
-  const throttle = limit(rateLimitKey("contract-view", `${token}:${address}`), {
+  const throttle = await limit(rateLimitKey("contract-view", `${token}:${address}`), {
     max: 30,
     windowMs: 15 * 60_000,
   });

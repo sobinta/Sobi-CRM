@@ -13,6 +13,11 @@ const secure = {
   BETTER_AUTH_URL: "https://crm.example.test",
   NEXT_PUBLIC_APP_URL: "https://crm.example.test",
   WEBHOOK_ALLOW_PRIVATE_NETWORKS: "false",
+  RATE_LIMIT_BACKEND: "redis",
+  RATE_LIMIT_REDIS_URL: "rediss://cache.example.test:6379",
+  FILE_STORAGE_DRIVER: "s3",
+  FILE_STORAGE_S3_BUCKET: "crm-files",
+  FILE_STORAGE_S3_REGION: "eu-central-1",
 };
 
 describe("production environment policy", () => {
@@ -28,6 +33,9 @@ describe("production environment policy", () => {
       FIELD_ENCRYPTION_KEY: "not-a-key",
       BETTER_AUTH_URL: "http://crm.example.test",
       WEBHOOK_ALLOW_PRIVATE_NETWORKS: "true",
+      RATE_LIMIT_BACKEND: "memory",
+      RATE_LIMIT_REDIS_URL: "http://cache.example.test",
+      FILE_STORAGE_DRIVER: "local",
     });
     expect(problems).toContain("database capabilities must use four distinct URLs/roles");
     expect(problems).toContain(
@@ -40,5 +48,8 @@ describe("production environment policy", () => {
     expect(problems).toContain(
       "WEBHOOK_ALLOW_PRIVATE_NETWORKS cannot be enabled in production",
     );
+    expect(problems).toContain("RATE_LIMIT_BACKEND must be redis in production");
+    expect(problems).toContain("RATE_LIMIT_REDIS_URL must be a Redis URL");
+    expect(problems).toContain("FILE_STORAGE_DRIVER must be s3 in production");
   });
 });
