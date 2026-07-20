@@ -79,25 +79,35 @@ Production uses separate connection URLs for tenant, identity, system, and
 migration capabilities. Local development provisions the same roles in
 PostgreSQL; it does not collapse them into one privileged URL.
 
-### Tenant transaction
+### Tenant context and database transactions
 
-`runWithTenantTransaction(context, fn)` becomes the root of every tenant data
-flow:
+`runWithContext(context, fn)` carries the immutable identity, tenant, and RBAC
+context across a request, but it does not keep a database transaction open.
+This distinction is required because some contextual flows call AI providers,
+SMTP, webhooks, or other slow networks. A PostgreSQL transaction must never
+remain open across those calls.
+
+Normal `tenantDb` operations use a short batch transaction:
 
 1. Validate that the context contains a non-empty tenant and actor identity.
-2. Start a Prisma interactive transaction using the tenant runtime role.
-3. Execute `SELECT set_config('app.tenant_id', tenantId, true)` in that
-   transaction. The third argument makes the value transaction-local.
-4. Store both the immutable `PlatformContext` and transaction client in
-   `AsyncLocalStorage`.
-5. Execute `fn` using `tenantDb`, which delegates only to the stored transaction
-   client.
-6. Commit on success or roll back on any error.
+2. Start a transaction using the tenant runtime role.
+3. Execute `SELECT set_config('app.tenant_id', tenantId, true)`. The third
+   argument makes the value transaction-local.
+4. Execute the single Prisma operation, including any nested writes, on the
+   same connection.
+5. Commit on success or roll back on any error.
+
+Multi-query invariants use `runWithTenantTransaction(context, fn)`. This API is
+reserved for short database-only units of work. It stores the transaction
+client in a separate AsyncLocalStorage slot, reuses it for nested calls only
+when tenant IDs match, and rejects external I/O inside the transaction by code
+review and targeted tests.
 
 No request-scoped tenant value is set at connection or pool-session level.
 This prevents tenant state from leaking when pooled connections are reused.
-Nested tenant transactions reuse the existing transaction only when the tenant
-IDs match; a mismatched nested context throws immediately.
+The tenant Prisma client does not expose a general `$transaction` method;
+atomic work must use the reviewed transaction helper so query extensions cannot
+accidentally open a second connection.
 
 ### Fail-closed Prisma boundary
 
@@ -113,7 +123,8 @@ For every model listed as tenant-scoped:
   fails a metadata consistency test.
 
 `tenantDb` is not a fallback to an unscoped client. Missing context is a
-programming and security error.
+programming and security error. Context may outlive a database operation, but
+the transaction-local RLS setting never does.
 
 ### PostgreSQL RLS
 
@@ -167,8 +178,10 @@ so the API does not reveal that an ID exists in another tenant.
 
 Session resolution uses `identityDb` to verify that the user has an active,
 non-deleted membership. `withPlatformContext` and `withActionContext` then run
-their callback through `runWithTenantTransaction`. Permission checks execute
-inside the same immutable context.
+their callback inside the immutable application context. Each tenant query is
+RLS-bound independently; services use an explicit short tenant transaction
+only when several queries must be atomic. Permission checks execute inside the
+same immutable context.
 
 ### Public lead intake
 
@@ -195,8 +208,10 @@ enforced in this phase.
 
 The system dispatcher may discover due work across tenants but must not execute
 business handlers with `systemDb`. It claims a job, resolves its tenant, and
-runs the handler in a tenant transaction. Automation, notifications, events,
-audit records, and outbound webhook selection inherit that transaction context.
+runs the handler in that tenant's application context. Automation,
+notifications, events, audit records, and outbound webhook selection open
+their own short RLS-bound operations. Network delivery happens after database
+state is committed and without an open database transaction.
 
 ### Provisioning
 
