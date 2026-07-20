@@ -336,7 +336,15 @@ Action Center → Human Approval → AI Audit`.
   HTTPS enforcement,
   private/metadata-network blocking, DNS pinning, and no redirect following.
 - **Scoped API keys** for the public REST API (`/api/v1/...`) with hashed
-  throttle identifiers.
+  throttle identifiers, cursor pagination, stable error envelopes, monthly
+  quotas, an OpenAPI contract, and a dependency-free TypeScript SDK.
+- **SaaS commercial core** — provider-neutral subscriptions, trials,
+  machine-readable plan entitlements/limits, atomic usage counters, and a
+  conservative free-plan fallback. Manual billing is explicit until a PSP
+  adapter is configured.
+- **Contact CSV imports** — private source storage, bounded parsing and mapping,
+  durable processing, per-row error summaries, quota checks, and idempotent
+  retry coordinates.
 - OAuth and third-party provider scaffolding (Google, Microsoft, WhatsApp,
   Telegram, Stripe, PayPal) is architected but not wired to live credentials
   — see [`docs/ROADMAP.md`](docs/ROADMAP.md).

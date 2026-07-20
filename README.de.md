@@ -375,6 +375,10 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 
 ### Sicherheit, Audit & DSGVO
 
+- Der SaaS-Kern umfasst providerneutrale Abos, Plan-Entitlements/-Limits,
+  atomare Nutzung, eine paginierte OpenAPI/SDK-Schnittstelle und persistente
+  CSV-Importjobs.
+
 - Argon2-Passwort-Hashing, DB-Sessions (httpOnly, SameSite), Rate-Limiting.
 - CSP mit Nonce pro Request (`strict-dynamic`, keine Inline-Skripte in
   Produktion), HSTS und weitere Sicherheitsheader.

@@ -318,6 +318,9 @@ npm run dev               # http://localhost:3000
 
 ### امنیت، حسابرسی و GDPR
 
+- هسته SaaS شامل subscription مستقل از درگاه، entitlement/limit پلن، شمارنده
+  مصرف اتمیک، API صفحه‌بندی‌شده با OpenAPI/SDK و import پایدار CSV است.
+
 - هش‌کردن گذرواژه با Argon2، نشست‌های دیتابیسی (httpOnly، SameSite)،
   محدودسازی نرخ.
 - CSP با nonce مجزای هر درخواست (`strict-dynamic` و بدون inline script در

@@ -7,6 +7,8 @@
   AES-GCM field encryption, provider-backed rate limiting, retry backoff,
   durable-consumer catalog, and S3 provider selection. The PostgreSQL suite is
   skipped here by design.
+  It also covers conservative plan-limit parsing, cursor contracts, bounded
+  CSV parsing/mapping, and TypeScript SDK error behavior.
 - `npm run test:rls` — destructive-test-safe PostgreSQL integration suite on
   random temporary tenant rows. Requires a migrated database and all four
   least-privilege URLs from `.env`; proves ORM/raw read isolation, pool reuse,

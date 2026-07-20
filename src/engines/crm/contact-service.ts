@@ -5,6 +5,7 @@ import { publish } from "@/core/event-bus/bus";
 import { record } from "@/core/audit/audit";
 import { addActivity } from "@/engines/timeline/timeline";
 import { assertTenantReferences } from "@/core/tenancy/relations";
+import { assertRecordQuota } from "@/core/billing/quota";
 
 /**
  * Contact service — permission-aware CRUD that emits events, writes audit, and
@@ -73,6 +74,9 @@ export async function getContact(id: string) {
 export async function createContact(input: ContactInput) {
   authorize("crm.contact.create");
   const ctx = requireContext();
+
+  const contactCount = await db.contact.count();
+  await assertRecordQuota("contacts", contactCount);
 
   await assertTenantReferences([
     { kind: "company", id: input.companyId },

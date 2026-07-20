@@ -56,6 +56,14 @@ team visibility → record constraints) is covered by unit tests
   row and stable `X-Sobi-Delivery` id for receiver-side deduplication.
 - **API key scopes** — each REST route explicitly requires a normalized scope
   such as `contacts:read`; an authenticated key without that scope gets 403.
+- **Commercial enforcement** — subscription state and usage counters are
+  tenant-scoped and protected by forced RLS. Missing/expired subscriptions
+  resolve to conservative free limits. Metered usage is atomically reserved;
+  API responses expose stable quota codes without internal errors.
+- **Imports** — CSV sources are private objects, capped before buffering,
+  parsed with row/cell/column limits, mapped only to allowlisted fields, and
+  processed by idempotent tenant jobs. Row errors are bounded and contain no
+  raw input values.
 - **Public contract links** — 192-bit random tokens have a bounded expiry,
   conditional idempotent state transitions, and per-client throttling.
 - **Audit trail** — `AuditLog` records auth, data, file, permission, export,

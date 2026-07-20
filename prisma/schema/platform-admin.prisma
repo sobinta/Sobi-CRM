@@ -21,8 +21,14 @@ model PricingPlan {
   /// "19 €" vs "$19") never need reformatting at render time:
   /// { en: { name, desc, priceMonthly, priceAnnual, cta, features: string[] }, de: {...}, fa: {...} }
   translations Json     @default("{}")
+  /// Machine-readable enabled capabilities and numeric limits.
+  entitlements Json     @default("[]")
+  limits       Json     @default("{}")
+  active       Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  subscriptions TenantSubscription[]
 }
 
 model LandingContentOverride {

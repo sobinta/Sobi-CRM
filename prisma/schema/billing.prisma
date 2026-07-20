@@ -1,0 +1,83 @@
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  PAUSED
+  CANCELED
+}
+
+enum ImportStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  PARTIAL
+  FAILED
+  CANCELED
+}
+
+/// Provider-neutral commercial state for one tenant.
+model TenantSubscription {
+  id                     String             @id @default(cuid())
+  tenantId               String             @unique
+  planKey                String
+  provider               String             @default("manual")
+  externalCustomerId     String?
+  externalSubscriptionId String?
+  status                 SubscriptionStatus @default(TRIALING)
+  trialEndsAt            DateTime?
+  currentPeriodStart     DateTime
+  currentPeriodEnd       DateTime
+  cancelAtPeriodEnd      Boolean            @default(false)
+  canceledAt             DateTime?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  tenant Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  plan   PricingPlan @relation(fields: [planKey], references: [key], onDelete: Restrict)
+
+  @@index([tenantId, status])
+  @@index([provider, externalSubscriptionId])
+}
+
+/// Period-bounded metered usage. Mutated atomically by the quota gateway.
+model UsageCounter {
+  id          String   @id @default(cuid())
+  tenantId    String
+  metric      String
+  periodStart DateTime
+  periodEnd   DateTime
+  value       BigInt   @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, metric, periodStart])
+  @@index([tenantId, periodEnd])
+}
+
+/// Asynchronous, auditable import of external business data.
+model ImportRun {
+  id          String       @id @default(cuid())
+  tenantId    String
+  entityType  String
+  sourceKey   String
+  status      ImportStatus @default(PENDING)
+  mapping     Json         @default("{}")
+  totalRows   Int          @default(0)
+  processedRows Int        @default(0)
+  succeededRows Int        @default(0)
+  failedRows  Int          @default(0)
+  errors      Json         @default("[]")
+  createdById String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, id])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, entityType, createdAt])
+}

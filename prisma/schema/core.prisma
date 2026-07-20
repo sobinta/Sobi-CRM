@@ -41,6 +41,9 @@ model Tenant {
   jobs          Job[]
   features      FeatureGrant[]
   moduleStates  ModuleState[]
+  subscription  TenantSubscription?
+  usageCounters UsageCounter[]
+  imports       ImportRun[]
 
   @@index([status])
 }

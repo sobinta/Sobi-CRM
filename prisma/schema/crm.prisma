@@ -42,6 +42,9 @@ model Contact {
   /// Lifecycle: lead | prospect | customer | inactive
   lifecycle   String    @default("lead")
   source      String?
+  /// Idempotency coordinates for asynchronous imports.
+  importRunId String?
+  importRow   Int?
   /// Link back to the originating lead + chatbot conversation (360 view).
   leadId         String?
   conversationId String?
@@ -62,6 +65,7 @@ model Contact {
   @@index([tenantId, ownerId])
   @@index([tenantId, companyId])
   @@index([tenantId, email])
+  @@unique([tenantId, importRunId, importRow])
 }
 
 model Lead {

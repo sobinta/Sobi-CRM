@@ -82,6 +82,10 @@ export const TENANT_SCOPED = new Set<string>([
   "RetentionPolicy",
   // Phase F
   "KnowledgeArticle",
+  // SaaS commercial/import
+  "TenantSubscription",
+  "UsageCounter",
+  "ImportRun",
   // NB: EntityDefinition is intentionally NOT here — built-ins have a null
   // tenantId and are shared across tenants; its queries filter explicitly.
 ]);

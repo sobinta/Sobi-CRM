@@ -1,0 +1,75 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SOBI CRM API",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "/" }],
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/api/v1/public/contacts": {
+      "get": {
+        "summary": "List contacts",
+        "parameters": [
+          { "name": "cursor", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cursor page",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ContactPage" } } }
+          },
+          "401": { "$ref": "#/components/responses/Error" },
+          "403": { "$ref": "#/components/responses/Error" },
+          "429": { "$ref": "#/components/responses/Error" }
+        }
+      },
+      "post": {
+        "summary": "Create a contact",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateContact" } } }
+        },
+        "responses": {
+          "201": { "description": "Created" },
+          "401": { "$ref": "#/components/responses/Error" },
+          "403": { "$ref": "#/components/responses/Error" },
+          "422": { "$ref": "#/components/responses/Error" },
+          "429": { "$ref": "#/components/responses/Error" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer" }
+    },
+    "responses": {
+      "Error": {
+        "description": "Machine-readable error",
+        "content": { "application/json": { "schema": { "type": "object", "properties": { "error": { "type": "object", "properties": { "code": { "type": "string" } } } } } } }
+      }
+    },
+    "schemas": {
+      "CreateContact": {
+        "type": "object",
+        "required": ["firstName", "lastName"],
+        "properties": {
+          "firstName": { "type": "string", "maxLength": 120 },
+          "lastName": { "type": "string", "maxLength": 120 },
+          "email": { "type": ["string", "null"], "format": "email" },
+          "phone": { "type": ["string", "null"], "maxLength": 40 },
+          "lifecycle": { "type": "string", "maxLength": 40 },
+          "source": { "type": ["string", "null"], "maxLength": 80 }
+        }
+      },
+      "ContactPage": {
+        "type": "object",
+        "properties": {
+          "data": { "type": "array", "items": { "type": "object" } },
+          "meta": { "type": "object", "properties": { "requestId": { "type": "string" }, "nextCursor": { "type": ["string", "null"] } } }
+        }
+      }
+    }
+  }
+}

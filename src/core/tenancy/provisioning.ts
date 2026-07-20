@@ -49,12 +49,43 @@ export async function provisionTenant(
   const slug = await uniqueSlug(slugify(input.workspaceName));
 
   const result = await systemDb.$transaction(async (tx) => {
+    await tx.pricingPlan.upsert({
+      where: { key: "free" },
+      update: {},
+      create: {
+        key: "free",
+        order: 0,
+        translations: {},
+        entitlements: ["crm.core", "api.contacts"],
+        limits: {
+          contacts: 500,
+          members: 3,
+          storageBytes: 104857600,
+          apiRequestsMonthly: 10000,
+          aiTokensMonthly: 0,
+        },
+      },
+    });
     const tenant = await tx.tenant.create({
       data: {
         name: input.workspaceName,
         slug,
         status: "TRIAL",
         settings: { locale: input.locale ?? "en" },
+      },
+    });
+
+    const periodStart = new Date();
+    const periodEnd = new Date(periodStart.getTime() + 14 * 86_400_000);
+    await tx.tenantSubscription.create({
+      data: {
+        tenantId: tenant.id,
+        planKey: "free",
+        provider: "manual",
+        status: "TRIALING",
+        trialEndsAt: periodEnd,
+        currentPeriodStart: periodStart,
+        currentPeriodEnd: periodEnd,
       },
     });
 

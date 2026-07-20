@@ -32,6 +32,10 @@ requires `RATE_LIMIT_BACKEND=redis` and `FILE_STORAGE_DRIVER=s3`; startup
 rejects missing Redis/S3 configuration, insecure custom S3 endpoints, or
 partial custom-endpoint credentials.
 
+`BILLING_PROVIDER=manual` is the implemented local/manual-invoice mode. It
+enforces subscriptions and quotas but does not collect payment. Do not market
+automatic billing until a PSP adapter and verified webhook handler are added.
+
 ## Fresh local database
 
 The role initialization script runs only when the PostgreSQL volume is first
@@ -83,8 +87,10 @@ durable event outbox. Multiple workers may tick concurrently. Set
 3. Confirm the startup tenant-database security check passes in strict mode.
 4. Set production env (real URLs/secrets, Redis, S3, SMTP, encryption key).
 5. Verify Redis/S3 connectivity, CSP/HSTS headers, and AI keys (if any).
-6. Confirm `npm audit --audit-level=moderate` reports zero known issues.
-7. Smoke: register → onboard → activate a module → create records → export a
+6. Confirm the intended billing mode, active plans, limits, and a test tenant's
+   subscription/usage counters.
+7. Confirm `npm audit --audit-level=moderate` reports zero known issues.
+8. Smoke: register → onboard → activate a module → create records → export a
    report → check the health dashboard.
 
 See [TESTING.md](TESTING.md) for the full verification checklist.
