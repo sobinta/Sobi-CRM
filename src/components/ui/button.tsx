@@ -22,11 +22,11 @@ const buttonVariants = cva(
         subtle: "bg-brand-subtle text-brand-subtle-ink hover:bg-brand-100",
       },
       size: {
-        sm: "h-7 px-2.5 text-xs",
-        md: "h-8.5 px-3.5 text-sm",
-        lg: "h-10 px-5 text-sm",
-        icon: "h-8.5 w-8.5",
-        iconSm: "h-7 w-7",
+        sm: "h-11 px-3 text-sm sm:h-8 sm:px-2.5 sm:text-xs",
+        md: "h-11 px-4 text-sm sm:h-9",
+        lg: "h-12 px-5 text-base sm:h-10 sm:text-sm",
+        icon: "h-11 w-11 sm:h-9 sm:w-9",
+        iconSm: "h-11 w-11 sm:h-8 sm:w-8",
       },
     },
     defaultVariants: {

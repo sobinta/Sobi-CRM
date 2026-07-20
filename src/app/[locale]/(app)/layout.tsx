@@ -11,7 +11,6 @@ import {
 } from "@/engines/platform-admin/announcement-service";
 import { AppShell } from "@/components/layout/app-shell";
 import type { SessionUser } from "@/components/layout/session-context";
-// Side-effect import: subscribes the automation + webhook engines to the bus.
 
 export default async function AppLayout({
   children,
@@ -86,6 +85,13 @@ export default async function AppLayout({
         user={user}
         enabledModuleKeys={enabledModuleKeys ?? []}
         announcement={announcement}
+        skipLabel={
+          locale === "fa"
+            ? "رفتن به محتوای اصلی"
+            : locale === "de"
+              ? "Zum Hauptinhalt springen"
+              : "Skip to main content"
+        }
       >
         {children}
       </AppShell>

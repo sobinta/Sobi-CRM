@@ -17,9 +17,9 @@ export function Topbar() {
           type="button"
           onClick={toggle}
           aria-label="Menu"
-          className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-md text-ink-muted outline-none hover:bg-surface-sunken focus-visible:outline-2 focus-visible:outline-focus-ring lg:hidden"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-ink-muted outline-none hover:bg-surface-sunken focus-visible:outline-2 focus-visible:outline-focus-ring lg:hidden"
         >
-          <Menu className="h-4.5 w-4.5" />
+          <Menu aria-hidden="true" className="h-4.5 w-4.5" />
         </button>
 
         {/* Global search trigger — opens the ⌘K command palette */}
@@ -30,7 +30,7 @@ export function Topbar() {
           }
           className="flex h-8.5 w-full max-w-sm cursor-pointer items-center gap-2.5 rounded-md border border-line bg-surface-raised px-3 text-sm text-ink-faint outline-none transition-colors duration-(--motion-fast) hover:border-line-strong focus-visible:outline-2 focus-visible:outline-focus-ring"
         >
-          <Search className="h-4 w-4 shrink-0" />
+          <Search aria-hidden="true" className="h-4 w-4 shrink-0" />
           <span className="hidden flex-1 text-start sm:block">
             {t("common.searchPlaceholder")}
           </span>

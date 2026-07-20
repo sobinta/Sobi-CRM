@@ -114,6 +114,7 @@ export const workspaces: WorkspaceDef[] = [
       { key: "roles", labelKey: "roles", href: "/admin/roles" },
       { key: "modules", labelKey: "modules", href: "/admin/modules" },
       { key: "integrations", labelKey: "integrations", href: "/admin/integrations" },
+      { key: "imports", labelKey: "imports", href: "/admin/imports" },
       { key: "audit", labelKey: "audit", href: "/admin/audit" },
       { key: "health", labelKey: "health", href: "/admin/health" },
     ],

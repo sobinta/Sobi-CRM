@@ -100,6 +100,13 @@ body {
   height: 100%;
 }
 
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+
 /* Announcement bar marquee — two duplicated copies of the text scroll as one
    continuous strip. Direction is which way the text appears to travel. */
 @keyframes marquee-ltr {
@@ -127,11 +134,38 @@ body {
   background: var(--surface);
   color: var(--ink);
   font-family: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.875rem; /* 14px base for data-dense UI; forms/readers bump up */
+  font-size: 1rem;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+
+@media (min-width: 640px) {
+  body { font-size: 0.875rem; }
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+.skip-link {
+  position: fixed;
+  inset-block-start: 0.75rem;
+  inset-inline-start: 0.75rem;
+  z-index: 1000;
+  transform: translateY(-200%);
+  border-radius: var(--radius-md);
+  background: var(--brand);
+  color: var(--ink-on-brand);
+  padding: 0.65rem 1rem;
+  font-weight: 600;
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+.skip-link:focus-visible { transform: translateY(0); }
 
 /* Numbers in data contexts never jiggle */
 .tabular {

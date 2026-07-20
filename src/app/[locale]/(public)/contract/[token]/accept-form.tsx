@@ -45,11 +45,13 @@ export function AcceptForm({
         <Label htmlFor="acceptName">تأیید قرارداد با درج نام</Label>
         <Input
           id="acceptName"
+          name="acceptedByName"
+          autoComplete="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="نام و نام خانوادگی"
         />
-        {error && <p className="mt-1 text-xs text-danger">{error}</p>}
+        {error && <p role="alert" className="mt-1 text-xs text-danger">{error}</p>}
       </div>
       <div className="flex gap-2">
         <Button variant="secondary" onClick={() => window.print()}>

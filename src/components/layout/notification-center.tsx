@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback, useTransition } from "react";
 import { Bell, CheckCheck } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,7 +28,7 @@ interface NotificationItem {
 
 export function NotificationCenter() {
   const t = useTranslations("shell");
-  const router = useRouter();
+  const locale = useLocale();
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [unread, setUnread] = useState(0);
   const [, startTransition] = useTransition();
@@ -59,9 +59,9 @@ export function NotificationCenter() {
     <DropdownMenu onOpenChange={(o) => o && load()}>
       <DropdownMenuTrigger
         aria-label={t("notifications")}
-        className="relative flex h-8.5 w-8.5 items-center justify-center rounded-md text-ink-muted outline-none transition-colors hover:bg-surface-sunken hover:text-ink focus-visible:outline-2 focus-visible:outline-focus-ring"
+        className="relative flex h-11 w-11 items-center justify-center rounded-md text-ink-muted outline-none transition-colors hover:bg-surface-sunken hover:text-ink focus-visible:outline-2 focus-visible:outline-focus-ring sm:h-9 sm:w-9"
       >
-        <Bell className="h-4.5 w-4.5" />
+        <Bell aria-hidden="true" className="h-4.5 w-4.5" />
         {unread > 0 && (
           <span className="absolute -end-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold text-ink-on-brand">
             {unread > 9 ? "9+" : unread}
@@ -85,24 +85,30 @@ export function NotificationCenter() {
               You&apos;re all caught up.
             </p>
           ) : (
-            items.map((n) => (
-              <button
-                key={n.id}
-                onClick={() => n.href && router.push(n.href)}
-                className={cn(
-                  "flex w-full flex-col items-start gap-0.5 border-b border-line px-3 py-2.5 text-start transition-colors hover:bg-surface-sunken",
-                  !n.readAt && "bg-brand-subtle/30",
-                )}
-              >
+            items.map((n) => {
+              const content = <>
                 <span className="text-sm font-medium text-ink">{n.title}</span>
                 {n.body && (
                   <span className="text-xs text-ink-muted">{n.body}</span>
                 )}
                 <span className="tabular text-[11px] text-ink-faint">
-                  {new Date(n.createdAt).toLocaleString()}
+                  {new Intl.DateTimeFormat(locale, {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  }).format(new Date(n.createdAt))}
                 </span>
-              </button>
-            ))
+              </>;
+              const className = cn(
+                "flex min-h-11 w-full flex-col items-start gap-0.5 border-b border-line px-3 py-2.5 text-start transition-colors",
+                n.href && "hover:bg-surface-sunken focus-visible:outline-2 focus-visible:outline-focus-ring",
+                !n.readAt && "bg-brand-subtle/30",
+              );
+              return n.href ? (
+                <Link key={n.id} href={n.href} className={className}>{content}</Link>
+              ) : (
+                <div key={n.id} className={className}>{content}</div>
+              );
+            })
           )}
         </div>
       </DropdownMenuContent>

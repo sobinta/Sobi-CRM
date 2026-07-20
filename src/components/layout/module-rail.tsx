@@ -95,6 +95,7 @@ export function ModuleRail() {
             <Link
               href={ws.href}
               onClick={close}
+              aria-label={expanded ? undefined : t(ws.labelKey)}
               aria-current={active ? "page" : undefined}
               className={cn(
                 "relative flex items-center rounded-lg outline-none",
@@ -108,7 +109,7 @@ export function ModuleRail() {
                   : "text-ink-on-rail/55 hover:bg-white/8 hover:text-ink-on-rail",
               )}
             >
-              <Icon className="h-4.5 w-4.5 shrink-0" />
+              <Icon aria-hidden="true" className="h-4.5 w-4.5 shrink-0" />
               {expanded && <span className="truncate">{t(ws.labelKey)}</span>}
               {!expanded && (
                 <span

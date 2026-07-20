@@ -69,6 +69,7 @@
     "audit": "Audit log",
     "modules": "Modules",
     "integrations": "Integrations",
+    "imports": "Data imports",
     "automations": "Automations",
     "themeBuilder": "Theme builder",
     "health": "System health",
@@ -300,5 +301,22 @@
     "animationRtl": "Scroll right → left",
     "linkUrl": "Link URL (optional)",
     "preview": "Preview"
+  },
+  "imports": {
+    "title": "Data imports",
+    "description": "Bring contacts from another system into this workspace.",
+    "uploadTitle": "Import contacts",
+    "fileLabel": "CSV file",
+    "fileHint": "Up to 2,000 rows and 5 MB. Include firstName and lastName columns.",
+    "start": "Start import",
+    "starting": "Starting…",
+    "queued": "Import queued. Processing continues in the background.",
+    "failed": "Import could not start. Check the file and try again.",
+    "history": "Import history",
+    "empty": "No imports yet. Choose a CSV file to begin.",
+    "file": "Source",
+    "status": "Status",
+    "progress": "Progress",
+    "created": "Created"
   }
 }

@@ -69,6 +69,7 @@
     "audit": "Audit-Protokoll",
     "modules": "Module",
     "integrations": "Integrationen",
+    "imports": "Datenimporte",
     "automations": "Automatisierungen",
     "themeBuilder": "Design-Editor",
     "health": "Systemstatus",
@@ -299,5 +300,22 @@
     "animationRtl": "Scrollen rechts → links",
     "linkUrl": "Link-URL (optional)",
     "preview": "Vorschau"
+  },
+  "imports": {
+    "title": "Datenimporte",
+    "description": "Kontakte aus einem anderen System in diesen Arbeitsbereich übernehmen.",
+    "uploadTitle": "Kontakte importieren",
+    "fileLabel": "CSV-Datei",
+    "fileHint": "Bis zu 2.000 Zeilen und 5 MB. Spalten firstName und lastName sind erforderlich.",
+    "start": "Import starten",
+    "starting": "Wird gestartet…",
+    "queued": "Import eingereiht. Die Verarbeitung läuft im Hintergrund weiter.",
+    "failed": "Import konnte nicht starten. Datei prüfen und erneut versuchen.",
+    "history": "Importverlauf",
+    "empty": "Noch keine Importe. Wählen Sie eine CSV-Datei aus.",
+    "file": "Quelle",
+    "status": "Status",
+    "progress": "Fortschritt",
+    "created": "Erstellt"
   }
 }

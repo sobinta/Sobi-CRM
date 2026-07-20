@@ -14,13 +14,13 @@ export const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <DialogPrimitive.Portal>
-    <DialogPrimitive.Overlay className="fixed inset-0 z-[900] bg-scrim backdrop-blur-[2px] data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+    <DialogPrimitive.Overlay className="fixed inset-0 z-[900] bg-scrim backdrop-blur-[2px] data-[state=open]:animate-in data-[state=open]:fade-in-0 motion-reduce:animate-none" />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
         "fixed start-1/2 top-1/2 z-[901] w-full max-w-md -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2",
-        "rounded-xl border border-line bg-surface-overlay shadow-overlay",
-        "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 duration-(--motion-base)",
+        "max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain rounded-xl border border-line bg-surface-overlay shadow-overlay",
+        "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 duration-(--motion-base) motion-reduce:animate-none",
         className,
       )}
       {...props}
@@ -30,7 +30,7 @@ export const DialogContent = React.forwardRef<
         className="absolute end-3 top-3 rounded-md p-1 text-ink-faint outline-none transition-colors hover:bg-surface-sunken hover:text-ink focus-visible:outline-2 focus-visible:outline-focus-ring"
         aria-label="Close"
       >
-        <X className="h-4 w-4" />
+        <X aria-hidden="true" className="h-4 w-4" />
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPrimitive.Portal>

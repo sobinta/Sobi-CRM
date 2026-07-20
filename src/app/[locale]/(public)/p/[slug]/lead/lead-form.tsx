@@ -62,21 +62,21 @@ export function PublicLeadForm({
         <form onSubmit={onSubmit} className="space-y-3" noValidate>
           <div>
             <Label htmlFor="name" required>Your name</Label>
-            <Input id="name" name="name" required autoFocus />
+            <Input id="name" name="name" autoComplete="name" required />
           </div>
           <div>
             <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" dir="ltr" />
+            <Input id="email" name="email" type="email" autoComplete="email" spellCheck={false} dir="ltr" />
           </div>
           <div>
             <Label htmlFor="phone">Phone</Label>
-            <Input id="phone" name="phone" dir="ltr" />
+            <Input id="phone" name="phone" type="tel" autoComplete="tel" dir="ltr" />
           </div>
           <div>
             <Label htmlFor="message">How can we help?</Label>
             <Textarea id="message" name="message" rows={3} />
           </div>
-          {error && <p className="text-xs text-danger">{error}</p>}
+          {error && <p role="alert" className="text-xs text-danger">{error}</p>}
           <Button variant="primary" size="lg" type="submit" className="w-full" disabled={pending}>
             {pending ? "Sending…" : "Send enquiry"}
           </Button>
