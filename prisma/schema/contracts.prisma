@@ -22,6 +22,7 @@ model Contract {
   status         String    @default("draft")
   /// Public, unguessable token for the share link.
   shareToken     String    @unique
+  shareTokenExpiresAt DateTime?
   sentAt         DateTime?
   viewedAt       DateTime?
   acceptedAt     DateTime?
@@ -35,4 +36,5 @@ model Contract {
   @@index([tenantId, status])
   @@index([tenantId, dealId])
   @@index([tenantId, contactId])
+  @@index([shareTokenExpiresAt])
 }

@@ -4,11 +4,19 @@ export async function register(): Promise<void> {
   const mode =
     process.env.TENANT_DB_SECURITY_CHECK ??
     (process.env.NODE_ENV === "production" ? "strict" : "warn");
-  if (mode === "off" || process.env.NEXT_PHASE === "phase-production-build") {
+  if (process.env.NEXT_PHASE === "phase-production-build") {
     return;
   }
 
   const { logger } = await import("@/core/observability/logger");
+  if (process.env.NODE_ENV === "production") {
+    const { assertProductionEnvironment } = await import(
+      "@/core/security/environment"
+    );
+    assertProductionEnvironment(process.env);
+  }
+  if (mode === "off") return;
+
   try {
     const {
       inspectTenantDatabaseSecurity,

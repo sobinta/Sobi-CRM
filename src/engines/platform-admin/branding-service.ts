@@ -29,6 +29,20 @@ export async function getSiteAssetsPublic(): Promise<Record<string, string>> {
 
 export async function setSiteAsset(slot: AssetSlot, url: string) {
   requireSuperAdmin();
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new Error("Invalid site asset URL.");
+  }
+  if (
+    url.length > 2_048 ||
+    parsed.protocol !== "https:" ||
+    parsed.username ||
+    parsed.password
+  ) {
+    throw new Error("Invalid site asset URL.");
+  }
   const ctx = getContext();
   const row = await systemDb.siteAsset.upsert({
     where: { slot },

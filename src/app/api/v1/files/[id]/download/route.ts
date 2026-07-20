@@ -27,6 +27,8 @@ export async function GET(
       "Content-Type": file.mimeType,
       "Content-Disposition": `attachment; filename="${encodeURIComponent(file.name)}"`,
       "Content-Length": String(file.size),
+      "X-Content-Type-Options": "nosniff",
+      "Cache-Control": "private, no-store",
     },
   });
 }

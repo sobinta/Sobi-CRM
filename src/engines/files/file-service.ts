@@ -9,6 +9,7 @@ import {
   assertPolymorphicTenantReference,
   assertTenantReference,
 } from "@/core/tenancy/relations";
+import { validateUpload } from "@/core/security/upload-policy";
 
 /**
  * File engine — secure upload with versioning + checklist support. Uploads are
@@ -35,33 +36,46 @@ export async function uploadFile(input: UploadInput) {
     assertPolymorphicTenantReference(input.entityType, input.entityId),
     assertTenantReference("document_checklist_item", input.checklistItemId),
   ]);
-  const storageKey = makeStorageKey(ctx.tenantId, input.filename);
-  await storage.put(storageKey, input.data);
-
-  const file = await db.fileObject.create({
-    data: {
-      tenantId: ctx.tenantId,
-      name: input.filename,
-      storageKey,
+  const validated = validateUpload(
+    {
+      filename: input.filename,
       mimeType: input.mimeType,
       size: input.data.length,
-      category: input.category,
-      entityType: input.entityType,
-      entityId: input.entityId,
-      expiresAt: input.expiresAt,
-      ownerId: ctx.membershipId,
-      createdById: ctx.membershipId,
-      versions: {
-        create: {
-          tenantId: ctx.tenantId,
-          version: 1,
-          storageKey,
-          size: input.data.length,
-          createdById: ctx.membershipId,
+    },
+    input.data,
+  );
+  const storageKey = makeStorageKey(ctx.tenantId, validated.filename);
+  await storage.put(storageKey, input.data);
+
+  const file = await db.fileObject
+    .create({
+      data: {
+        tenantId: ctx.tenantId,
+        name: validated.filename,
+        storageKey,
+        mimeType: validated.mimeType,
+        size: validated.size,
+        category: input.category,
+        entityType: input.entityType,
+        entityId: input.entityId,
+        expiresAt: input.expiresAt,
+        ownerId: ctx.membershipId,
+        createdById: ctx.membershipId,
+        versions: {
+          create: {
+            tenantId: ctx.tenantId,
+            version: 1,
+            storageKey,
+            size: validated.size,
+            createdById: ctx.membershipId,
+          },
         },
       },
-    },
-  });
+    })
+    .catch(async (error) => {
+      await storage.delete(storageKey).catch(() => undefined);
+      throw error;
+    });
 
   if (input.checklistItemId) {
     await db.documentChecklistItem.update({
@@ -80,7 +94,7 @@ export async function uploadFile(input: UploadInput) {
       entityType: input.entityType,
       entityId: input.entityId,
       kind: "file",
-      title: `File uploaded: ${input.filename}`,
+      title: `File uploaded: ${validated.filename}`,
     });
   }
 
@@ -106,7 +120,7 @@ export async function listFiles(params?: {
 export async function readFileForDownload(fileId: string) {
   authorize("ops.file.read");
   const file = await db.fileObject.findFirst({ where: { id: fileId } });
-  if (!file) return null;
+  if (!file) return undefined;
   const data = await storage.get(file.storageKey);
   await record({
     category: "FILE",

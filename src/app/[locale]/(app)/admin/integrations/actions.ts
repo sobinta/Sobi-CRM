@@ -11,6 +11,7 @@ import {
   revokeApiKey,
 } from "@/engines/integrations/api-key-service";
 import { record } from "@/core/audit/audit";
+import { resolveOutboundUrl } from "@/core/security/outbound-url";
 
 const webhookSchema = z.object({
   name: z.string().trim().min(1),
@@ -21,6 +22,11 @@ const webhookSchema = z.object({
 export async function createWebhookAction(input: unknown) {
   const parsed = webhookSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const };
+  try {
+    await resolveOutboundUrl(parsed.data.url);
+  } catch {
+    return { ok: false as const };
+  }
   await withActionContext(
     async () => {
       const { tenantId, membershipId } = requireContext();

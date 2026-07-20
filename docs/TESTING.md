@@ -12,6 +12,8 @@
 - `npm run typecheck` — strict TypeScript, zero errors.
 - `npm run lint` — ESLint incl. architectural import-boundary rules
   (modules → engines → core).
+- `npm audit --audit-level=moderate` — release gate for known dependency
+  advisories. The lockfile currently resolves with zero reported issues.
 
 ## Manual end-to-end (against `npm run dev` + seeded data)
 1. **Auth & tenancy** — register a workspace; confirm you land in the shell with
@@ -55,7 +57,12 @@ npm run test
 npm run lint
 npm run typecheck
 npm run build
+npm audit --audit-level=moderate
 ```
 
 The RLS test intentionally does not auto-run on an arbitrary developer
 database. `RUN_DATABASE_INTEGRATION_TESTS=true` is set only by `test:rls`.
+
+Security unit coverage includes SSRF address policy/DNS pinning, upload
+envelope and magic-byte checks, API scopes, public-token shape/expiry,
+production environment validation, safe public error mapping, and CSP policy.

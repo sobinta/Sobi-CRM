@@ -14,6 +14,7 @@ import {
   markAllRead,
   listNotifications,
 } from "@/engines/notifications/notification-service";
+import { assertUploadEnvelope } from "@/core/security/upload-policy";
 
 const taskSchema = z.object({
   title: z.string().trim().min(1),
@@ -75,6 +76,15 @@ export async function createEventAction(input: unknown) {
 export async function uploadFileAction(formData: FormData) {
   const file = formData.get("file");
   if (!(file instanceof File)) return { ok: false as const };
+  try {
+    assertUploadEnvelope({
+      filename: file.name,
+      mimeType: file.type || "application/octet-stream",
+      size: file.size,
+    });
+  } catch {
+    return { ok: false as const };
+  }
   const buffer = Buffer.from(await file.arrayBuffer());
   await withActionContext(() =>
     uploadFile({

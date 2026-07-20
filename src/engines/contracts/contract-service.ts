@@ -15,6 +15,10 @@ import { buildContractTemplate } from "./template";
 import { getProvider } from "@/engines/ai/provider";
 import { assertTenantReferences } from "@/core/tenancy/relations";
 import { TenantMismatchError } from "@/core/tenancy/errors";
+import {
+  contractTokenExpiry,
+  isContractShareToken,
+} from "@/core/security/public-tokens";
 
 /**
  * Contract engine — generation, the public share/acceptance lifecycle, and
@@ -149,7 +153,12 @@ export async function sendContract(id: string) {
   authorize("crm.contract.update");
   const updated = await db.contract.update({
     where: { id },
-    data: { status: "sent", sentAt: new Date() },
+    data: {
+      status: "sent",
+      sentAt: new Date(),
+      shareToken: crypto.randomBytes(24).toString("base64url"),
+      shareTokenExpiresAt: contractTokenExpiry(),
+    },
   });
   await Promise.all([
     publish({ type: "contract.sent", entityType: "contract", entityId: id }),
@@ -160,15 +169,23 @@ export async function sendContract(id: string) {
 
 export async function cancelContract(id: string) {
   authorize("crm.contract.update");
-  const updated = await db.contract.update({ where: { id }, data: { status: "canceled" } });
+  const updated = await db.contract.update({
+    where: { id },
+    data: { status: "canceled", shareTokenExpiresAt: new Date() },
+  });
   await record({ category: "DATA", action: "contract.cancel", entityType: "contract", entityId: id });
   return updated;
 }
 
 /** Narrow system gateway: a token may resolve only a tenant and record id. */
 async function resolvePublicContract(shareToken: string) {
-  return systemDb.contract.findUnique({
-    where: { shareToken },
+  if (!isContractShareToken(shareToken)) return null;
+  return systemDb.contract.findFirst({
+    where: {
+      shareToken,
+      shareTokenExpiresAt: { gt: new Date() },
+      status: { in: ["sent", "viewed", "accepted"] },
+    },
     select: { id: true, tenantId: true },
   });
 }
@@ -180,7 +197,13 @@ export async function markContractViewed(shareToken: string): Promise<void> {
 
   await runWithContext(publicTenantContext(resolved.tenantId, "fa"), async () => {
     const updated = await db.contract.updateMany({
-      where: { id: resolved.id, shareToken, status: "sent", viewedAt: null },
+      where: {
+        id: resolved.id,
+        shareToken,
+        shareTokenExpiresAt: { gt: new Date() },
+        status: "sent",
+        viewedAt: null,
+      },
       data: { status: "viewed", viewedAt: new Date() },
     });
     if (updated.count === 0) return;
@@ -211,6 +234,7 @@ export async function acceptContractPublic(
       where: {
         id: contract.id,
         shareToken,
+        shareTokenExpiresAt: { gt: new Date() },
         status: { in: ["sent", "viewed"] },
       },
       data: { status: "accepted", acceptedAt: new Date(), acceptedByName: name },
@@ -244,7 +268,13 @@ export async function getContractByToken(shareToken: string) {
   const resolved = await resolvePublicContract(shareToken);
   if (!resolved) return null;
   return runWithContext(publicTenantContext(resolved.tenantId, "fa"), () =>
-    db.contract.findFirst({ where: { id: resolved.id, shareToken } }),
+    db.contract.findFirst({
+      where: {
+        id: resolved.id,
+        shareToken,
+        shareTokenExpiresAt: { gt: new Date() },
+      },
+    }),
   );
 }
 

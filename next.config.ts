@@ -5,23 +5,26 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const isProd = process.env.NODE_ENV === "production";
 
-// Content-Security-Policy. Dev needs 'unsafe-eval' for React Refresh/Turbopack;
-// production tightens to self + inline styles (Tailwind) only.
+// Fallback policy for API/static responses. Rendered pages receive a stricter
+// per-request nonce policy from src/proxy.ts.
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
+  "img-src 'self' https: data: blob:",
   "font-src 'self' data:",
   "connect-src 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
+  "object-src 'none'",
 ].join("; ");
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Permissions-Policy",
@@ -39,6 +42,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   async headers() {
     return [
       {

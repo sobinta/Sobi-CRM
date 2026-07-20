@@ -4,6 +4,7 @@ import { getContext } from "@/core/tenancy/context";
 import { subscribe } from "@/core/event-bus/bus";
 import type { PlatformEvent } from "@/core/event-bus/types";
 import { logger } from "@/core/observability/logger";
+import { postWebhook } from "@/core/security/outbound-url";
 
 /**
  * Integration Engine v1 — outbound webhooks.
@@ -39,16 +40,15 @@ async function deliver(event: PlatformEvent): Promise<void> {
         .update(body)
         .digest("hex");
       try {
-        const res = await fetch(hook.url, {
-          method: "POST",
-          headers: {
+        const res = await postWebhook(
+          hook.url,
+          body,
+          {
             "Content-Type": "application/json",
             "X-Sobi-Signature": signature,
             "X-Sobi-Event": event.type,
           },
-          body,
-          signal: AbortSignal.timeout(5000),
-        });
+        );
         await db.webhook.update({
           where: { id: hook.id },
           data: {
@@ -59,7 +59,7 @@ async function deliver(event: PlatformEvent): Promise<void> {
         });
       } catch (err) {
         logger.warn("Webhook delivery failed", {
-          url: hook.url,
+          host: new URL(hook.url).hostname,
           error: (err as Error).message,
         });
         await db.webhook.update({

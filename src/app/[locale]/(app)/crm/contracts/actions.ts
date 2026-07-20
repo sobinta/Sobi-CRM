@@ -11,6 +11,7 @@ import {
   aiRewriteContract,
   aiContractFollowUp,
 } from "@/engines/contracts/contract-service";
+import { reportPublicActionError } from "@/core/security/public-errors";
 
 const createSchema = z.object({
   title: z.string().trim().min(1),
@@ -42,7 +43,7 @@ export async function updateContractBodyAction(id: string, bodyMd: string) {
   try {
     await withActionContext(() => updateContractBody(id, bodyMd));
   } catch (e) {
-    return { ok: false as const, error: (e as Error).message };
+    return { ok: false as const, error: reportPublicActionError(e) };
   }
   revalidatePath(`/[locale]/(app)/crm/contracts/${id}`, "page");
   return { ok: true as const };

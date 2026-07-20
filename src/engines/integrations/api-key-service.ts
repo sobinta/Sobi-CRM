@@ -19,7 +19,10 @@ function hashKey(key: string): string {
   return crypto.createHash("sha256").update(key).digest("hex");
 }
 
-export async function createApiKey(name: string, scopes: string[] = ["read"]) {
+export async function createApiKey(
+  name: string,
+  scopes: string[] = ["contacts:read"],
+) {
   authorize("admin.integration.update");
   const ctx = requireContext();
   const raw = `clk_${crypto.randomBytes(24).toString("base64url")}`;

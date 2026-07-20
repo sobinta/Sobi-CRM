@@ -18,12 +18,17 @@ export interface StorageProvider {
 class LocalStorage implements StorageProvider {
   private root: string;
   constructor() {
-    this.root = process.env.FILE_STORAGE_LOCAL_PATH ?? "./storage";
+    this.root = path.resolve(
+      /* turbopackIgnore: true */
+      process.env.FILE_STORAGE_LOCAL_PATH ?? "./storage",
+    );
   }
   private full(key: string) {
-    // Prevent path traversal.
-    const safe = key.replace(/\.\./g, "").replace(/^\/+/, "");
-    return path.join(this.root, safe);
+    const candidate = path.resolve(this.root, key);
+    if (candidate !== this.root && !candidate.startsWith(`${this.root}${path.sep}`)) {
+      throw new Error("Storage key escapes the configured root.");
+    }
+    return candidate;
   }
   async put(key: string, data: Buffer) {
     const p = this.full(key);
@@ -49,7 +54,7 @@ export function makeStorageKey(tenantId: string, filename: string): string {
 
 /** Sign a file id for time-limited download links. */
 export function signFileToken(fileId: string, ttlMs = 5 * 60_000): string {
-  const secret = process.env.FILE_SIGNING_SECRET ?? "dev";
+  const secret = signingSecret();
   const exp = Date.now() + ttlMs;
   const payload = `${fileId}.${exp}`;
   const sig = crypto.createHmac("sha256", secret).update(payload).digest("hex");
@@ -57,7 +62,7 @@ export function signFileToken(fileId: string, ttlMs = 5 * 60_000): string {
 }
 
 export function verifyFileToken(fileId: string, token: string): boolean {
-  const secret = process.env.FILE_SIGNING_SECRET ?? "dev";
+  const secret = signingSecret();
   const [expStr, sig] = token.split(".");
   if (!expStr || !sig) return false;
   if (Number(expStr) < Date.now()) return false;
@@ -65,5 +70,19 @@ export function verifyFileToken(fileId: string, token: string): boolean {
     .createHmac("sha256", secret)
     .update(`${fileId}.${expStr}`)
     .digest("hex");
-  return crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
+  const actualBuffer = Buffer.from(sig);
+  const expectedBuffer = Buffer.from(expected);
+  return (
+    actualBuffer.length === expectedBuffer.length &&
+    crypto.timingSafeEqual(actualBuffer, expectedBuffer)
+  );
+}
+
+function signingSecret(): string {
+  const secret = process.env.FILE_SIGNING_SECRET;
+  if (secret && secret.length >= 32) return secret;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("FILE_SIGNING_SECRET must contain at least 32 characters.");
+  }
+  return "local-development-file-signing-secret";
 }

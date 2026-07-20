@@ -332,8 +332,10 @@ Action Center → Human Approval → AI Audit`.
 
 - **Outbound webhooks** — signed (`HMAC-SHA256`, `X-Sobi-Signature` /
   `X-Sobi-Event` headers), per-tenant subscriptions by event type,
-  best-effort delivery with status/failure recording.
-- **API keys** for the public REST API (`/api/v1/...`).
+  best-effort delivery with status/failure recording, HTTPS enforcement,
+  private/metadata-network blocking, DNS pinning, and no redirect following.
+- **Scoped API keys** for the public REST API (`/api/v1/...`) with hashed
+  throttle identifiers.
 - OAuth and third-party provider scaffolding (Google, Microsoft, WhatsApp,
   Telegram, Stripe, PayPal) is architected but not wired to live credentials
   — see [`docs/ROADMAP.md`](docs/ROADMAP.md).
@@ -375,8 +377,9 @@ scaffolds in module activation.
 ### Security, audit & GDPR
 
 - Argon2 password hashing, DB sessions (httpOnly, SameSite), rate limiting.
-- CSP, HSTS, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`,
-  `Permissions-Policy` security headers on every response.
+- Per-request nonce CSP (`strict-dynamic`, no production inline scripts),
+  HSTS, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and
+  `Permissions-Policy` security headers.
 - AES-256-GCM field-level encryption for sensitive data (e.g. loan-applicant
   income/employment).
 - Soft delete + trash for the core entities; full audit trail including file

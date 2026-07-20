@@ -23,6 +23,7 @@ import {
   type AnnouncementBarInput,
 } from "@/engines/platform-admin/announcement-service";
 import { sanitizeRichText } from "@/lib/sanitize-html";
+import { reportPublicActionError } from "@/core/security/public-errors";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -40,7 +41,7 @@ export async function createPricingPlanAction(
     revalidatePlatformSurfaces();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, error: reportPublicActionError(e) };
   }
 }
 
@@ -53,7 +54,7 @@ export async function updatePricingPlanAction(
     revalidatePlatformSurfaces();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, error: reportPublicActionError(e) };
   }
 }
 
@@ -63,7 +64,7 @@ export async function deletePricingPlanAction(id: string): Promise<ActionResult>
     revalidatePlatformSurfaces();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, error: reportPublicActionError(e) };
   }
 }
 
@@ -83,7 +84,7 @@ export async function setContentOverrideAction(
     revalidatePlatformSurfaces();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, error: reportPublicActionError(e) };
   }
 }
 
@@ -96,7 +97,7 @@ export async function clearContentOverrideAction(
     revalidatePlatformSurfaces();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, error: reportPublicActionError(e) };
   }
 }
 
@@ -108,7 +109,7 @@ export async function setAnnouncementBarAction(
     revalidatePlatformSurfaces();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, error: reportPublicActionError(e) };
   }
 }
 
@@ -125,6 +126,6 @@ export async function setSiteAssetAction(
     revalidatePlatformSurfaces();
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, error: reportPublicActionError(e) };
   }
 }

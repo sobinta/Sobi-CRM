@@ -1,3 +1,5 @@
+import crypto from "node:crypto";
+
 /**
  * In-memory token-bucket rate limiter.
  *
@@ -10,6 +12,12 @@
 interface Bucket {
   tokens: number;
   updatedAt: number;
+}
+
+/** Stable opaque key so raw tokens, IPs, emails, or tenant slugs aren't stored. */
+export function rateLimitKey(namespace: string, identifier: string): string {
+  const digest = crypto.createHash("sha256").update(identifier).digest("hex");
+  return `${namespace}:${digest}`;
 }
 
 const buckets = new Map<string, Bucket>();

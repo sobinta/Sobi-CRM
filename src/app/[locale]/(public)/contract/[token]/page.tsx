@@ -7,6 +7,9 @@ import { renderContractMarkdown } from "@/engines/contracts/render";
 import { Logo } from "@/components/brand/logo";
 import { getSiteAssetsPublic } from "@/engines/platform-admin/branding-service";
 import { AcceptForm } from "./accept-form";
+import { headers } from "next/headers";
+import { limit, rateLimitKey } from "@/core/security/rate-limit";
+import { isContractShareToken } from "@/core/security/public-tokens";
 
 export default async function PublicContractPage({
   params,
@@ -14,6 +17,17 @@ export default async function PublicContractPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
+  if (!isContractShareToken(token)) notFound();
+  const requestHeaders = await headers();
+  const address =
+    requestHeaders.get("x-forwarded-for")?.split(",", 1)[0]?.trim() ??
+    requestHeaders.get("x-real-ip") ??
+    "unknown";
+  const throttle = limit(rateLimitKey("contract-view", `${token}:${address}`), {
+    max: 30,
+    windowMs: 15 * 60_000,
+  });
+  if (!throttle.ok) notFound();
   const [contract, assets] = await Promise.all([
     getContractByToken(token),
     getSiteAssetsPublic(),

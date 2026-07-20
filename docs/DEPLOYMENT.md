@@ -4,7 +4,7 @@
 Required: `DATABASE_URL`, `IDENTITY_DATABASE_URL`, `SYSTEM_DATABASE_URL`,
 `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`,
 `NEXT_PUBLIC_APP_URL`. Recommended: `FIELD_ENCRYPTION_KEY` (32 bytes base64),
-`FILE_SIGNING_SECRET`, SMTP settings. Optional: AI provider keys
+`FILE_SIGNING_SECRET`, `JOB_RUNNER_SECRET`, SMTP settings. Optional: AI provider keys
 (`OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `AI_LOCAL_ENDPOINT`) — omit to run AI
 in mock mode. See `.env.example`.
 
@@ -21,6 +21,12 @@ may require an administrator to provision LOGIN roles and passwords first.
 Runtime roles must not own tables and must be `NOSUPERUSER NOBYPASSRLS`.
 Set `TENANT_DB_SECURITY_CHECK=strict`; startup then validates the deployed
 role and policy posture before serving requests.
+
+Production startup treats `BETTER_AUTH_SECRET`, `FILE_SIGNING_SECRET`, and
+`JOB_RUNNER_SECRET` as separate 32+ character secrets and requires a valid
+32-byte base64 `FIELD_ENCRYPTION_KEY`. `BETTER_AUTH_URL` and
+`NEXT_PUBLIC_APP_URL` must use HTTPS. `WEBHOOK_ALLOW_PRIVATE_NETWORKS=true` is
+development-only and causes production startup to fail.
 
 ## Fresh local database
 
@@ -48,7 +54,8 @@ containing data that must be retained.
 - **Email:** any SMTP provider (swap Mailpit).
 - **Files:** the local-disk provider works on a single host; for multi-instance
   swap `engines/files/storage.ts` for the S3-compatible implementation (the
-  interface is already S3-shaped).
+  interface is already S3-shaped). Add provider-side malware scanning and a
+  quarantine bucket before enabling uploads from unauthenticated users.
 
 ### Self-hosted (Docker)
 `docker-compose.yml` provisions Postgres + Mailpit for development; extend it
@@ -57,7 +64,7 @@ for `/storage`, or point file storage at object storage.
 
 ## Background jobs
 The DB-backed runner is triggered by `POST /api/v1/internal/jobs/tick`
-(protected by `BETTER_AUTH_SECRET` via `x-internal-secret`). Schedule it every
+(protected by `JOB_RUNNER_SECRET` via `x-internal-secret`). Schedule it every
 1–5 minutes with the platform scheduler / an external cron. Handlers: reminders,
 overdue scans, automation timers.
 
@@ -67,7 +74,8 @@ overdue scans, automation timers.
 3. Confirm the startup tenant-database security check passes in strict mode.
 4. Set production env (real `BETTER_AUTH_URL`, secrets, SMTP, encryption key).
 5. Verify CSP/HSTS headers and that AI keys (if any) resolve.
-6. Smoke: register → onboard → activate a module → create records → export a
+6. Confirm `npm audit --audit-level=moderate` reports zero known issues.
+7. Smoke: register → onboard → activate a module → create records → export a
    report → check the health dashboard.
 
 See [TESTING.md](TESTING.md) for the full verification checklist.

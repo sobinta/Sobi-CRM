@@ -272,6 +272,7 @@ async function main() {
       durationLabel: "12 months",
       status: "sent",
       shareToken: crypto.randomBytes(24).toString("base64url"),
+      shareTokenExpiresAt: new Date(Date.now() + 30 * 86_400_000),
       sentAt: new Date(),
     },
   });

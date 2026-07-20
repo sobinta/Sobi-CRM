@@ -8,6 +8,7 @@ import { requireContext } from "@/core/tenancy/context";
 import { getModule } from "@/core/module-registry/catalog";
 import { record } from "@/core/audit/audit";
 import { publish } from "@/core/event-bus/bus";
+import { reportPublicActionError } from "@/core/security/public-errors";
 
 /** Activate or deactivate a business module for the current tenant. */
 export async function toggleModuleAction(
@@ -46,6 +47,6 @@ export async function toggleModuleAction(
     revalidatePath("/[locale]/(app)/admin/modules", "page");
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, error: reportPublicActionError(e) };
   }
 }

@@ -341,8 +341,10 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 ### Integrationen
 
 - **Ausgehende Webhooks** — signiert (`HMAC-SHA256`, `X-Sobi-Signature` /
-  `X-Sobi-Event`-Header), pro Mandant nach Ereignistyp abonnierbar.
-- **API-Schlüssel** für die öffentliche REST-API.
+  `X-Sobi-Event`-Header), mit HTTPS-Pflicht, Sperre privater/Metadata-Netze,
+  DNS-Pinning und ohne Redirect-Folgen.
+- **API-Schlüssel mit Scopes** für die öffentliche REST-API und gehashten
+  Throttle-Kennungen.
 - OAuth- und Drittanbieter-Gerüst (Google, Microsoft, WhatsApp, Telegram,
   Stripe, PayPal) ist konzipiert, aber nicht an echte Zugangsdaten
   angebunden — siehe [`docs/ROADMAP.md`](docs/ROADMAP.md).
@@ -374,7 +376,8 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 ### Sicherheit, Audit & DSGVO
 
 - Argon2-Passwort-Hashing, DB-Sessions (httpOnly, SameSite), Rate-Limiting.
-- CSP-, HSTS- und weitere Sicherheitsheader auf jeder Antwort.
+- CSP mit Nonce pro Request (`strict-dynamic`, keine Inline-Skripte in
+  Produktion), HSTS und weitere Sicherheitsheader.
 - AES-256-GCM-Feldverschlüsselung für sensible Daten.
 - Soft-Delete + Papierkorb für Kern-Entitäten; vollständiger Audit-Trail.
 - DSGVO: Einwilligungsdatensätze, Export personenbezogener Daten

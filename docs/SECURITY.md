@@ -36,11 +36,23 @@ team visibility → record constraints) is covered by unit tests
 - **Input validation** — Zod on every server action and API route; metadata
   drives generated schemas.
 - **Rate limiting** — a token-bucket limiter (`core/security/rate-limit.ts`)
-  guards the public API and can front auth.
+  guards the public API, lead intake, and contract access. Keys are hashed so
+  raw credentials/IPs are not retained in process memory. This implementation
+  is single-instance; Redis replacement remains a production scale gate.
 - **Field encryption** — AES-256-GCM (`core/security/encryption.ts`) for
   sensitive fields (income, national IDs); tamper-evident via the GCM tag.
 - **File access** — files are never served from public paths; downloads go
-  through a permission-checked, audited route.
+  through a tenant/RBAC-checked, audited, `no-store` route. Uploads are capped
+  before buffering and require an allowlisted extension/MIME plus matching
+  magic bytes; SVG/HTML/executable content is rejected.
+- **Outbound webhook SSRF** — URLs are checked on creation and every delivery.
+  DNS results must all be public addresses, the validated address is pinned to
+  the socket, redirects are not followed, private/metadata networks and URL
+  credentials are blocked, and production requires HTTPS.
+- **API key scopes** — each REST route explicitly requires a normalized scope
+  such as `contacts:read`; an authenticated key without that scope gets 403.
+- **Public contract links** — 192-bit random tokens have a bounded expiry,
+  conditional idempotent state transitions, and per-client throttling.
 - **Audit trail** — `AuditLog` records auth, data, file, permission, export,
   admin, security, and AI actions with actor, IP, and before/after snapshots.
 
@@ -56,6 +68,12 @@ team visibility → record constraints) is covered by unit tests
 
 The development credentials in `.env.example` are local-only and must never
 be reused in staging or production.
+
+Production startup also rejects missing/placeholder secrets, non-HTTPS public
+URLs, invalid field-encryption keys, shared database capability URLs, and a
+private-network webhook override. Rendered pages use a per-request CSP nonce
+with `strict-dynamic`; production scripts do not receive `unsafe-inline` or
+`unsafe-eval`.
 
 ## GDPR
 - **Consent** — `ConsentRecord` tracks purpose-scoped consent per subject.

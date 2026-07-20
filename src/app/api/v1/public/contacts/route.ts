@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { verifyApiKey } from "@/engines/integrations/api-key-service";
 import { runWithContext } from "@/core/tenancy/context";
 import { db } from "@/core/db";
-import { limit } from "@/core/security/rate-limit";
+import { limit, rateLimitKey } from "@/core/security/rate-limit";
+import { hasApiScope } from "@/core/security/api-scopes";
 
 /**
  * Public API — list contacts. Authenticated by an API key (Bearer token),
@@ -20,10 +21,19 @@ export async function GET(req: Request) {
   if (!resolved) {
     return NextResponse.json({ error: "invalid_api_key" }, { status: 401 });
   }
+  if (!hasApiScope(resolved.scopes, "contacts:read")) {
+    return NextResponse.json({ error: "insufficient_scope" }, { status: 403 });
+  }
 
-  const rl = limit(`api:${token.slice(0, 16)}`, { max: 60, windowMs: 60_000 });
+  const rl = limit(rateLimitKey("api", token), { max: 60, windowMs: 60_000 });
   if (!rl.ok) {
-    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+    return NextResponse.json(
+      { error: "rate_limited" },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.max(1, Math.ceil(rl.resetMs / 1000))) },
+      },
+    );
   }
 
   const contacts = await runWithContext(
