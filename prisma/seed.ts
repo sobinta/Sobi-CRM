@@ -8,7 +8,12 @@ import { PrismaClient } from "../src/generated/prisma/client";
  * (created via registration). Safe to re-run — clears and reinserts demo rows.
  */
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg({
+  connectionString:
+    process.env.SYSTEM_DATABASE_URL ??
+    process.env.DIRECT_URL ??
+    process.env.DATABASE_URL,
+});
 const db = new PrismaClient({ adapter });
 
 const DEAL_STAGES = [

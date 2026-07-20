@@ -1,13 +1,13 @@
-import { rawDb } from "@/core/db";
+import { identityDb } from "@/core/db/identity";
 import { normalizeBranding, type Branding } from "./brand-tokens";
 
 /**
  * Read a tenant's branding config from tenant.settings.branding.
- * Uses rawDb with an explicit tenantId (called from the app layout before a
+ * Uses the identity capability with an explicit tenantId (called before a
  * full context is established for rendering).
  */
 export async function getTenantBranding(tenantId: string): Promise<Branding> {
-  const tenant = await rawDb.tenant.findUnique({
+  const tenant = await identityDb.tenant.findUnique({
     where: { id: tenantId },
     select: { settings: true },
   });

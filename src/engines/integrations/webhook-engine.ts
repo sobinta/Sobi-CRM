@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { db, rawDb } from "@/core/db";
+import { db } from "@/core/db";
 import { getContext } from "@/core/tenancy/context";
 import { subscribe } from "@/core/event-bus/bus";
 import type { PlatformEvent } from "@/core/event-bus/types";
@@ -49,7 +49,7 @@ async function deliver(event: PlatformEvent): Promise<void> {
           body,
           signal: AbortSignal.timeout(5000),
         });
-        await rawDb.webhook.update({
+        await db.webhook.update({
           where: { id: hook.id },
           data: {
             lastStatus: res.status,
@@ -62,7 +62,7 @@ async function deliver(event: PlatformEvent): Promise<void> {
           url: hook.url,
           error: (err as Error).message,
         });
-        await rawDb.webhook.update({
+        await db.webhook.update({
           where: { id: hook.id },
           data: { failureCount: { increment: 1 }, lastFiredAt: new Date() },
         });

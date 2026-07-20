@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:rls": "node scripts/run-rls-tests.mjs",
     "db:up": "docker compose up -d",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",

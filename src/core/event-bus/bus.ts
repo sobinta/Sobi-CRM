@@ -1,5 +1,7 @@
-import { rawDb, Prisma } from "@/core/db";
-import { getContext } from "@/core/tenancy/context";
+import { db, Prisma } from "@/core/db";
+import { requireContext, runWithContext } from "@/core/tenancy/context";
+import { TenantMismatchError } from "@/core/tenancy/errors";
+import type { PlatformContext } from "@/core/tenancy/context";
 import type { EventHandler, EventType, PlatformEvent } from "./types";
 
 /**
@@ -36,11 +38,11 @@ export interface PublishInput {
 }
 
 export async function publish(input: PublishInput): Promise<void> {
-  const ctx = getContext();
-  const tenantId = input.tenantId ?? ctx?.tenantId;
-  if (!tenantId) {
-    throw new Error(`publish(${input.type}): no tenant in context or input.`);
+  const ctx = requireContext();
+  if (input.tenantId && input.tenantId !== ctx.tenantId) {
+    throw new TenantMismatchError();
   }
+  const tenantId = ctx.tenantId;
 
   const event: PlatformEvent = {
     type: input.type,
@@ -52,9 +54,8 @@ export async function publish(input: PublishInput): Promise<void> {
     occurredAt: new Date(),
   };
 
-  // Durable log first — rawDb because tenantId is explicit and this must
-  // succeed regardless of the caller's scoping.
-  await rawDb.event.create({
+  // Durable log first, under the same tenant capability as the publisher.
+  await db.event.create({
     data: {
       tenantId: event.tenantId,
       type: event.type,
@@ -66,10 +67,13 @@ export async function publish(input: PublishInput): Promise<void> {
     },
   });
 
-  await fanOut(event);
+  await fanOut(event, ctx);
 }
 
-async function fanOut(event: PlatformEvent): Promise<void> {
+async function fanOut(
+  event: PlatformEvent,
+  context: PlatformContext,
+): Promise<void> {
   const subs = [
     ...(handlers.get(event.type) ?? []),
     ...(handlers.get("*") ?? []),
@@ -77,7 +81,7 @@ async function fanOut(event: PlatformEvent): Promise<void> {
   await Promise.allSettled(
     subs.map(async (h) => {
       try {
-        await h(event);
+        await runWithContext(context, () => h(event));
       } catch (err) {
         console.error(`[event-bus] handler failed for ${event.type}:`, err);
       }

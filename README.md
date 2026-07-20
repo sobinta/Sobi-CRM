@@ -96,10 +96,11 @@ one-click **"Continue with demo workspace"** button (see
 
 ### Platform & multi-tenancy
 
-- **Data-layer multi-tenancy** — a Prisma client extension injects `tenantId`
-  from an AsyncLocalStorage-based `PlatformContext`, so cross-tenant access is
-  structurally impossible, not just filtered per-handler. A separate `rawDb`
-  client exists for genuinely cross-tenant/system code (seeding, admin tools).
+- **Defense-in-depth multi-tenancy** — a fail-closed Prisma capability injects
+  the immutable AsyncLocalStorage tenant context while forced PostgreSQL RLS
+  independently enforces the same boundary. Identity and narrowly allowlisted
+  system clients use separate least-privilege database roles; there is no
+  general `rawDb` escape hatch.
 - **Tenant provisioning** — new workspaces are created via a guided
   onboarding flow (`createWorkspaceAction`) that provisions the tenant, the
   Owner role, and default pipeline/stages.
@@ -489,6 +490,7 @@ catalogue, event catalogue, AI OS, and deployment guide.
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint (incl. architectural import boundaries) |
 | `npm run test` | Vitest unit suite |
+| `npm run test:rls` | PostgreSQL two-tenant isolation suite |
 | `npm run db:migrate` / `db:generate` / `db:seed` / `db:studio` | Prisma |
 
 ## Deployment

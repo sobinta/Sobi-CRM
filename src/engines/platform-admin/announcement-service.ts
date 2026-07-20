@@ -1,4 +1,5 @@
-import { rawDb, Prisma } from "@/core/db";
+import { Prisma } from "@/core/db";
+import { systemDb } from "@/core/db/system";
 import { requireSuperAdmin } from "@/core/rbac/guard";
 import { record } from "@/core/audit/audit";
 import { getContext } from "@/core/tenancy/context";
@@ -18,12 +19,12 @@ export interface AnnouncementBarInput {
 
 /** Public read — no auth required, used by both the landing page and the app shell. */
 export async function getAnnouncementBarPublic() {
-  return rawDb.announcementBar.findUnique({ where: { id: SINGLETON_ID } });
+  return systemDb.announcementBar.findUnique({ where: { id: SINGLETON_ID } });
 }
 
 export async function getAnnouncementBar() {
   requireSuperAdmin();
-  return rawDb.announcementBar.findUnique({ where: { id: SINGLETON_ID } });
+  return systemDb.announcementBar.findUnique({ where: { id: SINGLETON_ID } });
 }
 
 /** Picks the current locale's text, falling back to English. */
@@ -47,7 +48,7 @@ export async function setAnnouncementBar(input: AnnouncementBarInput) {
     linkUrl: input.linkUrl,
     updatedById: ctx?.membershipId,
   };
-  const row = await rawDb.announcementBar.upsert({
+  const row = await systemDb.announcementBar.upsert({
     where: { id: SINGLETON_ID },
     create: { id: SINGLETON_ID, ...data },
     update: data,

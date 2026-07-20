@@ -1,6 +1,11 @@
 import crypto from "node:crypto";
-import { db, rawDb } from "@/core/db";
-import { requireContext } from "@/core/tenancy/context";
+import { db } from "@/core/db";
+import { systemDb } from "@/core/db/system";
+import {
+  publicTenantContext,
+  requireContext,
+  runWithContext,
+} from "@/core/tenancy/context";
 import { authorize } from "@/core/rbac/guard";
 import { record } from "@/core/audit/audit";
 
@@ -61,17 +66,20 @@ export async function revokeApiKey(id: string) {
   });
 }
 
-/** Resolve an API key to its tenant (public API auth). Uses rawDb. */
+/** Resolve an API key to its tenant through the narrow system gateway. */
 export async function verifyApiKey(
   raw: string,
 ): Promise<{ tenantId: string; scopes: string[] } | null> {
-  const key = await rawDb.apiKey.findFirst({
+  const key = await systemDb.apiKey.findFirst({
     where: { keyHash: hashKey(raw), revokedAt: null },
+    select: { id: true, tenantId: true, scopes: true },
   });
   if (!key) return null;
-  await rawDb.apiKey.update({
-    where: { id: key.id },
-    data: { lastUsedAt: new Date() },
-  });
+  await runWithContext(publicTenantContext(key.tenantId), () =>
+    db.apiKey.updateMany({
+      where: { id: key.id, revokedAt: null },
+      data: { lastUsedAt: new Date() },
+    }),
+  );
   return { tenantId: key.tenantId, scopes: key.scopes };
 }

@@ -1,4 +1,4 @@
-import { db, rawDb } from "@/core/db";
+import { db } from "@/core/db";
 import { requireContext } from "@/core/tenancy/context";
 
 /**
@@ -8,7 +8,7 @@ import { requireContext } from "@/core/tenancy/context";
  */
 
 export async function getHealthSnapshot() {
-  const ctx = requireContext();
+  requireContext();
   const dayAgo = new Date(Date.now() - 24 * 3600_000);
 
   const [
@@ -22,8 +22,8 @@ export async function getHealthSnapshot() {
     securityEvents,
     recentErrors,
   ] = await Promise.all([
-    rawDb.job.count({ where: { tenantId: ctx.tenantId, status: "PENDING" } }),
-    rawDb.job.count({ where: { tenantId: ctx.tenantId, status: "FAILED" } }),
+    db.job.count({ where: { status: "PENDING" } }),
+    db.job.count({ where: { status: "FAILED" } }),
     db.automationRun.count({ where: { createdAt: { gte: dayAgo } } }),
     db.automationRun.count({ where: { status: "failed", createdAt: { gte: dayAgo } } }),
     db.aiLog.aggregate({

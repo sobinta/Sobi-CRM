@@ -1,4 +1,4 @@
-import { rawDb } from "@/core/db";
+import { systemDb } from "@/core/db/system";
 import { requireSuperAdmin } from "@/core/rbac/guard";
 import { record } from "@/core/audit/audit";
 import { getContext } from "@/core/tenancy/context";
@@ -16,12 +16,12 @@ export type AssetSlot = "logo" | "favicon";
 export const ASSET_SLOTS: AssetSlot[] = ["logo", "favicon"];
 
 export async function listSiteAssets() {
-  return rawDb.siteAsset.findMany();
+  return systemDb.siteAsset.findMany();
 }
 
 /** Public read — no auth required, used wherever the logo/favicon render. */
 export async function getSiteAssetsPublic(): Promise<Record<string, string>> {
-  const rows = await rawDb.siteAsset.findMany();
+  const rows = await systemDb.siteAsset.findMany();
   const map: Record<string, string> = {};
   for (const row of rows) map[row.slot] = row.url;
   return map;
@@ -30,7 +30,7 @@ export async function getSiteAssetsPublic(): Promise<Record<string, string>> {
 export async function setSiteAsset(slot: AssetSlot, url: string) {
   requireSuperAdmin();
   const ctx = getContext();
-  const row = await rawDb.siteAsset.upsert({
+  const row = await systemDb.siteAsset.upsert({
     where: { slot },
     create: { slot, url, updatedById: ctx?.membershipId },
     update: { url, updatedById: ctx?.membershipId },
@@ -47,7 +47,7 @@ export async function setSiteAsset(slot: AssetSlot, url: string) {
 
 export async function clearSiteAsset(slot: AssetSlot) {
   requireSuperAdmin();
-  await rawDb.siteAsset.deleteMany({ where: { slot } });
+  await systemDb.siteAsset.deleteMany({ where: { slot } });
   await record({
     category: "ADMIN",
     action: "platform.asset.clear",

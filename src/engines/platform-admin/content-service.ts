@@ -1,4 +1,4 @@
-import { rawDb } from "@/core/db";
+import { systemDb } from "@/core/db/system";
 import { requireSuperAdmin } from "@/core/rbac/guard";
 import { record } from "@/core/audit/audit";
 import { getContext } from "@/core/tenancy/context";
@@ -17,12 +17,12 @@ export { EDITABLE_CONTENT_KEYS, type EditableContentKey } from "./content-keys";
 
 export async function listContentOverrides() {
   requireSuperAdmin();
-  return rawDb.landingContentOverride.findMany({ orderBy: { key: "asc" } });
+  return systemDb.landingContentOverride.findMany({ orderBy: { key: "asc" } });
 }
 
 /** Public read — no auth required, used by the landing page itself. */
 export async function getContentOverridesPublic(): Promise<Map<string, string>> {
-  const rows = await rawDb.landingContentOverride.findMany();
+  const rows = await systemDb.landingContentOverride.findMany();
   const map = new Map<string, string>();
   for (const row of rows) map.set(`${row.locale}:${row.key}`, row.value);
   return map;
@@ -45,7 +45,7 @@ export async function setContentOverride(
 ) {
   requireSuperAdmin();
   const ctx = getContext();
-  const row = await rawDb.landingContentOverride.upsert({
+  const row = await systemDb.landingContentOverride.upsert({
     where: { key_locale: { key, locale } },
     create: { key, locale, value, updatedById: ctx?.membershipId },
     update: { value, updatedById: ctx?.membershipId },
@@ -62,7 +62,7 @@ export async function setContentOverride(
 
 export async function clearContentOverride(key: EditableContentKey, locale: string) {
   requireSuperAdmin();
-  await rawDb.landingContentOverride.deleteMany({ where: { key, locale } });
+  await systemDb.landingContentOverride.deleteMany({ where: { key, locale } });
   await record({
     category: "ADMIN",
     action: "platform.content.clear",

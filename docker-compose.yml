@@ -11,6 +11,7 @@ services:
       - "5433:5432"
     volumes:
       - coreline_pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init-runtime-roles.sql:/docker-entrypoint-initdb.d/10-runtime-roles.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U coreline -d coreline"]
       interval: 5s

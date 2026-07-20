@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
-import { rawDb } from "@/core/db";
+import { identityDb } from "@/core/db/identity";
 
 /**
  * Better Auth instance.
@@ -17,7 +17,7 @@ import { rawDb } from "@/core/db";
 const isDev = process.env.NODE_ENV !== "production";
 
 export const auth = betterAuth({
-  database: prismaAdapter(rawDb, { provider: "postgresql" }),
+  database: prismaAdapter(identityDb, { provider: "postgresql" }),
   secret: process.env.BETTER_AUTH_SECRET,
   // In production, pin the base URL. In dev, let Better Auth infer the origin
   // so it works on whatever port the dev server (autoPort) lands on.

@@ -4,6 +4,7 @@ import { authorize } from "@/core/rbac/guard";
 import { publish } from "@/core/event-bus/bus";
 import { record } from "@/core/audit/audit";
 import { addActivity } from "@/engines/timeline/timeline";
+import { assertTenantReference } from "@/core/tenancy/relations";
 
 /**
  * Insurance module service — policies + claims on the shared Pipeline/Finance
@@ -51,6 +52,7 @@ export async function policyStats() {
 export async function createPolicy(input: PolicyInput) {
   authorize("insurance.policy.update");
   const ctx = requireContext();
+  await assertTenantReference("contact", input.contactId);
   const policy = await db.policy.create({
     data: {
       tenantId: ctx.tenantId,

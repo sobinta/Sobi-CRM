@@ -79,11 +79,10 @@ npm run dev               # http://localhost:3000
 
 ### پلتفرم و چندمستأجری
 
-- **چندمستأجری در لایه‌ی داده** — یک اکستنشن Prisma client، `tenantId` را
-  از یک `PlatformContext` مبتنی بر AsyncLocalStorage تزریق می‌کند، به
-  طوری‌که دسترسی بین‌مستأجری از نظر ساختاری غیرممکن است، نه فقط فیلترشده
-  در هر handler. یک کلاینت جدای `rawDb` برای کد سیستمی واقعاً
-  بین‌مستأجری (seed، ابزارهای ادمین) وجود دارد.
+- **چندمستأجری دفاع‌درعمق** — کلاینت fail-closed پریزما tenant را از
+  `PlatformContext` تغییرناپذیر تزریق می‌کند و RLS اجباری PostgreSQL همان
+  مرز را مستقل از کد برنامه اعمال می‌کند. دسترسی‌های identity و system نقش
+  دیتابیس جدا و حداقل‌دسترسی دارند و هیچ escape hatch عمومی `rawDb` وجود ندارد.
 - **راه‌اندازی مستأجر** — فضاهای کاری جدید از طریق یک فرایند onboarding
   هدایت‌شده ساخته می‌شوند که مستأجر، نقش Owner و پایپ‌لاین/مراحل پیش‌فرض را
   می‌سازد.
@@ -416,6 +415,7 @@ src/
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
 | `npm run test` | مجموعه‌ی تست Vitest |
+| `npm run test:rls` | تست یکپارچه‌ی جداسازی دو tenant در PostgreSQL |
 | `npm run db:migrate` / `db:generate` / `db:seed` / `db:studio` | Prisma |
 
 ## استقرار

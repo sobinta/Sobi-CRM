@@ -1,23 +1,43 @@
 # Deployment
 
 ## Environment
-Required: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`,
+Required: `DATABASE_URL`, `IDENTITY_DATABASE_URL`, `SYSTEM_DATABASE_URL`,
+`DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`,
 `NEXT_PUBLIC_APP_URL`. Recommended: `FIELD_ENCRYPTION_KEY` (32 bytes base64),
 `FILE_SIGNING_SECRET`, SMTP settings. Optional: AI provider keys
 (`OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `AI_LOCAL_ENDPOINT`) — omit to run AI
 in mock mode. See `.env.example`.
 
-**`DATABASE_URL` vs `DIRECT_URL`** — if your Postgres provider fronts
-connections with a pooler (Supabase's pgbouncer, PgBouncer, RDS Proxy, …),
-set **both**:
-- `DATABASE_URL` — the pooled connection string. Used by the running app
-  (`src/core/db.ts`'s PrismaPg driver adapter) — ideal for serverless
-  platforms with many short-lived function invocations.
-- `DIRECT_URL` — a *non-pooled* direct connection string. Used only by
-  `prisma migrate deploy` (`prisma.config.ts`), since pooler transaction
-  mode doesn't support the multi-statement/advisory-lock behavior schema
-  migrations need. Without a pooler in front of your database (e.g. local
-  Docker Postgres), both variables can be identical.
+The four database URLs are security capabilities, not aliases:
+
+- `DATABASE_URL` is the pooled, least-privilege tenant runtime connection.
+- `IDENTITY_DATABASE_URL` can access auth and identity tables, not CRM data.
+- `SYSTEM_DATABASE_URL` is reserved for provisioning and audited dispatchers.
+- `DIRECT_URL` is the non-pooled migration-owner connection used only by
+  Prisma migrations.
+
+The migration creates the group roles and RLS policies, but managed providers
+may require an administrator to provision LOGIN roles and passwords first.
+Runtime roles must not own tables and must be `NOSUPERUSER NOBYPASSRLS`.
+Set `TENANT_DB_SECURITY_CHECK=strict`; startup then validates the deployed
+role and policy posture before serving requests.
+
+## Fresh local database
+
+The role initialization script runs only when the PostgreSQL volume is first
+created. Because this project has no production data yet, migrate an older
+local volume by recreating it, then deploy and seed:
+
+```bash
+docker compose down -v
+docker compose up -d
+npm run db:deploy
+npm run db:seed
+npm run test:rls
+```
+
+`down -v` deletes the local database and must never be used against a volume
+containing data that must be retained.
 
 ## Options
 
@@ -43,10 +63,11 @@ overdue scans, automation timers.
 
 ## Release checklist
 1. `npm run typecheck && npm run lint && npm run test` — all green.
-2. `npx prisma migrate deploy`.
-3. Set production env (real `BETTER_AUTH_URL`, secrets, SMTP, encryption key).
-4. Verify CSP/HSTS headers and that AI keys (if any) resolve.
-5. Smoke: register → onboard → activate a module → create records → export a
+2. Deploy migrations through `DIRECT_URL`, then run `npm run test:rls`.
+3. Confirm the startup tenant-database security check passes in strict mode.
+4. Set production env (real `BETTER_AUTH_URL`, secrets, SMTP, encryption key).
+5. Verify CSP/HSTS headers and that AI keys (if any) resolve.
+6. Smoke: register → onboard → activate a module → create records → export a
    report → check the health dashboard.
 
 See [TESTING.md](TESTING.md) for the full verification checklist.

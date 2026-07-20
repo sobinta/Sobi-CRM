@@ -8,11 +8,11 @@ strict, lint-enforced dependency direction: **modules → engines → core**.
 ### `core/` — platform kernel
 Framework-level services with **no business logic**:
 
-- **auth / tenancy / rbac** — Better Auth sessions bound to a tenant; a Prisma
-  client extension (`core/db.ts`) injects `tenantId` from an AsyncLocalStorage
-  `PlatformContext` on every query, and turns soft-delete models' deletes into
-  `deletedAt` writes. `can()` composes role grants → ownership → team visibility
-  → admin override.
+- **auth / tenancy / rbac** — Better Auth sessions bound to a tenant; separate
+  tenant, identity, and system database capabilities; a fail-closed Prisma
+  extension plus forced PostgreSQL RLS bind every business query to the
+  immutable AsyncLocalStorage `PlatformContext`. `can()` composes role grants
+  → ownership → team visibility → admin override.
 - **event-bus** — a typed in-process bus with a durable `Event` log. `publish()`
   persists then fans out to subscribers; failures are isolated.
 - **jobs** — a DB-backed job runner (reminders, overdue scans, automation
@@ -52,9 +52,14 @@ booking engine backs the barber/salon/restaurant service modules.
    `PlatformContext`, and composes the workspace rail from activated modules.
 3. Server components / actions run inside `withPlatformContext`/
    `withActionContext`, which set the AsyncLocalStorage context so the scoped
-   `db` client and `can()` apply automatically.
+   `db` client, transaction-local RLS setting, and `can()` apply automatically.
 4. Services mutate, then `publish()` events + `record()` audit entries; the bus
    drives Timeline, Feed, Automation, Notifications, and Integrations.
+
+Public gateways and cross-tenant dispatchers may use the allowlisted system
+capability only to resolve a tenant/work item. They execute business logic
+inside that tenant's context. ESLint prevents new system/identity client
+imports outside the reviewed boundary files.
 
 ## Metadata-driven, low-code
 

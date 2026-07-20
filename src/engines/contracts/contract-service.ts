@@ -1,6 +1,11 @@
 import crypto from "node:crypto";
-import { db, rawDb, Prisma } from "@/core/db";
-import { requireContext, runWithContext } from "@/core/tenancy/context";
+import { db, Prisma } from "@/core/db";
+import { systemDb } from "@/core/db/system";
+import {
+  publicTenantContext,
+  requireContext,
+  runWithContext,
+} from "@/core/tenancy/context";
 import { authorize } from "@/core/rbac/guard";
 import { publish } from "@/core/event-bus/bus";
 import { record } from "@/core/audit/audit";
@@ -8,6 +13,8 @@ import { addActivity } from "@/engines/timeline/timeline";
 import { toJalali } from "@/core/i18n/jalali";
 import { buildContractTemplate } from "./template";
 import { getProvider } from "@/engines/ai/provider";
+import { assertTenantReferences } from "@/core/tenancy/relations";
+import { TenantMismatchError } from "@/core/tenancy/errors";
 
 /**
  * Contract engine — generation, the public share/acceptance lifecycle, and
@@ -44,6 +51,12 @@ export async function createContract(input: CreateContractInput) {
   authorize("crm.contract.create");
   const ctx = requireContext();
 
+  await assertTenantReferences([
+    { kind: "deal", id: input.dealId },
+    { kind: "contact", id: input.contactId },
+    { kind: "company", id: input.companyId },
+  ]);
+
   let clientName = "کارفرما";
   let companyName: string | undefined;
   if (input.contactId) {
@@ -51,14 +64,14 @@ export async function createContract(input: CreateContractInput) {
       where: { id: input.contactId },
       include: { company: { select: { name: true } } },
     });
-    if (contact) {
-      clientName = `${contact.firstName} ${contact.lastName}`;
-      companyName = contact.company?.name;
-    }
+    if (!contact) throw new TenantMismatchError();
+    clientName = `${contact.firstName} ${contact.lastName}`;
+    companyName = contact.company?.name;
   }
   if (!companyName && input.companyId) {
     const company = await db.company.findFirst({ where: { id: input.companyId } });
-    companyName = company?.name;
+    if (!company) throw new TenantMismatchError();
+    companyName = company.name;
   }
 
   const contractNo = await nextContractNumber();
@@ -152,34 +165,31 @@ export async function cancelContract(id: string) {
   return updated;
 }
 
-/** A minimal, permission-less context for portal/public-triggered side effects
- *  (mirrors engines/portal/portal-service.ts) — lets the event bus's
- *  automation/webhook subscribers see a tenant even though there's no signed-in
- *  actor, without granting the public caller any real access. */
-function publicContext(tenantId: string) {
-  return {
-    tenantId,
-    membershipId: "portal",
-    userId: "portal",
-    permissions: new Set<string>(),
-    isAdmin: false,
-    isSuperAdmin: false,
-    locale: "fa",
-  };
+/** Narrow system gateway: a token may resolve only a tenant and record id. */
+async function resolvePublicContract(shareToken: string) {
+  return systemDb.contract.findUnique({
+    where: { shareToken },
+    select: { id: true, tenantId: true },
+  });
 }
 
 /** Public — no auth. Called from the share-token page on first client view. */
 export async function markContractViewed(shareToken: string): Promise<void> {
-  const contract = await rawDb.contract.findUnique({ where: { shareToken } });
-  if (!contract || contract.viewedAt) return; // idempotent — only the first view counts
-  if (contract.status !== "sent") return;
-  await rawDb.contract.update({
-    where: { id: contract.id },
-    data: { status: "viewed", viewedAt: new Date() },
+  const resolved = await resolvePublicContract(shareToken);
+  if (!resolved) return;
+
+  await runWithContext(publicTenantContext(resolved.tenantId, "fa"), async () => {
+    const updated = await db.contract.updateMany({
+      where: { id: resolved.id, shareToken, status: "sent", viewedAt: null },
+      data: { status: "viewed", viewedAt: new Date() },
+    });
+    if (updated.count === 0) return;
+    await publish({
+      type: "contract.viewed",
+      entityType: "contract",
+      entityId: resolved.id,
+    });
   });
-  await runWithContext(publicContext(contract.tenantId), () =>
-    publish({ type: "contract.viewed", entityType: "contract", entityId: contract.id }),
-  );
 }
 
 /** Public — no auth. The client's online acceptance ("simple signature"). */
@@ -187,18 +197,26 @@ export async function acceptContractPublic(
   shareToken: string,
   acceptedByName: string,
 ): Promise<{ ok: boolean }> {
-  const contract = await rawDb.contract.findUnique({ where: { shareToken } });
-  if (!contract) return { ok: false };
-  if (contract.status === "accepted" || contract.status === "canceled") return { ok: false };
+  const resolved = await resolvePublicContract(shareToken);
+  if (!resolved) return { ok: false };
   const name = acceptedByName.trim();
   if (!name) return { ok: false };
 
-  await rawDb.contract.update({
-    where: { id: contract.id },
-    data: { status: "accepted", acceptedAt: new Date(), acceptedByName: name },
-  });
+  return runWithContext(publicTenantContext(resolved.tenantId, "fa"), async () => {
+    const contract = await db.contract.findFirst({
+      where: { id: resolved.id, shareToken },
+    });
+    if (!contract) return { ok: false };
+    const accepted = await db.contract.updateMany({
+      where: {
+        id: contract.id,
+        shareToken,
+        status: { in: ["sent", "viewed"] },
+      },
+      data: { status: "accepted", acceptedAt: new Date(), acceptedByName: name },
+    });
+    if (accepted.count === 0) return { ok: false };
 
-  await runWithContext(publicContext(contract.tenantId), async () => {
     await Promise.all([
       publish({ type: "contract.accepted", entityType: "contract", entityId: contract.id }),
       record({
@@ -217,27 +235,29 @@ export async function acceptContractPublic(
           })
         : Promise.resolve(),
     ]);
+    return { ok: true };
   });
-
-  return { ok: true };
 }
 
 /** Public — no auth. Fetch by token for the public review page. */
 export async function getContractByToken(shareToken: string) {
-  return rawDb.contract.findUnique({ where: { shareToken } });
+  const resolved = await resolvePublicContract(shareToken);
+  if (!resolved) return null;
+  return runWithContext(publicTenantContext(resolved.tenantId, "fa"), () =>
+    db.contract.findFirst({ where: { id: resolved.id, shareToken } }),
+  );
 }
 
 // --- AI-assisted ---
 
-async function loadSetting(tenantId: string) {
-  const s = await rawDb.aiSetting.findUnique({ where: { tenantId } });
+async function loadSetting() {
+  const s = await db.aiSetting.findFirst();
   return s ?? { provider: "mock", model: null };
 }
 
 /** Rewrite the contract body personalized with the lead's challenge + AI customer knowledge. */
 export async function aiRewriteContract(id: string): Promise<string | null> {
   authorize("crm.contract.update");
-  const ctx = requireContext();
   const contract = await db.contract.findFirst({ where: { id } });
   if (!contract) return null;
 
@@ -251,7 +271,7 @@ export async function aiRewriteContract(id: string): Promise<string | null> {
     if (deal) context += `فرصت فروش: ${deal.title} — ارزش ${Number(deal.value)} ${deal.currency}\n`;
   }
 
-  const setting = await loadSetting(ctx.tenantId);
+  const setting = await loadSetting();
   const provider = getProvider(setting);
   const res = await provider.complete([
     {
@@ -274,7 +294,6 @@ export async function aiRewriteContract(id: string): Promise<string | null> {
 /** AI-drafted, polite Persian follow-up for a sent/viewed-but-unaccepted contract. */
 export async function aiContractFollowUp(id: string): Promise<string | null> {
   authorize("crm.contract.read");
-  const ctx = requireContext();
   const contract = await db.contract.findFirst({ where: { id } });
   if (!contract) return null;
 
@@ -282,7 +301,7 @@ export async function aiContractFollowUp(id: string): Promise<string | null> {
   const days = Math.max(0, Math.floor((Date.now() - anchor.getTime()) / 86_400_000));
   const link = `/contract/${contract.shareToken}`;
 
-  const setting = await loadSetting(ctx.tenantId);
+  const setting = await loadSetting();
   const provider = getProvider(setting);
   const res = await provider.complete([
     {

@@ -1,7 +1,16 @@
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, Prisma } from "@/generated/prisma/client";
+import { Prisma } from "@/generated/prisma/client";
+import { makePrismaClient } from "./db/factory";
 import { getContext } from "./tenancy/context";
-import { TENANT_SCOPED, SOFT_DELETE } from "./tenancy/model-metadata";
+import { SOFT_DELETE } from "./tenancy/model-metadata";
+import {
+  SystemCapabilityRequiredError,
+  TenantContextRequiredError,
+} from "./tenancy/errors";
+import { getModelScope } from "./tenancy/model-metadata";
+import {
+  scopeTenantOperation,
+  TENANT_READ_OPERATIONS,
+} from "./tenancy/tenant-query";
 
 /**
  * Tenant-scoped Prisma client.
@@ -16,108 +25,57 @@ import { TENANT_SCOPED, SOFT_DELETE } from "./tenancy/model-metadata";
  * `deletedAt` and remain tenant-scoped through the same extension.
  *
  * Cross-tenant access is structurally impossible from request code. System
- * paths (seeding, cross-tenant jobs) run outside a context and use `rawDb`.
+ * paths (seeding and cross-tenant dispatch) use the system capability.
  */
 
-const READ_OPS = new Set([
-  "findFirst",
-  "findFirstOrThrow",
-  "findMany",
-  "findUnique",
-  "findUniqueOrThrow",
-  "count",
-  "aggregate",
-  "groupBy",
-]);
-
-const WHERE_OPS = new Set([
-  "findFirst",
-  "findFirstOrThrow",
-  "findMany",
-  "findUnique",
-  "findUniqueOrThrow",
-  "count",
-  "aggregate",
-  "groupBy",
-  "update",
-  "updateMany",
-  "updateManyAndReturn",
-  "delete",
-  "deleteMany",
-]);
-
-function withWhere(
-  args: Record<string, unknown>,
-  extra: Record<string, unknown>,
-): Record<string, unknown> {
-  const where = (args.where as Record<string, unknown>) ?? {};
-  return { ...args, where: { ...where, ...extra } };
-}
-
-function makeAdapter() {
-  return new PrismaPg({ connectionString: process.env.DATABASE_URL });
-}
-
 function makeClient() {
-  const base = new PrismaClient({ adapter: makeAdapter() });
+  const base = makePrismaClient(process.env.DATABASE_URL);
 
   return base
     .$extends({
       query: {
-        $allModels: {
-          async $allOperations({ model, operation, args, query }) {
-            const ctx = getContext();
-            const tenantScoped = model ? TENANT_SCOPED.has(model) : false;
-            const softDelete = model ? SOFT_DELETE.has(model) : false;
-            let next = (args ?? {}) as Record<string, unknown>;
+        async $allOperations({ model, operation, args, query }) {
+          const ctx = getContext();
+          const softDelete = model ? SOFT_DELETE.has(model) : false;
+          let next = (args ?? {}) as Record<string, unknown>;
 
-            if (tenantScoped && ctx) {
-              if (WHERE_OPS.has(operation)) {
-                next = withWhere(next, { tenantId: ctx.tenantId });
-              }
-              if (operation === "create") {
-                const data = (next.data as Record<string, unknown>) ?? {};
-                if (data.tenantId === undefined) {
-                  next = { ...next, data: { ...data, tenantId: ctx.tenantId } };
-                }
-              }
-              if (
-                operation === "createMany" ||
-                operation === "createManyAndReturn"
-              ) {
-                const stamp = (row: Record<string, unknown>) =>
-                  row.tenantId === undefined
-                    ? { ...row, tenantId: ctx.tenantId }
-                    : row;
-                const data = next.data;
-                next = {
-                  ...next,
-                  data: Array.isArray(data)
-                    ? data.map((r) => stamp(r as Record<string, unknown>))
-                    : stamp(data as Record<string, unknown>),
-                };
-              }
-              if (operation === "upsert") {
-                next = withWhere(next, { tenantId: ctx.tenantId });
-                const create = (next.create as Record<string, unknown>) ?? {};
-                if (create.tenantId === undefined) {
-                  next = {
-                    ...next,
-                    create: { ...create, tenantId: ctx.tenantId },
-                  };
-                }
-              }
+          // `db` is the tenant capability. Model and raw operations both fail
+          // before SQL when no request/system tenant context exists.
+          if (!ctx) {
+            throw new TenantContextRequiredError(model, operation);
+          }
+
+          if (model) {
+            const scope = getModelScope(model);
+            if (
+              scope === "global" ||
+              (scope === "tenant-root" &&
+                ["create", "createMany", "createManyAndReturn", "upsert"].includes(
+                  operation,
+                ))
+            ) {
+              throw new SystemCapabilityRequiredError(`${model}.${operation}`);
             }
+            next = scopeTenantOperation(model, operation, next, ctx.tenantId);
+          }
 
-            if (softDelete && READ_OPS.has(operation)) {
-              const where = (next.where as Record<string, unknown>) ?? {};
-              if (where.deletedAt === undefined) {
-                next = { ...next, where: { ...where, deletedAt: null } };
-              }
+          if (softDelete && TENANT_READ_OPERATIONS.has(operation)) {
+            const where = (next.where as Record<string, unknown>) ?? {};
+            if (where.deletedAt === undefined) {
+              next = { ...next, where: { ...where, deletedAt: null } };
             }
+          }
 
-            return query(next);
-          },
+          // The RLS variable and query must share one pooled connection. A
+          // transaction-local setting cannot leak to the next request.
+          const setTenant = base.$executeRaw`
+            SELECT set_config('app.tenant_id', ${ctx.tenantId}, true)
+          `;
+          const [, result] = await base.$transaction([
+            setTenant,
+            query(next),
+          ]);
+          return result;
         },
       },
     })
@@ -154,27 +112,20 @@ function makeClient() {
     });
 }
 
-function makeRawClient() {
-  return new PrismaClient({ adapter: makeAdapter() });
-}
-
-type ExtendedClient = ReturnType<typeof makeClient>;
+type InternalClient = ReturnType<typeof makeClient>;
+type TenantClient = Omit<InternalClient, "$transaction">;
 
 const globalForDb = globalThis as unknown as {
-  __corelineDb?: ExtendedClient;
-  __corelineRawDb?: PrismaClient;
+  __corelineDb?: InternalClient;
 };
 
 /** Tenant-scoped client — the default for all request/service code. */
-export const db: ExtendedClient = globalForDb.__corelineDb ?? makeClient();
-
-/** Unscoped client — system/seed/cross-tenant only. Use deliberately. */
-export const rawDb: PrismaClient =
-  globalForDb.__corelineRawDb ?? makeRawClient();
+const internalDb: InternalClient = globalForDb.__corelineDb ?? makeClient();
+/** Interactive transactions are intentionally absent from the public type. */
+export const db: TenantClient = internalDb;
 
 if (process.env.NODE_ENV !== "production") {
-  globalForDb.__corelineDb = db;
-  globalForDb.__corelineRawDb = rawDb;
+  globalForDb.__corelineDb = internalDb;
 }
 
 export { Prisma };

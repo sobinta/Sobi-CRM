@@ -129,8 +129,49 @@ export const SOFT_DELETE = new Set<string>([
  * their parent (e.g. TeamMember via Team, RolePermission via Role).
  */
 export const TENANT_SCOPED_VIA_RELATION = new Set<string>([
+  "User",
   "TeamMember",
   "RolePermission",
   "MembershipRole",
   "FieldRule",
 ]);
+
+/**
+ * Global models are deliberately unavailable through tenant filtering. They
+ * are accessed through the identity or system database capabilities instead.
+ */
+export const GLOBAL_MODELS = new Set<string>([
+  "Session",
+  "Account",
+  "Verification",
+  "Feature",
+  "PricingPlan",
+  "LandingContentOverride",
+  "SiteAsset",
+  "AnnouncementBar",
+]);
+
+/**
+ * EntityDefinition contains shared built-ins (`tenantId = null`) and custom
+ * tenant definitions. Its access rules are explicit and tested separately.
+ */
+export const TENANT_OR_GLOBAL = new Set<string>(["EntityDefinition"]);
+
+/** The tenant row is scoped by its primary key rather than a tenantId field. */
+export const TENANT_ROOT_MODELS = new Set<string>(["Tenant"]);
+
+export type ModelScope =
+  | "tenant"
+  | "relation"
+  | "global"
+  | "tenant-root"
+  | "tenant-or-global";
+
+export function getModelScope(model: string): ModelScope | null {
+  if (TENANT_SCOPED.has(model)) return "tenant";
+  if (TENANT_SCOPED_VIA_RELATION.has(model)) return "relation";
+  if (GLOBAL_MODELS.has(model)) return "global";
+  if (TENANT_ROOT_MODELS.has(model)) return "tenant-root";
+  if (TENANT_OR_GLOBAL.has(model)) return "tenant-or-global";
+  return null;
+}

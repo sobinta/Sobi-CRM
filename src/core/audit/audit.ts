@@ -1,4 +1,4 @@
-import { rawDb, Prisma } from "@/core/db";
+import { db, Prisma } from "@/core/db";
 import { getContext } from "@/core/tenancy/context";
 import type { AuditCategory } from "@/generated/prisma/enums";
 
@@ -31,7 +31,7 @@ export async function record(input: AuditInput): Promise<void> {
   const tenantId = input.tenantId ?? ctx?.tenantId;
   if (!tenantId) return; // nothing to attribute to
 
-  await rawDb.auditLog.create({
+  await db.auditLog.create({
     data: {
       tenantId,
       category: input.category,
@@ -64,7 +64,7 @@ export async function list(query: AuditQuery = {}) {
   if (!ctx) return { items: [], nextCursor: null as string | null };
 
   const take = Math.min(query.take ?? 50, 200);
-  const items = await rawDb.auditLog.findMany({
+  const items = await db.auditLog.findMany({
     where: {
       tenantId: ctx.tenantId,
       category: query.category,

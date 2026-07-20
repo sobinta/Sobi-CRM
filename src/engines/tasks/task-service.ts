@@ -5,6 +5,11 @@ import { publish } from "@/core/event-bus/bus";
 import { record } from "@/core/audit/audit";
 import { notify } from "@/engines/notifications/notification-service";
 import { addActivity } from "@/engines/timeline/timeline";
+import {
+  assertPolymorphicTenantReference,
+  assertTenantReference,
+  assertTenantReferences,
+} from "@/core/tenancy/relations";
 
 /**
  * Task engine — tasks, subtasks, dependencies, comments, recurrence.
@@ -49,6 +54,16 @@ export async function listTasks(params?: {
 export async function createTask(input: TaskInput) {
   authorize("ops.task.create");
   const ctx = requireContext();
+  const assigneeId = input.assigneeId ?? ctx.membershipId;
+
+  await Promise.all([
+    assertTenantReferences([
+      { kind: "membership", id: assigneeId },
+      { kind: "task", id: input.parentId },
+      { kind: "task", id: input.dependsOnId },
+    ]),
+    assertPolymorphicTenantReference(input.entityType, input.entityId),
+  ]);
 
   const task = await db.task.create({
     data: {
@@ -57,7 +72,7 @@ export async function createTask(input: TaskInput) {
       description: input.description,
       priority: input.priority ?? "normal",
       dueAt: input.dueAt,
-      assigneeId: input.assigneeId ?? ctx.membershipId,
+      assigneeId,
       parentId: input.parentId,
       dependsOnId: input.dependsOnId,
       entityType: input.entityType,
@@ -147,6 +162,7 @@ export async function setTaskStatus(id: string, status: string) {
 export async function addTaskComment(taskId: string, body: string) {
   authorize("ops.task.update");
   const ctx = requireContext();
+  await assertTenantReference("task", taskId);
   return db.taskComment.create({
     data: { tenantId: ctx.tenantId, taskId, body, authorId: ctx.membershipId },
   });

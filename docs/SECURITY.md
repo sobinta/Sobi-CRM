@@ -1,11 +1,24 @@
 # Security & GDPR
 
 ## Tenant isolation
-Every tenant-scoped model carries `tenantId`. The Prisma client extension in
-`core/db.ts` injects the current context's `tenantId` into the `where` of reads
-and writes and stamps it on creates — so a request can never reach another
-tenant's rows, even if a handler forgets to filter. System/cross-tenant work
-(seeding, the job runner, portal intake) uses the explicit `rawDb` client.
+Tenant isolation is enforced twice. The tenant Prisma capability in
+`core/db.ts` fails closed without a `PlatformContext`, injects the active
+tenant into reads and mutations, and overwrites caller-supplied tenant IDs.
+PostgreSQL independently enables and forces RLS on every tenant table using a
+transaction-local `app.tenant_id`; the value and query run on the same pooled
+connection and the setting cannot leak to another request.
+
+There is no general unscoped database export. Separate least-privilege URLs
+back the tenant, identity, and narrowly allowlisted system capabilities.
+Public slugs/tokens/API keys only resolve a tenant through the system gateway;
+business reads and writes then re-enter the tenant capability. Same-tenant
+service assertions and PostgreSQL integrity triggers reject foreign relation
+IDs without revealing whether the foreign record exists.
+
+Production startup runs a database security self-check and refuses readiness
+if the tenant connection is privileged, can bypass RLS, has access to auth or
+global tables, or any expected table lacks enabled and forced RLS. Configure
+this with `TENANT_DB_SECURITY_CHECK=strict` (the production default).
 
 The `can()` matrix (super-admin → admin override → role grants → ownership →
 team visibility → record constraints) is covered by unit tests
@@ -30,6 +43,19 @@ team visibility → record constraints) is covered by unit tests
   through a permission-checked, audited route.
 - **Audit trail** — `AuditLog` records auth, data, file, permission, export,
   admin, security, and AI actions with actor, IP, and before/after snapshots.
+
+## Database capabilities
+
+- `DATABASE_URL`: tenant runtime; no ownership, superuser, `BYPASSRLS`, or
+  global/auth-table grants.
+- `IDENTITY_DATABASE_URL`: authentication, users, sessions, memberships, and
+  RBAC resolution only.
+- `SYSTEM_DATABASE_URL`: provisioning, tenant/token discovery, and job
+  dispatch only; imports are enforced by ESLint allowlists.
+- `DIRECT_URL`: non-pooled migration owner; never used by request code.
+
+The development credentials in `.env.example` are local-only and must never
+be reused in staging or production.
 
 ## GDPR
 - **Consent** — `ConsentRecord` tracks purpose-scoped consent per subject.

@@ -5,6 +5,10 @@ import { record } from "@/core/audit/audit";
 import { publish } from "@/core/event-bus/bus";
 import { addActivity } from "@/engines/timeline/timeline";
 import { storage, makeStorageKey } from "./storage";
+import {
+  assertPolymorphicTenantReference,
+  assertTenantReference,
+} from "@/core/tenancy/relations";
 
 /**
  * File engine — secure upload with versioning + checklist support. Uploads are
@@ -26,6 +30,11 @@ export interface UploadInput {
 export async function uploadFile(input: UploadInput) {
   authorize("ops.file.create");
   const ctx = requireContext();
+
+  await Promise.all([
+    assertPolymorphicTenantReference(input.entityType, input.entityId),
+    assertTenantReference("document_checklist_item", input.checklistItemId),
+  ]);
   const storageKey = makeStorageKey(ctx.tenantId, input.filename);
   await storage.put(storageKey, input.data);
 

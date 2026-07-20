@@ -102,11 +102,11 @@ Demo-Arbeitsbereich fortfahren"** (siehe [Demo-Modus](#demo-modus)).
 
 ### Plattform & Mandantenfähigkeit
 
-- **Mandantenfähigkeit auf Datenebene** — eine Prisma-Client-Erweiterung
-  fügt `tenantId` aus einem AsyncLocalStorage-basierten `PlatformContext`
-  ein, sodass mandantenübergreifender Zugriff strukturell unmöglich ist,
-  nicht nur pro Handler gefiltert. Ein separater `rawDb`-Client existiert
-  für echt mandantenübergreifenden Systemcode (Seeding, Admin-Tools).
+- **Mandantenfähigkeit mit Defense-in-Depth** — ein fail-closed
+  Prisma-Zugriff bindet jede Abfrage an den unveränderlichen
+  `PlatformContext`; erzwungenes PostgreSQL-RLS schützt dieselbe Grenze
+  unabhängig. Identity und eng begrenzte Systemzugriffe verwenden getrennte
+  Least-Privilege-Rollen; einen allgemeinen `rawDb`-Bypass gibt es nicht.
 - **Mandanten-Provisionierung** — neue Arbeitsbereiche werden über einen
   geführten Onboarding-Flow erstellt, der den Mandanten, die
   Owner-Rolle und Standard-Pipeline/-Stufen anlegt.
@@ -480,6 +480,7 @@ Abhängigkeitsregel (lint-geprüft): **modules → engines → core**, nie seitl
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
 | `npm run test` | Vitest-Testsuite |
+| `npm run test:rls` | PostgreSQL-Integrationstest mit zwei Mandanten |
 | `npm run db:migrate` / `db:generate` / `db:seed` / `db:studio` | Prisma |
 
 ## Deployment

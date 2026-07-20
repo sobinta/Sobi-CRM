@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { cache } from "react";
 import { auth } from "./auth";
-import { rawDb } from "@/core/db";
+import { identityDb } from "@/core/db/identity";
 import type { PlatformContext } from "@/core/tenancy/context";
 
 /**
@@ -37,7 +37,7 @@ export const resolveSession = cache(
     const session = await auth.api.getSession({ headers: hdrs });
     if (!session?.user) return null;
 
-    const user = await rawDb.user.findFirst({
+    const user = await identityDb.user.findFirst({
       where: { id: session.user.id, deletedAt: null },
       include: {
         memberships: {

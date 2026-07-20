@@ -5,6 +5,8 @@ import { publish } from "@/core/event-bus/bus";
 import { record } from "@/core/audit/audit";
 import { addActivity } from "@/engines/timeline/timeline";
 import { ensureDefaultPipeline } from "@/engines/pipeline/pipeline-service";
+import { assertTenantReferences } from "@/core/tenancy/relations";
+import { TenantMismatchError } from "@/core/tenancy/errors";
 
 /**
  * Deal service — CRM deals on top of the Pipeline Engine. Stage moves emit
@@ -67,13 +69,22 @@ export async function createDeal(input: DealInput) {
   const ctx = requireContext();
   const pipeline = await ensureDefaultPipeline("deal");
   const firstStage = pipeline.stages[0];
+  const stageId = input.stageId ?? firstStage.id;
+
+  await assertTenantReferences([
+    { kind: "contact", id: input.contactId },
+    { kind: "company", id: input.companyId },
+    { kind: "stage", id: stageId },
+  ]);
+  const selectedStage = pipeline.stages.find((stage) => stage.id === stageId);
+  if (!selectedStage) throw new TenantMismatchError();
 
   const deal = await db.deal.create({
     data: {
       tenantId: ctx.tenantId,
       title: input.title,
       pipelineId: pipeline.id,
-      stageId: input.stageId ?? firstStage.id,
+      stageId,
       value: new Prisma.Decimal(input.value ?? 0),
       currency: input.currency ?? "EUR",
       contactId: input.contactId,
@@ -117,6 +128,7 @@ export async function moveDealToStage(dealId: string, stageId: string) {
     db.stage.findFirst({ where: { id: stageId } }),
   ]);
   if (!deal || !stage) throw new Error("Deal or stage not found");
+  if (deal.pipelineId !== stage.pipelineId) throw new TenantMismatchError();
   if (deal.stageId === stageId) return deal;
 
   const status = stage.isWon ? "won" : stage.isLost ? "lost" : "open";

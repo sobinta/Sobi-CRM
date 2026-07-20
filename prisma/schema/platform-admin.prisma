@@ -2,7 +2,7 @@
 // Platform admin — cross-tenant content the super admin manages:
 // marketing pricing plans, curated landing-page copy overrides, and
 // brand asset (logo/favicon) replacement. Deliberately NOT tenant-scoped
-// (accessed via rawDb) — this is site-wide marketing content, not
+// (accessed via the allowlisted system capability) — site-wide content, not
 // per-tenant CRM data.
 // ============================================================
 

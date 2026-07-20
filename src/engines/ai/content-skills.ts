@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { db, rawDb } from "@/core/db";
+import { db } from "@/core/db";
 import { requireContext } from "@/core/tenancy/context";
 import { authorize } from "@/core/rbac/guard";
 import { record } from "@/core/audit/audit";
@@ -13,7 +13,7 @@ import { getProvider } from "./provider";
  */
 
 async function loadSetting(tenantId: string) {
-  const s = await rawDb.aiSetting.findUnique({ where: { tenantId } });
+  const s = await db.aiSetting.findUnique({ where: { tenantId } });
   return s ?? { provider: "mock", model: null };
 }
 

@@ -1,7 +1,7 @@
 /**
  * Curated, super-admin-editable landing content slots. Kept in its own file
  * (no server imports) so the admin UI's client components can import it
- * directly without pulling `rawDb`/Prisma into the browser bundle.
+ * directly without pulling server database capabilities into the browser.
  */
 export const EDITABLE_CONTENT_KEYS = [
   "hero.badge",

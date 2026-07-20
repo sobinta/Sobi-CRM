@@ -1,4 +1,5 @@
-import { rawDb, Prisma } from "@/core/db";
+import { Prisma } from "@/core/db";
+import { systemDb } from "@/core/db/system";
 import { requireSuperAdmin } from "@/core/rbac/guard";
 import { record } from "@/core/audit/audit";
 import { getContext } from "@/core/tenancy/context";
@@ -6,7 +7,7 @@ import { getContext } from "@/core/tenancy/context";
 /**
  * Platform-wide pricing plans shown on the public marketing page. Not
  * tenant-scoped — this is site content the super admin manages, not CRM
- * data — so it's read via rawDb and gated by requireSuperAdmin() rather
+ * data, so it uses a system capability gated by requireSuperAdmin() rather
  * than the tenant permission system.
  */
 
@@ -29,17 +30,17 @@ export interface PricingPlanInput {
 
 export async function listPricingPlans() {
   requireSuperAdmin();
-  return rawDb.pricingPlan.findMany({ orderBy: { order: "asc" } });
+  return systemDb.pricingPlan.findMany({ orderBy: { order: "asc" } });
 }
 
 /** Public read — no auth required, used by the landing page itself. */
 export async function listPricingPlansPublic() {
-  return rawDb.pricingPlan.findMany({ orderBy: { order: "asc" } });
+  return systemDb.pricingPlan.findMany({ orderBy: { order: "asc" } });
 }
 
 export async function createPricingPlan(input: PricingPlanInput) {
   requireSuperAdmin();
-  const plan = await rawDb.pricingPlan.create({
+  const plan = await systemDb.pricingPlan.create({
     data: { ...input, translations: input.translations as unknown as Prisma.InputJsonValue },
   });
   await auditLog("platform.pricing_plan.create", plan.id);
@@ -48,7 +49,7 @@ export async function createPricingPlan(input: PricingPlanInput) {
 
 export async function updatePricingPlan(id: string, input: PricingPlanInput) {
   requireSuperAdmin();
-  const plan = await rawDb.pricingPlan.update({
+  const plan = await systemDb.pricingPlan.update({
     where: { id },
     data: { ...input, translations: input.translations as unknown as Prisma.InputJsonValue },
   });
@@ -58,7 +59,7 @@ export async function updatePricingPlan(id: string, input: PricingPlanInput) {
 
 export async function deletePricingPlan(id: string) {
   requireSuperAdmin();
-  await rawDb.pricingPlan.delete({ where: { id } });
+  await systemDb.pricingPlan.delete({ where: { id } });
   await auditLog("platform.pricing_plan.delete", id);
 }
 

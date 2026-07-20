@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { auth } from "@/core/auth/auth";
-import { rawDb } from "@/core/db";
+import { identityDb } from "@/core/db/identity";
 import { resolveSession } from "@/core/auth/session";
 
 /**
@@ -20,7 +20,7 @@ export async function switchTenantAction(
   const isMember = session?.memberships.some((m) => m.tenantId === tenantId);
   if (!isMember) return { ok: false };
 
-  await rawDb.session.update({
+  await identityDb.session.update({
     where: { id: raw.session.id },
     data: { activeTenantId: tenantId },
   });

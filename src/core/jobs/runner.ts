@@ -1,4 +1,9 @@
-import { rawDb, Prisma } from "@/core/db";
+import { Prisma } from "@/core/db";
+import { systemDb } from "@/core/db/system";
+import {
+  runWithContext,
+  systemTenantContext,
+} from "@/core/tenancy/context";
 
 /**
  * DB-backed job runner.
@@ -37,7 +42,7 @@ export interface EnqueueInput {
 
 export async function enqueue(input: EnqueueInput): Promise<string | null> {
   try {
-    const job = await rawDb.job.create({
+    const job = await systemDb.job.create({
       data: {
         kind: input.kind,
         tenantId: input.tenantId ?? null,
@@ -66,7 +71,7 @@ export async function runDueJobs(limit = 25): Promise<{
   const now = new Date();
 
   // Claim a batch atomically via a locking update.
-  const due = await rawDb.job.findMany({
+  const due = await systemDb.job.findMany({
     where: { status: "PENDING", runAt: { lte: now }, lockedAt: null },
     orderBy: { runAt: "asc" },
     take: limit,
@@ -77,7 +82,7 @@ export async function runDueJobs(limit = 25): Promise<{
 
   for (const job of due) {
     // Optimistic lock: only proceed if still unlocked.
-    const claim = await rawDb.job.updateMany({
+    const claim = await systemDb.job.updateMany({
       where: { id: job.id, lockedAt: null, status: "PENDING" },
       data: { status: "RUNNING", lockedAt: now, lockedBy: LOCK_ID },
     });
@@ -85,7 +90,7 @@ export async function runDueJobs(limit = 25): Promise<{
 
     const handler = registry.get(job.kind);
     if (!handler) {
-      await rawDb.job.update({
+      await systemDb.job.update({
         where: { id: job.id },
         data: {
           status: "FAILED",
@@ -99,12 +104,32 @@ export async function runDueJobs(limit = 25): Promise<{
     }
 
     try {
-      await handler({
+      const handlerContext = {
         jobId: job.id,
         tenantId: job.tenantId,
         payload: job.payload as Record<string, unknown>,
-      });
-      await rawDb.job.update({
+      };
+      if (job.tenantId) {
+        const actor = await systemDb.membership.findFirst({
+          where: {
+            tenantId: job.tenantId,
+            status: "ACTIVE",
+            deletedAt: null,
+          },
+          orderBy: { createdAt: "asc" },
+          select: { id: true, userId: true },
+        });
+        if (!actor) {
+          throw new Error("Tenant job has no active system actor.");
+        }
+        await runWithContext(
+          systemTenantContext(job.tenantId, actor.id, actor.userId),
+          () => handler(handlerContext),
+        );
+      } else {
+        await handler(handlerContext);
+      }
+      await systemDb.job.update({
         where: { id: job.id },
         data: { status: "SUCCEEDED", lockedAt: null, lockedBy: null },
       });
@@ -112,7 +137,7 @@ export async function runDueJobs(limit = 25): Promise<{
     } catch (err) {
       const attempts = job.attempts + 1;
       const exhausted = attempts >= job.maxAttempts;
-      await rawDb.job.update({
+      await systemDb.job.update({
         where: { id: job.id },
         data: {
           status: exhausted ? "FAILED" : "PENDING",

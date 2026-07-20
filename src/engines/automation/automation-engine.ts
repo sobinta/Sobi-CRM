@@ -1,4 +1,4 @@
-import { db, rawDb, Prisma } from "@/core/db";
+import { db, Prisma } from "@/core/db";
 import { getContext } from "@/core/tenancy/context";
 import { subscribe } from "@/core/event-bus/bus";
 import { publish } from "@/core/event-bus/bus";
@@ -94,7 +94,7 @@ async function logRun(
   detail: Record<string, unknown>,
   durationMs: number,
 ) {
-  await rawDb.automationRun.create({
+  await db.automationRun.create({
     data: {
       tenantId,
       automationId,

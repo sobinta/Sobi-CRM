@@ -4,6 +4,7 @@ import { authorize } from "@/core/rbac/guard";
 import { publish } from "@/core/event-bus/bus";
 import { record } from "@/core/audit/audit";
 import { addActivity } from "@/engines/timeline/timeline";
+import { assertTenantReferences } from "@/core/tenancy/relations";
 
 /**
  * Contact service — permission-aware CRUD that emits events, writes audit, and
@@ -73,6 +74,11 @@ export async function createContact(input: ContactInput) {
   authorize("crm.contact.create");
   const ctx = requireContext();
 
+  await assertTenantReferences([
+    { kind: "company", id: input.companyId },
+    { kind: "membership", id: input.ownerId ?? ctx.membershipId },
+  ]);
+
   const contact = await db.contact.create({
     data: {
       tenantId: ctx.tenantId,
@@ -118,6 +124,11 @@ export async function updateContact(id: string, input: Partial<ContactInput>) {
   const before = await db.contact.findFirst({ where: { id } });
   if (!before) throw new Error("Contact not found");
 
+  await assertTenantReferences([
+    { kind: "company", id: input.companyId },
+    { kind: "membership", id: input.ownerId },
+  ]);
+
   const contact = await db.contact.update({
     where: { id },
     data: {
@@ -129,6 +140,7 @@ export async function updateContact(id: string, input: Partial<ContactInput>) {
       companyId: input.companyId,
       lifecycle: input.lifecycle,
       source: input.source,
+      ownerId: input.ownerId,
     },
   });
 

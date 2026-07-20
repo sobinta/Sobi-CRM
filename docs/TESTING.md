@@ -2,8 +2,13 @@
 
 ## Automated
 - `npm run test` — Vitest unit suite: the sandboxed expression evaluator
-  (incl. prototype-pollution guards), permission matching, the `can()` matrix,
-  and AES-GCM field encryption.
+  (incl. prototype-pollution guards), permission matching, tenant-query
+  scoping/model classification/relation guards, the `can()` matrix, and
+  AES-GCM field encryption. The PostgreSQL suite is skipped here by design.
+- `npm run test:rls` — destructive-test-safe PostgreSQL integration suite on
+  random temporary tenant rows. Requires a migrated database and all four
+  least-privilege URLs from `.env`; proves ORM/raw read isolation, pool reuse,
+  forced tenant stamping, and database rejection of a cross-tenant relation.
 - `npm run typecheck` — strict TypeScript, zero errors.
 - `npm run lint` — ESLint incl. architectural import-boundary rules
   (modules → engines → core).
@@ -37,3 +42,20 @@
 11. **i18n & theming** — switch to `fa` (RTL + Vazirmatn) and `de`; toggle dark
     mode; change the brand hue in the Theme Builder and confirm the app
     re-themes.
+
+## Tenant-security release gate
+
+On a fresh PostgreSQL 16 volume run, in order:
+
+```bash
+npm run db:deploy
+npm run db:seed
+npm run test:rls
+npm run test
+npm run lint
+npm run typecheck
+npm run build
+```
+
+The RLS test intentionally does not auto-run on an arbitrary developer
+database. `RUN_DATABASE_INTEGRATION_TESTS=true` is set only by `test:rls`.

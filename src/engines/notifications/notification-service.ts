@@ -1,6 +1,6 @@
 import { db } from "@/core/db";
-import { rawDb } from "@/core/db";
-import { getContext } from "@/core/tenancy/context";
+import { getContext, requireContext } from "@/core/tenancy/context";
+import { TenantMismatchError } from "@/core/tenancy/errors";
 import { channels } from "./channels";
 import { logger } from "@/core/observability/logger";
 
@@ -9,8 +9,8 @@ import { logger } from "@/core/observability/logger";
  *
  * notify() writes an in-app Notification and fans out to enabled channels per
  * the recipient's preferences. Reads power the topbar notification center.
- * Runs with rawDb for the recipient lookup since notifications may target a
- * different member than the actor.
+ * Recipient lookup stays tenant-scoped even when the recipient differs from
+ * the actor.
  */
 
 export interface NotifyInput {
@@ -25,7 +25,10 @@ export interface NotifyInput {
 }
 
 export async function notify(input: NotifyInput): Promise<void> {
-  await rawDb.notification.create({
+  const ctx = requireContext();
+  if (input.tenantId !== ctx.tenantId) throw new TenantMismatchError();
+
+  await db.notification.create({
     data: {
       tenantId: input.tenantId,
       membershipId: input.membershipId,
@@ -39,13 +42,13 @@ export async function notify(input: NotifyInput): Promise<void> {
   });
 
   // Resolve recipient email + preferences for channel fan-out.
-  const membership = await rawDb.membership.findUnique({
+  const membership = await db.membership.findUnique({
     where: { id: input.membershipId },
     include: { user: { select: { email: true } } },
   });
   if (!membership) return;
 
-  const pref = await rawDb.notificationPreference.findUnique({
+  const pref = await db.notificationPreference.findUnique({
     where: { membershipId_kind: { membershipId: input.membershipId, kind: input.kind } },
   });
   const emailEnabled = pref?.email ?? true;

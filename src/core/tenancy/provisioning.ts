@@ -1,4 +1,4 @@
-import { rawDb } from "@/core/db";
+import { systemDb } from "@/core/db/system";
 import { runWithContext } from "./context";
 import { publish } from "@/core/event-bus/bus";
 import { SYSTEM_ROLES } from "@/core/rbac/catalog";
@@ -7,7 +7,7 @@ import { logger } from "@/core/observability/logger";
 /**
  * Tenant provisioning — creates a workspace and makes a user its owner.
  *
- * Runs unscoped (rawDb) since it is bootstrapping a tenant that doesn't yet
+ * Runs through the system capability because it bootstraps a tenant that
  * exist. Seeds the system roles, grants the creator the Owner role, and emits
  * the tenant.created event. Idempotent per (slug) via the unique constraint.
  */
@@ -25,7 +25,7 @@ async function uniqueSlug(base: string): Promise<string> {
   const root = base || "workspace";
   let candidate = root;
   let n = 1;
-  while (await rawDb.tenant.findUnique({ where: { slug: candidate } })) {
+  while (await systemDb.tenant.findUnique({ where: { slug: candidate } })) {
     candidate = `${root}-${++n}`;
   }
   return candidate;
@@ -48,7 +48,7 @@ export async function provisionTenant(
 ): Promise<ProvisionResult> {
   const slug = await uniqueSlug(slugify(input.workspaceName));
 
-  const result = await rawDb.$transaction(async (tx) => {
+  const result = await systemDb.$transaction(async (tx) => {
     const tenant = await tx.tenant.create({
       data: {
         name: input.workspaceName,

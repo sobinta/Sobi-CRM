@@ -2,7 +2,6 @@ import { db, Prisma } from "@/core/db";
 import { requireContext } from "@/core/tenancy/context";
 import { getTimeline } from "@/engines/timeline/timeline";
 import { getProvider } from "./provider";
-import { rawDb } from "@/core/db";
 
 /**
  * AI Skills registry.
@@ -15,7 +14,7 @@ import { rawDb } from "@/core/db";
  */
 
 async function loadSetting(tenantId: string) {
-  const s = await rawDb.aiSetting.findUnique({ where: { tenantId } });
+  const s = await db.aiSetting.findUnique({ where: { tenantId } });
   return s ?? { provider: "mock", model: null };
 }
 
