@@ -315,6 +315,12 @@ Action Center → Human Approval → AI Audit`.
   module-registered widgets), personal/role/tenant/shared layouts, and
   versioned templates.
 
+### Finance
+
+- **Finance workspace** — cross-module revenue rollups: won revenue and open
+  pipeline value from deals, total contract value broken down by status, win
+  rate, recently won deals, and the tenant's billing/subscription status.
+
 ### Workflow builder & automation
 
 - **Visual Workflow Builder** — stages/steps, Rules-routed approval chains,
@@ -375,9 +381,14 @@ scaffolds in module activation.
 - **Entity Builder** — create a custom entity (fields, relationships,
   permissions) that gets a generated CRUD API, list/detail views, search,
   and timeline attachment — no code required for the common case.
-- **Rule Editor**, **Template Editor**, and **Version history** panels
-  shared across every builder (forms, workflows, dashboards, automations,
-  entity definitions).
+- **Business Rules** — a dedicated editor for reusable validation, eligibility,
+  approval, and calculation rules, stored as a safe expression AST and evaluated
+  across forms, workflows, and automations.
+- **Templates** — author reusable email, document, notification, report, and
+  AI-prompt templates with `{{variable}}` interpolation and live variable
+  detection.
+- **Version history** panels shared across every builder (forms, workflows,
+  dashboards, automations, entity definitions).
 - **Command Platform** — a `Ctrl+K` command palette combining navigation,
   entity actions, and search results in one context-aware surface.
 - **Universal Search** — Postgres full-text search across entities, files,

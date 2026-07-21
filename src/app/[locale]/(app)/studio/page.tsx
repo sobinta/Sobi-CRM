@@ -25,8 +25,8 @@ const tools: Tool[] = [
   { href: "/studio/entities", labelKey: "entities", description: "Create custom entities with their own fields, views, and APIs.", icon: Shapes, ready: true },
   { href: "/studio/workflows", labelKey: "workflows", description: "Build stage pipelines with approvals, timers, and SLAs.", icon: Workflow, ready: true },
   { href: "/studio/automations", labelKey: "automations", description: "Automate work: triggers, conditions, and actions.", icon: Zap, ready: true },
-  { href: "/studio/rules", labelKey: "rules", description: "Reusable business rules for validation and eligibility.", icon: Scale, ready: false },
-  { href: "/studio/templates", labelKey: "templates", description: "Documents, emails, and reports as reusable templates.", icon: LayoutTemplate, ready: false },
+  { href: "/studio/rules", labelKey: "rules", description: "Reusable business rules for validation and eligibility.", icon: Scale, ready: true },
+  { href: "/studio/templates", labelKey: "templates", description: "Documents, emails, and reports as reusable templates.", icon: LayoutTemplate, ready: true },
 ];
 
 export default async function StudioPage() {

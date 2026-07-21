@@ -328,6 +328,13 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
   Widget-Bibliothek, persönlichen/Rollen-/Mandanten-/geteilten Layouts und
   versionierten Vorlagen.
 
+### Finanzen
+
+- **Finanz-Workspace** — modulübergreifende Umsatzübersichten: gewonnener
+  Umsatz und offener Pipeline-Wert aus Deals, Gesamtvertragswert nach Status,
+  Gewinnrate, kürzlich gewonnene Deals und der Abrechnungs-/Abo-Status des
+  Mandanten.
+
 ### Workflow-Builder & Automatisierung
 
 - **Visueller Workflow-Builder** — Stufen/Schritte, Rules-geleitete
@@ -367,8 +374,13 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 - **Entity Builder** — eigene Entität erstellen (Felder, Beziehungen,
   Berechtigungen), die eine generierte CRUD-API, Listen-/Detailansichten,
   Suche und Timeline-Anbindung erhält.
-- **Regel-Editor**, **Vorlagen-Editor** und **Versionshistorie**-Panels,
-  gemeinsam genutzt von jedem Builder.
+- **Geschäftsregeln** — ein eigener Editor für wiederverwendbare Validierungs-,
+  Berechtigungs-, Genehmigungs- und Berechnungsregeln, gespeichert als sicherer
+  Ausdrucks-AST und ausgewertet in Formularen, Workflows und Automationen.
+- **Vorlagen** — wiederverwendbare Vorlagen für E-Mail, Dokument,
+  Benachrichtigung, Bericht und KI-Prompt mit `{{variable}}`-Interpolation und
+  Live-Variablenerkennung.
+- **Versionshistorie**-Panels, gemeinsam genutzt von jedem Builder.
 - **Command Platform** — eine `Strg+K`-Befehlspalette.
 - **Universelle Suche** — Postgres-Volltextsuche über Entitäten, Dateien,
   Notizen, Aktivitäten, Berichte und Befehle.
