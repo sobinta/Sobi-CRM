@@ -457,6 +457,20 @@
     "linkUrl": "Link URL (optional)",
     "preview": "Preview"
   },
+  "calendar": {
+    "eyebrow": "Unified schedule", "title": "Calendar", "description": "See meetings, tasks, deals, campaigns, policies, and contracts in one bilingual calendar.",
+    "searchAndFilter": "Search and filter", "newEvent": "New event", "demoNotice": "Demo mode: you can try events and reminders, but changes stay only in this browser.",
+    "textSearch": "Search text", "searchPlaceholder": "Title, person, campaign…", "from": "From", "to": "To", "reminders": "Reminders", "any": "Any", "withReminder": "With reminder", "withoutReminder": "Without reminder", "sources": "Sources", "searching": "Searching…", "search": "Search", "searchResults": "{count, plural, =0 {No results} one {# result} other {# results}}", "closeResults": "Close results",
+    "previousMonth": "Previous month", "nextMonth": "Next month", "today": "Today", "month": "Month", "year": "Year", "jalali": "Jalali", "gregorian": "Gregorian", "partialSources": "Some sources are unavailable: {sources}", "truncated": "Only the first 200 matching items are shown.",
+    "weekdays": { "sat": "Sat", "sun": "Sun", "mon": "Mon", "tue": "Tue", "wed": "Wed", "thu": "Thu", "fri": "Fri" },
+    "jalaliMonths": { "1": "Farvardin", "2": "Ordibehesht", "3": "Khordad", "4": "Tir", "5": "Mordad", "6": "Shahrivar", "7": "Mehr", "8": "Aban", "9": "Azar", "10": "Dey", "11": "Bahman", "12": "Esfand" },
+    "sourcesMap": { "event": "Events", "task": "Tasks", "deal": "Deals", "campaign": "Campaigns", "policy": "Policies", "contract": "Contracts" },
+    "addOnDate": "Add an event on {date}", "more": "+{count} more", "close": "Close", "openRecord": "Open record", "editEvent": "Edit event", "eventTitle": "Title", "eventType": "Type", "color": "Color", "date": "Date", "allDay": "All day", "start": "Start", "end": "End", "location": "Location", "eventDescription": "Description",
+    "types": { "appointment": "Appointment", "meeting": "Meeting", "deadline": "Deadline", "followup": "Follow-up" },
+    "tones": { "brand": "CRM green", "accent": "Accent", "info": "Blue", "positive": "Positive", "warning": "Warning", "danger": "Urgent" },
+    "reminderOptions": { "0": "At start", "15": "15 minutes before", "60": "1 hour before", "1440": "1 day before" },
+    "deleteEvent": "Delete event", "cancel": "Cancel", "saving": "Saving…", "saveEvent": "Save event"
+  },
   "onboardingTour": {
     "progress": "Step {current} of {total}",
     "skip": "Skip tour",

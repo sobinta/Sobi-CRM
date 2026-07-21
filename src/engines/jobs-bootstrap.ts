@@ -8,3 +8,4 @@ import "@/engines/tasks/jobs"; // overdue detection
 import "@/engines/automation/jobs";
 import "@/engines/integrations/jobs";
 import "@/engines/imports/jobs";
+import "@/engines/calendar/jobs";

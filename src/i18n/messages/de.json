@@ -456,6 +456,20 @@
     "linkUrl": "Link-URL (optional)",
     "preview": "Vorschau"
   },
+  "calendar": {
+    "eyebrow": "Gemeinsame Planung", "title": "Kalender", "description": "Termine, Aufgaben, Abschlüsse, Kampagnen, Policen und Verträge in einem zweisprachigen Kalender.",
+    "searchAndFilter": "Suchen und filtern", "newEvent": "Neuer Termin", "demoNotice": "Demo-Modus: Termine und Erinnerungen können getestet werden, Änderungen bleiben aber nur in diesem Browser.",
+    "textSearch": "Textsuche", "searchPlaceholder": "Titel, Person, Kampagne…", "from": "Von", "to": "Bis", "reminders": "Erinnerungen", "any": "Alle", "withReminder": "Mit Erinnerung", "withoutReminder": "Ohne Erinnerung", "sources": "Quellen", "searching": "Suche…", "search": "Suchen", "searchResults": "{count, plural, =0 {Keine Ergebnisse} one {# Ergebnis} other {# Ergebnisse}}", "closeResults": "Ergebnisse schließen",
+    "previousMonth": "Vorheriger Monat", "nextMonth": "Nächster Monat", "today": "Heute", "month": "Monat", "year": "Jahr", "jalali": "Jalali", "gregorian": "Gregorianisch", "partialSources": "Einige Quellen sind nicht verfügbar: {sources}", "truncated": "Es werden nur die ersten 200 Treffer angezeigt.",
+    "weekdays": { "sat": "Sa", "sun": "So", "mon": "Mo", "tue": "Di", "wed": "Mi", "thu": "Do", "fri": "Fr" },
+    "jalaliMonths": { "1": "Farvardin", "2": "Ordibehesht", "3": "Khordad", "4": "Tir", "5": "Mordad", "6": "Shahrivar", "7": "Mehr", "8": "Aban", "9": "Azar", "10": "Dey", "11": "Bahman", "12": "Esfand" },
+    "sourcesMap": { "event": "Termine", "task": "Aufgaben", "deal": "Abschlüsse", "campaign": "Kampagnen", "policy": "Policen", "contract": "Verträge" },
+    "addOnDate": "Termin am {date} hinzufügen", "more": "+{count} weitere", "close": "Schließen", "openRecord": "Datensatz öffnen", "editEvent": "Termin bearbeiten", "eventTitle": "Titel", "eventType": "Typ", "color": "Farbe", "date": "Datum", "allDay": "Ganztägig", "start": "Beginn", "end": "Ende", "location": "Ort", "eventDescription": "Beschreibung",
+    "types": { "appointment": "Termin", "meeting": "Besprechung", "deadline": "Frist", "followup": "Nachfassen" },
+    "tones": { "brand": "CRM-Grün", "accent": "Akzent", "info": "Blau", "positive": "Positiv", "warning": "Warnung", "danger": "Dringend" },
+    "reminderOptions": { "0": "Bei Beginn", "15": "15 Minuten vorher", "60": "1 Stunde vorher", "1440": "1 Tag vorher" },
+    "deleteEvent": "Termin löschen", "cancel": "Abbrechen", "saving": "Speichern…", "saveEvent": "Termin speichern"
+  },
   "onboardingTour": {
     "progress": "Schritt {current} von {total}",
     "skip": "Tour überspringen",

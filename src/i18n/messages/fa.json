@@ -457,6 +457,20 @@
     "linkUrl": "آدرس لینک (اختیاری)",
     "preview": "پیش‌نمایش"
   },
+  "calendar": {
+    "eyebrow": "برنامه‌ریزی یکپارچه", "title": "تقویم", "description": "جلسه‌ها، کارها، معامله‌ها، کمپین‌ها، بیمه‌نامه‌ها و قراردادها را در یک تقویم دوزبانه ببینید.",
+    "searchAndFilter": "جست‌وجو و فیلتر", "newEvent": "رویداد جدید", "demoNotice": "حالت دمو: می‌توانید رویداد و یادآوری را امتحان کنید، اما تغییرات فقط در همین مرورگر می‌مانند.",
+    "textSearch": "جست‌وجوی متن", "searchPlaceholder": "عنوان، شخص، کمپین…", "from": "از تاریخ", "to": "تا تاریخ", "reminders": "یادآوری‌ها", "any": "همه", "withReminder": "دارای یادآوری", "withoutReminder": "بدون یادآوری", "sources": "منابع", "searching": "در حال جست‌وجو…", "search": "جست‌وجو", "searchResults": "{count} نتیجه", "closeResults": "بستن نتایج",
+    "previousMonth": "ماه قبل", "nextMonth": "ماه بعد", "today": "امروز", "month": "ماه", "year": "سال", "jalali": "شمسی", "gregorian": "میلادی", "partialSources": "برخی منابع در دسترس نیستند: {sources}", "truncated": "فقط ۲۰۰ مورد نخست نمایش داده شده است.",
+    "weekdays": { "sat": "ش", "sun": "ی", "mon": "د", "tue": "س", "wed": "چ", "thu": "پ", "fri": "ج" },
+    "jalaliMonths": { "1": "فروردین", "2": "اردیبهشت", "3": "خرداد", "4": "تیر", "5": "مرداد", "6": "شهریور", "7": "مهر", "8": "آبان", "9": "آذر", "10": "دی", "11": "بهمن", "12": "اسفند" },
+    "sourcesMap": { "event": "رویدادها", "task": "کارها", "deal": "معامله‌ها", "campaign": "کمپین‌ها", "policy": "بیمه‌نامه‌ها", "contract": "قراردادها" },
+    "addOnDate": "افزودن رویداد در {date}", "more": "+{count} مورد دیگر", "close": "بستن", "openRecord": "باز کردن رکورد", "editEvent": "ویرایش رویداد", "eventTitle": "عنوان", "eventType": "نوع", "color": "رنگ", "date": "تاریخ", "allDay": "تمام‌روز", "start": "شروع", "end": "پایان", "location": "مکان", "eventDescription": "توضیحات",
+    "types": { "appointment": "قرار", "meeting": "جلسه", "deadline": "مهلت", "followup": "پیگیری" },
+    "tones": { "brand": "سبز CRM", "accent": "تأکیدی", "info": "آبی", "positive": "مثبت", "warning": "هشدار", "danger": "فوری" },
+    "reminderOptions": { "0": "زمان شروع", "15": "۱۵ دقیقه قبل", "60": "۱ ساعت قبل", "1440": "۱ روز قبل" },
+    "deleteEvent": "حذف رویداد", "cancel": "انصراف", "saving": "در حال ذخیره…", "saveEvent": "ذخیره رویداد"
+  },
   "onboardingTour": {
     "progress": "مرحله {current} از {total}",
     "skip": "رد کردن تور",

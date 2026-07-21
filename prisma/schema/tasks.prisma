@@ -26,6 +26,7 @@ model Task {
   recurrence  String?
   ownerId     String?
   createdById String?
+  customFields Json     @default("{}")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?

@@ -48,6 +48,7 @@ export const TENANT_SCOPED = new Set<string>([
   "Task",
   "TaskComment",
   "CalendarEvent",
+  "CalendarReminder",
   "EventAttendee",
   "Notification",
   "NotificationPreference",

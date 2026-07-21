@@ -17,6 +17,7 @@ model Contract {
   amount         Decimal   @default(0) @db.Decimal(14, 2)
   currency       String    @default("IRT")
   startDate      DateTime?
+  expiresAt      DateTime?
   durationLabel  String?
   /// draft | sent | viewed | accepted | canceled
   status         String    @default("draft")
@@ -28,6 +29,7 @@ model Contract {
   acceptedAt     DateTime?
   acceptedByName String?
   createdById    String?
+  customFields   Json      @default("{}")
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   deletedAt      DateTime?
@@ -37,4 +39,6 @@ model Contract {
   @@index([tenantId, dealId])
   @@index([tenantId, contactId])
   @@index([shareTokenExpiresAt])
+  @@index([tenantId, startDate])
+  @@index([tenantId, expiresAt])
 }

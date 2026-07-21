@@ -49,6 +49,16 @@ export async function enqueue(input: EnqueueInput): Promise<string | null> {
   }
 }
 
+/** Cancel queued work through the audited job gateway. */
+export async function cancelPendingJobs(jobIds: string[]): Promise<number> {
+  if (!jobIds.length) return 0;
+  const result = await systemDb.job.updateMany({
+    where: { id: { in: jobIds }, status: "PENDING" },
+    data: { status: "CANCELLED" },
+  });
+  return result.count;
+}
+
 const LOCK_ID = `runner-${process.pid}-${Math.random().toString(36).slice(2, 10)}`;
 
 export function jobRetryDelayMs(

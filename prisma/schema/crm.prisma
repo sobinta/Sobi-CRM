@@ -177,6 +177,8 @@ model Deal {
   @@index([tenantId, pipelineId, stageId])
   @@index([tenantId, ownerId])
   @@index([tenantId, status])
+  @@index([tenantId, expectedCloseAt])
+  @@index([tenantId, closedAt])
 }
 
 // ---- Shared polymorphic primitives ----

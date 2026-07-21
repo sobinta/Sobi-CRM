@@ -20,15 +20,37 @@ model CalendarEvent {
   entityId    String?
   ownerId     String? // membership id (organizer)
   createdById String?
+  customFields Json     @default("{}")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
   attendees EventAttendee[]
+  reminders CalendarReminder[]
 
   @@index([tenantId, startAt])
   @@index([tenantId, ownerId])
   @@index([tenantId, entityType, entityId])
+}
+
+model CalendarReminder {
+  id            String    @id @default(cuid())
+  tenantId      String
+  eventId       String
+  membershipId  String
+  offsetMinutes Int
+  triggerAt     DateTime
+  jobId         String?
+  deliveredAt   DateTime?
+  cancelledAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  event CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, membershipId, offsetMinutes])
+  @@index([tenantId, triggerAt])
+  @@index([tenantId, membershipId, deliveredAt])
 }
 
 model EventAttendee {

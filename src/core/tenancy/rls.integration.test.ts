@@ -57,6 +57,8 @@ suite("PostgreSQL tenant RLS", () => {
 
   afterAll(async () => {
     if (tenantA && tenantB) {
+      await systemDb.calendarReminder.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
+      await systemDb.calendarEvent.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.onboardingProgress.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.membership.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.contact.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
@@ -204,6 +206,68 @@ suite("PostgreSQL tenant RLS", () => {
             membershipId: membershipB,
             tourKey: "forged-membership",
             version: 1,
+          },
+        }),
+      ),
+    ).rejects.toThrow();
+  });
+
+  it("isolates calendar reminders and rejects forged membership references", async () => {
+    const contextFor = (tenantId: string, membershipId: string, userId: string) => ({
+      ...publicTenantContext(tenantId),
+      membershipId,
+      userId,
+    });
+
+    const event = await runWithContext(contextFor(tenantA, membershipA, userA), () =>
+      db.calendarEvent.create({
+        data: {
+          tenantId: tenantA,
+          title: `RLS event ${nonce}`,
+          startAt: new Date("2026-07-21T09:00:00.000Z"),
+          endAt: new Date("2026-07-21T10:00:00.000Z"),
+          ownerId: membershipA,
+        },
+      }),
+    );
+
+    const reminder = await runWithContext(contextFor(tenantA, membershipA, userA), () =>
+      db.calendarReminder.create({
+        data: {
+          tenantId: tenantA,
+          eventId: event.id,
+          membershipId: membershipA,
+          offsetMinutes: 15,
+          triggerAt: new Date("2026-07-21T08:45:00.000Z"),
+        },
+      }),
+    );
+
+    await expect(
+      runWithContext(contextFor(tenantA, membershipA, userA), () =>
+        db.calendarReminder.findMany({ select: { id: true } }),
+      ),
+    ).resolves.toEqual([{ id: reminder.id }]);
+    await expect(
+      runWithContext(contextFor(tenantA, membershipA2, userA2), () =>
+        db.calendarReminder.findMany({ select: { id: true } }),
+      ),
+    ).resolves.toEqual([]);
+    await expect(
+      runWithContext(contextFor(tenantB, membershipB, userB), () =>
+        db.calendarReminder.findMany({ select: { id: true } }),
+      ),
+    ).resolves.toEqual([]);
+
+    await expect(
+      runWithContext(contextFor(tenantA, membershipA, userA), () =>
+        db.calendarReminder.create({
+          data: {
+            tenantId: tenantA,
+            eventId: event.id,
+            membershipId: membershipB,
+            offsetMinutes: 60,
+            triggerAt: new Date("2026-07-21T08:00:00.000Z"),
           },
         }),
       ),

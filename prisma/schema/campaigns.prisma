@@ -15,13 +15,19 @@ model Campaign {
   goal        String
   /// draft | generating | ready | sent
   status      String    @default("draft")
+  scheduledStartAt DateTime?
+  scheduledEndAt DateTime?
   createdById String?
   sentAt      DateTime?
+  customFields Json     @default("{}")
   createdAt   DateTime  @default(now())
 
   emails CampaignEmail[]
 
   @@index([tenantId, status])
+  @@index([tenantId, scheduledStartAt])
+  @@index([tenantId, scheduledEndAt])
+  @@index([tenantId, sentAt])
 }
 
 model CampaignEmail {

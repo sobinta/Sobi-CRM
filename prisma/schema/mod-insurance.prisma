@@ -32,6 +32,7 @@ model Policy {
   commission    Decimal   @default(0) @db.Decimal(14, 2)
   ownerId       String?
   createdById   String?
+  customFields  Json      @default("{}")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?
