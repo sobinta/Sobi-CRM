@@ -35,4 +35,21 @@ describe("storage provider selection", () => {
       ServerSideEncryption: "AES256",
     });
   });
+
+  it("can omit SSE for a local S3-compatible development store", async () => {
+    const send = vi.fn().mockResolvedValue({});
+    const provider = createStorageProvider(
+      {
+        FILE_STORAGE_DRIVER: "s3",
+        FILE_STORAGE_S3_BUCKET: "crm-files",
+        FILE_STORAGE_S3_REGION: "eu-central-1",
+        FILE_STORAGE_S3_SERVER_SIDE_ENCRYPTION: "none",
+      },
+      { send } as never,
+    );
+    await provider.put("tenant/file.pdf", Buffer.from("pdf"));
+    expect(send.mock.calls[0][0].input).not.toHaveProperty(
+      "ServerSideEncryption",
+    );
+  });
 });

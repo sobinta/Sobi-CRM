@@ -50,6 +50,7 @@ export class S3Storage implements StorageProvider {
   constructor(
     private readonly bucket: string,
     private readonly client: S3Sender,
+    private readonly useServerSideEncryption = true,
   ) {}
 
   async put(key: string, data: Buffer): Promise<void> {
@@ -58,7 +59,9 @@ export class S3Storage implements StorageProvider {
         Bucket: this.bucket,
         Key: key,
         Body: data,
-        ServerSideEncryption: "AES256",
+        ...(this.useServerSideEncryption
+          ? { ServerSideEncryption: "AES256" as const }
+          : {}),
       }),
     );
   }
@@ -110,7 +113,17 @@ export function createStorageProvider(
   if (driver !== "s3") throw new Error(`Unsupported file storage driver: ${driver}`);
   const bucket = env.FILE_STORAGE_S3_BUCKET;
   if (!bucket) throw new Error("FILE_STORAGE_S3_BUCKET is required.");
-  return new S3Storage(bucket, client ?? new S3Client(s3Config(env)));
+  const encryption = env.FILE_STORAGE_S3_SERVER_SIDE_ENCRYPTION ?? "AES256";
+  if (encryption !== "AES256" && encryption !== "none") {
+    throw new Error(
+      "FILE_STORAGE_S3_SERVER_SIDE_ENCRYPTION must be AES256 or none.",
+    );
+  }
+  return new S3Storage(
+    bucket,
+    client ?? new S3Client(s3Config(env)),
+    encryption === "AES256",
+  );
 }
 
 let selectedStorage: StorageProvider | undefined;

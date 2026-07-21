@@ -5,6 +5,7 @@ import { SOFT_DELETE } from "./tenancy/model-metadata";
 import {
   SystemCapabilityRequiredError,
   TenantContextRequiredError,
+  TenantMismatchError,
 } from "./tenancy/errors";
 import { getModelScope } from "./tenancy/model-metadata";
 import {
@@ -75,6 +76,12 @@ function makeClient() {
             setTenant,
             query(next),
           ]);
+          // PostgreSQL may return no row for an UPSERT that conflicts with a
+          // row hidden by RLS. Prisma models upsert as non-null, so turn that
+          // sentinel into an explicit tenant-boundary failure.
+          if (model && operation === "upsert" && result === null) {
+            throw new TenantMismatchError();
+          }
           return result;
         },
       },

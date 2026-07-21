@@ -90,6 +90,9 @@ export function productionEnvironmentProblems(env: Environment): string[] {
   if (!env.FILE_STORAGE_S3_REGION) {
     problems.push("FILE_STORAGE_S3_REGION is required");
   }
+  if (env.FILE_STORAGE_S3_SERVER_SIDE_ENCRYPTION === "none") {
+    problems.push("S3 server-side encryption cannot be disabled in production");
+  }
   if (env.FILE_STORAGE_S3_ENDPOINT && !validHttpsUrl(env.FILE_STORAGE_S3_ENDPOINT)) {
     problems.push("FILE_STORAGE_S3_ENDPOINT must use HTTPS in production");
   }

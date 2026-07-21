@@ -36,6 +36,7 @@ describe("production environment policy", () => {
       RATE_LIMIT_BACKEND: "memory",
       RATE_LIMIT_REDIS_URL: "http://cache.example.test",
       FILE_STORAGE_DRIVER: "local",
+      FILE_STORAGE_S3_SERVER_SIDE_ENCRYPTION: "none",
     });
     expect(problems).toContain("database capabilities must use four distinct URLs/roles");
     expect(problems).toContain(
@@ -51,5 +52,8 @@ describe("production environment policy", () => {
     expect(problems).toContain("RATE_LIMIT_BACKEND must be redis in production");
     expect(problems).toContain("RATE_LIMIT_REDIS_URL must be a Redis URL");
     expect(problems).toContain("FILE_STORAGE_DRIVER must be s3 in production");
+    expect(problems).toContain(
+      "S3 server-side encryption cannot be disabled in production",
+    );
   });
 });
