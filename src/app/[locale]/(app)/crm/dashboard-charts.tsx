@@ -3,14 +3,15 @@
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { ActivityPoint } from "@/engines/analytics/analytics-service";
 import type { DashboardLeadSource } from "@/engines/crm/crm-dashboard-service";
+import { formatActivityDate, type ActivityCalendarMode } from "./activity-chart-calendar";
 
 const colors = ["var(--brand)", "var(--accent)", "var(--positive)", "var(--info)", "var(--warning)"];
 const tooltipStyle = { background: "var(--surface-overlay)", border: "1px solid var(--line)", borderRadius: 8, color: "var(--ink)", fontSize: 12 };
 
-export function ActivityBarChart({ data, locale, countLabel }: { data: ActivityPoint[]; locale: string; countLabel: string }) {
+export function ActivityBarChart({ data, locale, calendarMode, countLabel }: { data: ActivityPoint[]; locale: string; calendarMode: ActivityCalendarMode; countLabel: string }) {
   const formatted = data.map((point) => ({
     ...point,
-    label: new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", timeZone: "UTC" }).format(new Date(`${point.date}T00:00:00Z`)),
+    label: formatActivityDate(point.date, locale, calendarMode),
   }));
   return (
     <>

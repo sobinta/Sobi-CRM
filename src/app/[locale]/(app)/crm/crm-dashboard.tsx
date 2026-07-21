@@ -8,7 +8,6 @@ import {
   CircleDollarSign,
   CircleCheckBig,
   Clock3,
-  ChartNoAxesColumnIncreasing,
   Handshake,
   Inbox,
   Percent,
@@ -25,7 +24,8 @@ import type {
 } from "@/engines/crm/crm-dashboard-service";
 import { cn } from "@/lib/utils";
 import { QuickActions } from "./quick-actions";
-import { ActivityBarChart, LeadSourceDonut } from "./dashboard-charts";
+import { LeadSourceDonut } from "./dashboard-charts";
+import { ActivityTrendPanel } from "./activity-trend-panel";
 
 function formatNumber(locale: string, value: number) {
   return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(value);
@@ -231,16 +231,16 @@ export async function CrmDashboard({
 
       <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.85fr)]">
         <Card className="dashboard-glow-card overflow-hidden" data-tour="dashboard-performance">
-          <div className="border-b border-line px-5 py-4">
-            <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
-              <ChartNoAxesColumnIncreasing aria-hidden="true" className="h-4 w-4 text-brand" />
-              {t("activityTrend")}
-            </h2>
-            <p className="mt-1 text-xs text-ink-muted">{t("activityTrendDescription")}</p>
-          </div>
-          <div className="px-3 pb-3 pt-1">
-            <ActivityBarChart data={data.activityTrend} locale={locale} countLabel={t("activityCount")} />
-          </div>
+          <ActivityTrendPanel
+            data={data.activityTrend}
+            locale={locale}
+            title={t("activityTrend")}
+            description={t("activityTrendDescription")}
+            countLabel={t("activityCount")}
+            calendarLabel={t("activityCalendarLabel")}
+            jalaliLabel={t("activityCalendarJalali")}
+            gregorianLabel={t("activityCalendarGregorian")}
+          />
         </Card>
 
         <Card className="dashboard-glow-card overflow-hidden" data-tour="manager-attention">
