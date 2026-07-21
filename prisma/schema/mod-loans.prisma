@@ -1,0 +1,46 @@
+// ============================================================
+// Loan & Banking module — applications, bank partners, credit checklist.
+// Composes Pipeline (application stages) + Documents + Finance + Rules.
+// ============================================================
+
+model BankPartner {
+  id        String    @id @default(cuid())
+  tenantId  String
+  name      String
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  applications LoanApplication[]
+
+  @@index([tenantId])
+}
+
+model LoanApplication {
+  id            String    @id @default(cuid())
+  tenantId      String
+  reference     String
+  applicantName String
+  contactId     String?
+  /// "home" | "auto" | "business" | "personal" | "student"
+  purpose       String    @default("personal")
+  amount        Decimal   @default(0) @db.Decimal(14, 2)
+  currency      String    @default("EUR")
+  termMonths    Int       @default(12)
+  /// draft | submitted | under_review | approved | rejected | disbursed
+  status        String    @default("draft")
+  bankPartnerId String?
+  submittedAt   DateTime?
+  decidedAt     DateTime?
+  ownerId       String?
+  createdById   String?
+  customFields  Json      @default("{}")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  bankPartner BankPartner? @relation(fields: [bankPartnerId], references: [id])
+
+  @@index([tenantId, status])
+  @@index([tenantId, bankPartnerId])
+  @@index([tenantId, ownerId])
+}

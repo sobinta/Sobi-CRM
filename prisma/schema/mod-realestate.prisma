@@ -1,0 +1,51 @@
+// ============================================================
+// Real Estate module — properties, viewings, offers.
+// Composes Pipeline + Booking (viewings) + Documents + Finance.
+// ============================================================
+
+model Property {
+  id           String    @id @default(cuid())
+  tenantId     String
+  title        String
+  address      String?
+  /// "apartment" | "house" | "commercial" | "land"
+  propertyType String    @default("apartment")
+  price        Decimal   @default(0) @db.Decimal(14, 2)
+  currency     String    @default("EUR")
+  bedrooms     Int?
+  areaSqm      Decimal?  @db.Decimal(10, 2)
+  /// available | reserved | sold | withdrawn
+  status       String    @default("available")
+  ownerId      String?
+  createdById  String?
+  customFields Json      @default("{}")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  viewings Viewing[]
+
+  @@index([tenantId, status])
+  @@index([tenantId, propertyType])
+}
+
+model Viewing {
+  id          String    @id @default(cuid())
+  tenantId    String
+  propertyId  String
+  contactId   String?
+  visitorName String
+  scheduledAt DateTime
+  /// scheduled | completed | no_show | cancelled
+  status      String    @default("scheduled")
+  feedback    String?
+  ownerId     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+  @@index([tenantId, propertyId])
+}

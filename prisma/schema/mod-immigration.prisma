@@ -1,0 +1,31 @@
+// ============================================================
+// Immigration module — visa/permit cases, authority submissions,
+// required documents, deadlines. Composes Pipeline + Documents + Rules.
+// ============================================================
+
+model ImmigrationCase {
+  id           String    @id @default(cuid())
+  tenantId     String
+  reference    String
+  clientName   String
+  contactId    String?
+  /// "work" | "student" | "family" | "asylum" | "business" | "permanent"
+  visaType     String    @default("work")
+  /// Destination authority, e.g. "BMI Austria", "ICE UK".
+  authority    String?
+  /// intake | preparing | submitted | approved | rejected | appeal
+  status       String    @default("intake")
+  deadline     DateTime?
+  submittedAt  DateTime?
+  decidedAt    DateTime?
+  ownerId      String?
+  createdById  String?
+  customFields Json      @default("{}")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  @@index([tenantId, status])
+  @@index([tenantId, deadline])
+  @@index([tenantId, ownerId])
+}

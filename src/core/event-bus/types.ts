@@ -42,6 +42,10 @@ export type EventType =
   | "policy.renewed"
   | "loan.submitted"
   | "loan.decided"
+  | "property.listed"
+  | "property.sold"
+  | "immigration.case.created"
+  | "immigration.case.decided"
   // contracts
   | "contract.created"
   | "contract.sent"

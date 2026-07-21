@@ -359,11 +359,13 @@ Action Center → Human Approval → AI Audit`.
 
 Each module is a thin composition of the shared engines (Pipeline, Booking,
 Documents, Finance) plus a manifest (workspace, nav, permissions,
-relationship kinds, i18n):
+relationship kinds, i18n). **All eight ship a bespoke dashboard (KPI cards +
+an upcoming/recent list) and list views with a create flow**, seeded with demo
+data:
 
 | Module | Composition |
 |---|---|
-| **Insurance** *(fully realized reference build)* | products, carriers, policies with renewal reminders, claims, commissions |
+| **Insurance** | products, carriers, policies with renewal reminders, claims, commissions |
 | **Loan & Banking** | applications, bank partners, encrypted applicant profile, credit checklist, repayment plans |
 | **Real Estate** | properties, buyer/seller roles, viewings, offers, contracts, client↔property matching |
 | **Sales & Agency** | campaigns, proposals, targets, performance |

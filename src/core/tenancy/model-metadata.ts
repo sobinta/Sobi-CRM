@@ -71,6 +71,11 @@ export const TENANT_SCOPED = new Set<string>([
   "Service",
   "StaffMember",
   "Appointment",
+  "BankPartner",
+  "LoanApplication",
+  "Property",
+  "Viewing",
+  "ImmigrationCase",
   // Phase 11 AI
   "AiSetting",
   "Prompt",
@@ -127,6 +132,11 @@ export const SOFT_DELETE = new Set<string>([
   "Service",
   "StaffMember",
   "Appointment",
+  "BankPartner",
+  "LoanApplication",
+  "Property",
+  "Viewing",
+  "ImmigrationCase",
   // Phase F
   "KnowledgeArticle",
 ]);

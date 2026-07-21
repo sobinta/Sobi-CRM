@@ -6,9 +6,25 @@ export const DEMO_READ_PERMISSIONS = [
   "studio.*.read",
   "ai.*.read",
   "insurance.*.read",
+  "loans.*.read",
+  "realestate.*.read",
+  "immigration.*.read",
+  "barber.*.read",
+  "salon.*.read",
+  "restaurant.*.read",
+  "sales.*.read",
 ] as const;
 
-export const DEMO_MODULE_KEYS = ["sales", "insurance", "realestate"] as const;
+export const DEMO_MODULE_KEYS = [
+  "sales",
+  "insurance",
+  "realestate",
+  "loans",
+  "immigration",
+  "barber",
+  "salon",
+  "restaurant",
+] as const;
 
 export const DEMO_STAGE_FIXTURES = [
   { id: "demo-stage-new", key: "new", name: "New", position: 0, tone: "neutral", probability: 10, isWon: false, isLost: false },

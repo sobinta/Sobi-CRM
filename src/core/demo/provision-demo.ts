@@ -270,6 +270,109 @@ export async function provisionPublicDemo(): Promise<DemoProvisionResult> {
       create: { id: "demo-event-deal", tenantId: tenant.id, type: "deal.stage_changed", entityType: "deal", entityId: "demo-deal-fleet", actorId: membership.id, payload: {}, dispatchedAt: now },
     });
 
+    // --- Business module demo data (loans, real estate, immigration, booking) ---
+    const at = (offsetDays: number, hour = 10) =>
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() + offsetDays, hour, 0, 0);
+
+    // Loan & Banking
+    await tx.bankPartner.upsert({
+      where: { id: "demo-bank-alpenbank" },
+      update: { tenantId: tenant.id, name: "Alpenbank", deletedAt: null },
+      create: { id: "demo-bank-alpenbank", tenantId: tenant.id, name: "Alpenbank" },
+    });
+    const loans = [
+      { id: "demo-loan-1", reference: "LN-0001", applicantName: "Lena Hofer", purpose: "home", amount: 320000, termMonths: 240, status: "approved", contactId: "demo-contact-lena", bankPartnerId: "demo-bank-alpenbank" },
+      { id: "demo-loan-2", reference: "LN-0002", applicantName: "Sofia Reiter", purpose: "business", amount: 85000, termMonths: 60, status: "under_review", contactId: "demo-contact-sofia", bankPartnerId: "demo-bank-alpenbank" },
+      { id: "demo-loan-3", reference: "LN-0003", applicantName: "Jonas Winkler", purpose: "auto", amount: 24000, termMonths: 48, status: "submitted", contactId: "demo-contact-jonas", bankPartnerId: null },
+    ] as const;
+    for (const loan of loans) {
+      await tx.loanApplication.upsert({
+        where: { id: loan.id },
+        update: { tenantId: tenant.id, ownerId: membership.id, currency: "EUR", submittedAt: now, ...loan, deletedAt: null },
+        create: { tenantId: tenant.id, ownerId: membership.id, currency: "EUR", submittedAt: now, ...loan },
+      });
+    }
+
+    // Real Estate
+    const properties = [
+      { id: "demo-prop-1", title: "Ringstrasse 2-bed apartment", address: "Ringstrasse 12, Vienna", propertyType: "apartment", price: 480000, bedrooms: 2, status: "available" },
+      { id: "demo-prop-2", title: "Grinzing family house", address: "Grinzinger Allee 5, Vienna", propertyType: "house", price: 1250000, bedrooms: 5, status: "reserved" },
+      { id: "demo-prop-3", title: "Downtown retail unit", address: "Kärntner Str. 30, Vienna", propertyType: "commercial", price: 890000, bedrooms: null, status: "available" },
+    ] as const;
+    for (const prop of properties) {
+      await tx.property.upsert({
+        where: { id: prop.id },
+        update: { tenantId: tenant.id, ownerId: membership.id, currency: "EUR", ...prop, deletedAt: null },
+        create: { tenantId: tenant.id, ownerId: membership.id, currency: "EUR", ...prop },
+      });
+    }
+    const viewings = [
+      { id: "demo-view-1", propertyId: "demo-prop-1", visitorName: "Lena Hofer", contactId: "demo-contact-lena", scheduledAt: at(3, 14), status: "scheduled" },
+      { id: "demo-view-2", propertyId: "demo-prop-3", visitorName: "Sofia Reiter", contactId: "demo-contact-sofia", scheduledAt: at(6, 11), status: "scheduled" },
+    ] as const;
+    for (const viewing of viewings) {
+      await tx.viewing.upsert({
+        where: { id: viewing.id },
+        update: { tenantId: tenant.id, ownerId: membership.id, ...viewing, deletedAt: null },
+        create: { tenantId: tenant.id, ownerId: membership.id, ...viewing },
+      });
+    }
+
+    // Immigration
+    const cases = [
+      { id: "demo-imm-1", reference: "IMM-0001", clientName: "Amir Karimi", visaType: "work", authority: "BMI Austria", status: "submitted", deadline: at(10), contactId: null },
+      { id: "demo-imm-2", reference: "IMM-0002", clientName: "Maria Santos", visaType: "student", authority: "OeAD", status: "preparing", deadline: at(5), contactId: null },
+      { id: "demo-imm-3", reference: "IMM-0003", clientName: "Wei Chen", visaType: "family", authority: "BMI Austria", status: "approved", deadline: null, contactId: null },
+    ] as const;
+    for (const c of cases) {
+      await tx.immigrationCase.upsert({
+        where: { id: c.id },
+        update: { tenantId: tenant.id, ownerId: membership.id, submittedAt: now, ...c, deletedAt: null },
+        create: { tenantId: tenant.id, ownerId: membership.id, submittedAt: now, ...c },
+      });
+    }
+
+    // Booking modules (barber, salon, restaurant) — shared Booking-engine tables
+    const bookingServices = [
+      { id: "demo-svc-barber-cut", moduleKey: "barber", name: "Classic cut", durationMin: 30, price: 28 },
+      { id: "demo-svc-barber-beard", moduleKey: "barber", name: "Beard trim", durationMin: 20, price: 18 },
+      { id: "demo-svc-salon-color", moduleKey: "salon", name: "Full colour", durationMin: 90, price: 95 },
+      { id: "demo-svc-salon-mani", moduleKey: "salon", name: "Manicure", durationMin: 45, price: 35 },
+    ] as const;
+    for (const svc of bookingServices) {
+      await tx.service.upsert({
+        where: { id: svc.id },
+        update: { tenantId: tenant.id, currency: "EUR", active: true, ...svc, deletedAt: null },
+        create: { tenantId: tenant.id, currency: "EUR", active: true, ...svc },
+      });
+    }
+    const bookingStaff = [
+      { id: "demo-staff-barber", moduleKey: "barber", name: "Marco", role: "Barber" },
+      { id: "demo-staff-salon", moduleKey: "salon", name: "Elif", role: "Stylist" },
+    ] as const;
+    for (const staff of bookingStaff) {
+      await tx.staffMember.upsert({
+        where: { id: staff.id },
+        update: { tenantId: tenant.id, active: true, ...staff, deletedAt: null },
+        create: { tenantId: tenant.id, active: true, ...staff },
+      });
+    }
+    const appointments = [
+      { id: "demo-appt-barber-1", moduleKey: "barber", serviceId: "demo-svc-barber-cut", staffId: "demo-staff-barber", customerName: "Tomas B.", start: at(1, 10), dur: 30, partySize: null },
+      { id: "demo-appt-barber-2", moduleKey: "barber", serviceId: "demo-svc-barber-beard", staffId: "demo-staff-barber", customerName: "Felix K.", start: at(2, 15), dur: 20, partySize: null },
+      { id: "demo-appt-salon-1", moduleKey: "salon", serviceId: "demo-svc-salon-color", staffId: "demo-staff-salon", customerName: "Nina W.", start: at(1, 13), dur: 90, partySize: null },
+      { id: "demo-appt-rest-1", moduleKey: "restaurant", serviceId: null, staffId: null, customerName: "Weber party", start: at(1, 19), dur: 120, partySize: 4 },
+      { id: "demo-appt-rest-2", moduleKey: "restaurant", serviceId: null, staffId: null, customerName: "Gruber party", start: at(2, 20), dur: 120, partySize: 2 },
+    ] as const;
+    for (const a of appointments) {
+      const endAt = new Date(a.start.getTime() + a.dur * 60_000);
+      await tx.appointment.upsert({
+        where: { id: a.id },
+        update: { tenantId: tenant.id, ownerId: membership.id, status: "booked", moduleKey: a.moduleKey, serviceId: a.serviceId, staffId: a.staffId, customerName: a.customerName, startAt: a.start, endAt, partySize: a.partySize, deletedAt: null },
+        create: { id: a.id, tenantId: tenant.id, ownerId: membership.id, status: "booked", moduleKey: a.moduleKey, serviceId: a.serviceId, staffId: a.staffId, customerName: a.customerName, startAt: a.start, endAt, partySize: a.partySize },
+      });
+    }
+
     return {
       userId: user.id,
       tenantId: tenant.id,
