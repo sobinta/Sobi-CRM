@@ -21,6 +21,7 @@ export interface DealInput {
   companyId?: string | null;
   expectedCloseAt?: Date | null;
   stageId?: string;
+  customFields?: Record<string, unknown>;
 }
 
 export async function listDealsByStage() {
@@ -92,6 +93,7 @@ export async function createDeal(input: DealInput) {
       expectedCloseAt: input.expectedCloseAt,
       ownerId: ctx.membershipId,
       createdById: ctx.membershipId,
+      customFields: (input.customFields ?? {}) as Prisma.InputJsonValue,
     },
   });
 

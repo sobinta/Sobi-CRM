@@ -12,6 +12,7 @@ import {
   aiContractFollowUp,
 } from "@/engines/contracts/contract-service";
 import { reportPublicActionError } from "@/core/security/public-errors";
+import { validatePublishedCustomFields } from "@/engines/forms/service";
 
 const createSchema = z.object({
   title: z.string().trim().min(1),
@@ -20,12 +21,13 @@ const createSchema = z.object({
   subject: z.string().trim().min(1),
   amount: z.coerce.number().min(0),
   durationLabel: z.string().optional(),
+  customFields: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function createContractAction(input: unknown) {
   const parsed = createSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const };
-  const contract = await withActionContext(() =>
+  const contract = await withActionContext(async () =>
     createContract({
       title: parsed.data.title,
       contactId: parsed.data.contactId || null,
@@ -33,6 +35,7 @@ export async function createContractAction(input: unknown) {
       subject: parsed.data.subject,
       amount: parsed.data.amount,
       durationLabel: parsed.data.durationLabel,
+      customFields: await validatePublishedCustomFields("contract", parsed.data.customFields),
     }),
   );
   revalidatePath("/[locale]/(app)/crm/contracts", "page");

@@ -10,17 +10,19 @@ import {
   skipCampaignEmail,
   sendCampaignEmail,
 } from "@/engines/campaigns/campaign-service";
+import { validatePublishedCustomFields } from "@/engines/forms/service";
 
 const createSchema = z.object({
   name: z.string().trim().min(1),
   segmentKey: z.string().min(1),
   goal: z.string().trim().min(1),
+  customFields: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function createCampaignAction(input: unknown) {
   const parsed = createSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const };
-  const campaign = await withActionContext(() => createCampaign(parsed.data));
+  const campaign = await withActionContext(async () => createCampaign({ ...parsed.data, customFields: await validatePublishedCustomFields("campaign", parsed.data.customFields) }));
   revalidatePath("/[locale]/(app)/crm/campaigns", "page");
   return { ok: true as const, id: campaign.id, recipientCount: campaign.emails.length };
 }

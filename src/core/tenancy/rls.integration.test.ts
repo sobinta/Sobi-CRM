@@ -3,6 +3,7 @@ import { db } from "@/core/db";
 import { identityDb } from "@/core/db/identity";
 import { systemDb } from "@/core/db/system";
 import { publicTenantContext, runWithContext } from "./context";
+import { registerBuiltinEntity, resolveEntity } from "@/core/metadata/registry";
 
 const enabled = process.env.RUN_DATABASE_INTEGRATION_TESTS === "true";
 const suite = enabled ? describe : describe.skip;
@@ -21,6 +22,7 @@ suite("PostgreSQL tenant RLS", () => {
   let membershipB = "";
 
   beforeAll(async () => {
+    registerBuiltinEntity({ key: "contact", nameSingular: "Contact", namePlural: "Contacts", source: "builtin", module: "crm", titleField: "firstName", fields: [{ key: "firstName", label: "First name", type: "text" }] });
     const [a, b] = await Promise.all([
       systemDb.tenant.create({
         data: { name: `RLS A ${nonce}`, slug: `rls-a-${nonce}` },
@@ -59,6 +61,7 @@ suite("PostgreSQL tenant RLS", () => {
     if (tenantA && tenantB) {
       await systemDb.calendarReminder.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.calendarEvent.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
+      await systemDb.entityDefinition.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.onboardingProgress.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.membership.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.contact.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
@@ -272,5 +275,19 @@ suite("PostgreSQL tenant RLS", () => {
         }),
       ),
     ).rejects.toThrow();
+  });
+
+  it("merges only the active tenant's built-in field extensions", async () => {
+    await systemDb.entityDefinition.createMany({ data: [
+      { tenantId: tenantA, key: "contact", nameSingular: "Contact", namePlural: "Contacts", source: "extension", fields: [{ key: "tenant_a_field", label: "Tenant A", type: "text" }] },
+      { tenantId: tenantB, key: "contact", nameSingular: "Contact", namePlural: "Contacts", source: "extension", fields: [{ key: "tenant_b_field", label: "Tenant B", type: "text" }] },
+    ] });
+    const contextFor = (tenantId: string, membershipId: string, userId: string) => ({ ...publicTenantContext(tenantId), membershipId, userId });
+    const metaA = await runWithContext(contextFor(tenantA, membershipA, userA), () => resolveEntity("contact"));
+    const metaB = await runWithContext(contextFor(tenantB, membershipB, userB), () => resolveEntity("contact"));
+    expect(metaA?.fields.some((field) => field.key === "tenant_a_field")).toBe(true);
+    expect(metaA?.fields.some((field) => field.key === "tenant_b_field")).toBe(false);
+    expect(metaB?.fields.some((field) => field.key === "tenant_b_field")).toBe(true);
+    expect(metaB?.fields.some((field) => field.key === "tenant_a_field")).toBe(false);
   });
 });

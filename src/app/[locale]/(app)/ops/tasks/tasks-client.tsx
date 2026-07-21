@@ -19,6 +19,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { createTaskAction, setTaskStatusAction } from "../actions";
+import { BusinessCustomFields } from "@/components/patterns/business-custom-fields";
 import { cn } from "@/lib/utils";
 import { useDemoMode } from "@/components/layout/session-context";
 import { useTranslations } from "next-intl";
@@ -48,6 +49,7 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
   const [open, setOpen] = useState(false);
   const [simulated, setSimulated] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [customFields, setCustomFields] = useState<Record<string, unknown>>({});
   // Snapshot "now" once at mount for overdue comparison (kept out of render).
   const [now] = useState(() => Date.now());
 
@@ -78,6 +80,7 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
         priority: form.get("priority"),
         dueAt: form.get("dueAt"),
         recurrence: form.get("recurrence"),
+        customFields,
       });
       if (res.ok) {
         setOpen(false);
@@ -146,6 +149,7 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
                     <option value="monthly">Monthly</option>
                   </NativeSelect>
                 </div>
+                <BusinessCustomFields entityKey="task" onChange={setCustomFields} />
               </DialogBody>
               <DialogFooter>
                 <DialogClose asChild>

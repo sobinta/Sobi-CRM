@@ -19,6 +19,7 @@ export interface PolicyInput {
   contactId?: string | null;
   expiresAt?: Date | null;
   commission?: number;
+  customFields?: Record<string, unknown>;
 }
 
 export async function listPolicies(status?: string) {
@@ -66,6 +67,7 @@ export async function createPolicy(input: PolicyInput) {
       startAt: new Date(),
       ownerId: ctx.membershipId,
       createdById: ctx.membershipId,
+      customFields: (input.customFields ?? {}) as Prisma.InputJsonValue,
     },
   });
   await Promise.all([

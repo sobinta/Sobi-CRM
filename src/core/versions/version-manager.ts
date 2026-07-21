@@ -116,3 +116,22 @@ export async function listVersions(
     orderBy: { version: "desc" },
   });
 }
+
+export async function getVersion(
+  objectType: VersionObjectType,
+  objectId: string,
+  version: number,
+) {
+  return db.configVersion.findFirst({ where: { objectType, objectId, version } });
+}
+
+export async function archiveVersion(
+  objectType: VersionObjectType,
+  objectId: string,
+  version: number,
+): Promise<void> {
+  await db.configVersion.updateMany({
+    where: { objectType, objectId, version, status: { not: "PUBLISHED" } },
+    data: { status: "ARCHIVED" },
+  });
+}

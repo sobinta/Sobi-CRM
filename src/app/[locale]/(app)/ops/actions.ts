@@ -24,23 +24,26 @@ import {
   listNotifications,
 } from "@/engines/notifications/notification-service";
 import { assertUploadEnvelope } from "@/core/security/upload-policy";
+import { validatePublishedCustomFields } from "@/engines/forms/service";
 
 const taskSchema = z.object({
   title: z.string().trim().min(1),
   priority: z.string().optional(),
   dueAt: z.string().optional(),
   recurrence: z.string().optional(),
+  customFields: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function createTaskAction(input: unknown) {
   const parsed = taskSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const };
-  await withActionContext(() =>
+  await withActionContext(async () =>
     createTask({
       title: parsed.data.title,
       priority: parsed.data.priority,
       dueAt: parsed.data.dueAt ? new Date(parsed.data.dueAt) : null,
       recurrence: parsed.data.recurrence || null,
+      customFields: await validatePublishedCustomFields("task", parsed.data.customFields),
     }),
   );
   revalidatePath("/[locale]/(app)/ops/tasks", "page");
@@ -70,6 +73,7 @@ const eventSchema = z.object({
   location: z.string().trim().max(300).optional(),
   tone: z.enum(["brand", "accent", "info", "positive", "warning", "danger", "neutral"]).optional(),
   reminderOffsets: z.array(z.number().int().min(0).max(43_200)).max(10).optional(),
+  customFields: z.record(z.string(), z.unknown()).optional(),
 });
 
 function toEventInput(data: z.infer<typeof eventSchema>) {
@@ -83,8 +87,8 @@ function toEventInput(data: z.infer<typeof eventSchema>) {
 export async function createEventAction(input: unknown) {
   const parsed = eventSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const };
-  await withActionContext(() =>
-    createEvent(toEventInput(parsed.data)),
+  await withActionContext(async () =>
+    createEvent({ ...toEventInput(parsed.data), customFields: await validatePublishedCustomFields("event", parsed.data.customFields) }),
   );
   revalidatePath("/[locale]/(app)/ops/calendar", "page");
   return { ok: true as const };
@@ -94,7 +98,7 @@ export async function updateEventAction(eventId: string, input: unknown) {
   if (!z.string().cuid().safeParse(eventId).success) return { ok: false as const };
   const parsed = eventSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const };
-  await withActionContext(() => updateEvent(eventId, toEventInput(parsed.data)));
+  await withActionContext(async () => updateEvent(eventId, { ...toEventInput(parsed.data), customFields: await validatePublishedCustomFields("event", parsed.data.customFields) }));
   revalidatePath("/[locale]/(app)/ops/calendar", "page");
   return { ok: true as const };
 }

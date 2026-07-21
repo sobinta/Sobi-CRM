@@ -27,7 +27,7 @@ export type FieldType =
 
 export interface FieldOption {
   value: string;
-  label: string;
+  label: string | Record<string, string>;
   /** Chip tone for status-like selects. */
   tone?: string;
 }
@@ -57,6 +57,8 @@ export interface FieldDefinition {
   system?: boolean;
   /** Include in full-text search. */
   searchable?: boolean;
+  /** Hidden from new input while historical values remain readable. */
+  archived?: boolean;
 }
 
 export interface EntityMetadata {

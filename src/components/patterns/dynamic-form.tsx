@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocale } from "next-intl";
 import type { EntityMetadata, FieldDefinition } from "@/core/metadata/types";
 import { labelFor } from "@/core/metadata/types";
@@ -28,20 +28,24 @@ export function DynamicForm({
   form,
   initialValues = {},
   onValuesChange,
+  previewLocale,
 }: {
   meta: EntityMetadata;
   form: FormDefinition;
   initialValues?: Values;
   onValuesChange?: (values: Values) => void;
+  previewLocale?: string;
 }) {
-  const locale = useLocale();
+  const appLocale = useLocale();
+  const locale = previewLocale ?? appLocale;
   const [values, setValues] = useState<Values>(initialValues);
 
   const fieldMap = useMemo(() => {
     const m = new Map<string, FieldDefinition>();
     for (const f of meta.fields) m.set(f.key, f);
+    for (const f of form.fieldDefinitions ?? []) m.set(f.key, f);
     return m;
-  }, [meta]);
+  }, [meta, form.fieldDefinitions]);
 
   // Apply computed fields into the working values for evaluation/display.
   const resolved = useMemo(() => {
@@ -56,12 +60,12 @@ export function DynamicForm({
     return out;
   }, [values, form, fieldMap]);
 
+  useEffect(() => {
+    onValuesChange?.(resolved);
+  }, [onValuesChange, resolved]);
+
   function setValue(key: string, value: unknown) {
-    setValues((v) => {
-      const next = { ...v, [key]: value };
-      onValuesChange?.(next);
-      return next;
-    });
+    setValues((current) => ({ ...current, [key]: value }));
   }
 
   return (
@@ -163,11 +167,26 @@ function FieldControl({
             <option value="">—</option>
             {def.options?.map((o) => (
               <option key={o.value} value={o.value}>
-                {o.label}
+                {labelFor(o.label, locale)}
               </option>
             ))}
           </NativeSelect>
         );
+      case "multiselect": {
+        const selected = Array.isArray(value) ? value.map(String) : [];
+        return (
+          <select
+            id={id}
+            multiple
+            value={selected}
+            disabled={disabled}
+            onChange={(event) => onChange(Array.from(event.target.selectedOptions, (option) => option.value))}
+            className="min-h-24 w-full rounded-md border border-line bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/15"
+          >
+            {def.options?.map((option) => <option key={option.value} value={option.value}>{labelFor(option.label, locale)}</option>)}
+          </select>
+        );
+      }
       case "number":
       case "currency":
         return (
@@ -177,6 +196,8 @@ function FieldControl({
             value={str}
             disabled={disabled}
             dir="ltr"
+            min={def.min}
+            max={def.max}
             onChange={(e) => onChange(e.target.value)}
           />
         );
@@ -200,6 +221,9 @@ function FieldControl({
             value={str}
             disabled={disabled}
             dir={["email", "phone", "url"].includes(def.type) ? "ltr" : undefined}
+            placeholder={def.placeholder}
+            minLength={def.min}
+            maxLength={def.max}
             onChange={(e) => onChange(e.target.value)}
           />
         );

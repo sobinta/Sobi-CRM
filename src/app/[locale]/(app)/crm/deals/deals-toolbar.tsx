@@ -18,6 +18,7 @@ import {
 import { createDealAction } from "../actions";
 import { useTranslations } from "next-intl";
 import { useDemoMode } from "@/components/layout/session-context";
+import { BusinessCustomFields } from "@/components/patterns/business-custom-fields";
 
 export function DealsToolbar() {
   const t = useTranslations("deals");
@@ -25,6 +26,7 @@ export function DealsToolbar() {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
+  const [customFields, setCustomFields] = useState<Record<string, unknown>>({});
 
   function onCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,6 +50,7 @@ export function DealsToolbar() {
       const res = await createDealAction({
         title: form.get("title"),
         value: form.get("value"),
+        customFields,
       });
       if (res.ok) {
         setOpen(false);
@@ -85,6 +88,7 @@ export function DealsToolbar() {
                 dir="ltr"
               />
             </div>
+            <BusinessCustomFields entityKey="deal" onChange={setCustomFields} />
           </DialogBody>
           <DialogFooter>
             <DialogClose asChild>

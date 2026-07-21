@@ -15,6 +15,7 @@ export interface CompanyInput {
   phone?: string | null;
   size?: string | null;
   address?: string | null;
+  customFields?: Record<string, unknown>;
 }
 
 /** Escape LIKE/ILIKE wildcards so a name with %/_ matches literally. */
@@ -68,6 +69,7 @@ export async function createCompany(input: CompanyInput) {
       address: input.address,
       ownerId: ctx.membershipId,
       createdById: ctx.membershipId,
+      customFields: (input.customFields ?? {}) as Prisma.InputJsonValue,
     },
   });
   await Promise.all([
@@ -79,7 +81,14 @@ export async function createCompany(input: CompanyInput) {
 
 export async function updateCompany(id: string, input: Partial<CompanyInput>) {
   authorize("crm.company.update");
-  return db.company.update({ where: { id }, data: input });
+  return db.company.update({
+    where: { id },
+    data: {
+      name: input.name, industry: input.industry, website: input.website,
+      phone: input.phone, size: input.size, address: input.address,
+      customFields: input.customFields as Prisma.InputJsonValue | undefined,
+    },
+  });
 }
 
 /** Find a company by exact (case-insensitive) name, else create it. */

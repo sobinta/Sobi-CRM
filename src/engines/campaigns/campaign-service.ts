@@ -20,6 +20,7 @@ export interface CreateCampaignInput {
   name: string;
   segmentKey: string;
   goal: string;
+  customFields?: Record<string, unknown>;
 }
 
 export async function createCampaign(input: CreateCampaignInput) {
@@ -38,6 +39,7 @@ export async function createCampaign(input: CreateCampaignInput) {
       goal: input.goal,
       status: "draft",
       createdById: ctx.membershipId,
+      customFields: (input.customFields ?? {}) as Prisma.InputJsonValue,
       emails: {
         create: recipients.map((r) => ({
           tenantId: ctx.tenantId,

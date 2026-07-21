@@ -1,4 +1,4 @@
-import { db } from "@/core/db";
+import { db, Prisma } from "@/core/db";
 import { requireContext } from "@/core/tenancy/context";
 import { authorize } from "@/core/rbac/guard";
 import { publish } from "@/core/event-bus/bus";
@@ -28,6 +28,7 @@ export interface TaskInput {
   entityType?: string | null;
   entityId?: string | null;
   recurrence?: string | null;
+  customFields?: Record<string, unknown>;
 }
 
 export async function listTasks(params?: {
@@ -80,6 +81,7 @@ export async function createTask(input: TaskInput) {
       recurrence: input.recurrence,
       ownerId: ctx.membershipId,
       createdById: ctx.membershipId,
+      customFields: (input.customFields ?? {}) as Prisma.InputJsonValue,
     },
   });
 

@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/patterns/page-header";
 import { EmptyState } from "@/components/patterns/empty-state";
 import { Chip } from "@/components/ui/chip";
 import { ContactsToolbar } from "./contacts-toolbar";
+import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function ContactsPage({
   searchParams,
@@ -16,12 +17,16 @@ export default async function ContactsPage({
   searchParams: Promise<{ q?: string; page?: string }>;
 }) {
   const sp = await searchParams;
-  const data = await withPlatformContext(() =>
-    listContacts({
-      search: sp.q,
-      page: sp.page ? Number(sp.page) : 1,
-    }),
-  );
+  const [data, locale, t] = await Promise.all([
+    withPlatformContext(() =>
+      listContacts({
+        search: sp.q,
+        page: sp.page ? Number(sp.page) : 1,
+      }),
+    ),
+    getLocale(),
+    getTranslations("businessForms"),
+  ]);
   if (!data) notFound();
 
   const { rows, total, page, pageSize } = data;
@@ -30,8 +35,8 @@ export default async function ContactsPage({
   return (
     <div>
       <PageHeader
-        title={contactEntity.namePlural}
-        description={`${total} ${total === 1 ? "contact" : "contacts"}`}
+        title={t("contacts")}
+        description={t("contactCount", { count: total })}
       >
         <ContactsToolbar />
       </PageHeader>
@@ -40,19 +45,19 @@ export default async function ContactsPage({
         {rows.length === 0 ? (
           <EmptyState
             icon={Users}
-            title="No contacts yet"
-            description="Add your first contact to start building relationships."
+            title={t("noContacts")}
+            description={t("noContactsDescription")}
           />
         ) : (
           <div className="overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
               <thead className="bg-surface-sunken text-xs text-ink-faint">
                 <tr>
-                  <th className="px-4 py-2.5 text-start font-medium">Name</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Email</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Company</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("name")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("email")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("company")}</th>
                   <th className="px-4 py-2.5 text-start font-medium">
-                    Lifecycle
+                    {t("lifecycle")}
                   </th>
                 </tr>
               </thead>
@@ -62,6 +67,7 @@ export default async function ContactsPage({
                     contactEntity,
                     "lifecycle",
                     c.lifecycle,
+                    locale,
                   );
                   return (
                     <tr
@@ -99,7 +105,7 @@ export default async function ContactsPage({
         {totalPages > 1 && (
           <div className="mt-4 flex items-center justify-between text-sm text-ink-muted">
             <span>
-              Page {page} of {totalPages}
+              {t("pageOf", { page, total: totalPages })}
             </span>
             <div className="flex gap-2">
               {page > 1 && (
@@ -107,7 +113,7 @@ export default async function ContactsPage({
                   href={`/crm/contacts?${new URLSearchParams({ ...(sp.q ? { q: sp.q } : {}), page: String(page - 1) })}`}
                   className="rounded-md border border-line px-3 py-1.5 hover:bg-surface-sunken"
                 >
-                  Previous
+                  {t("previous")}
                 </Link>
               )}
               {page < totalPages && (
@@ -115,7 +121,7 @@ export default async function ContactsPage({
                   href={`/crm/contacts?${new URLSearchParams({ ...(sp.q ? { q: sp.q } : {}), page: String(page + 1) })}`}
                   className="rounded-md border border-line px-3 py-1.5 hover:bg-surface-sunken"
                 >
-                  Next
+                  {t("next")}
                 </Link>
               )}
             </div>

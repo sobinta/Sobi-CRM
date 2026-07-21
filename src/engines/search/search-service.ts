@@ -1,5 +1,6 @@
-import { db } from "@/core/db";
+import { db, Prisma } from "@/core/db";
 import { requireContext } from "@/core/tenancy/context";
+import { resolveEntity } from "@/core/metadata/registry";
 
 /**
  * Universal Search — cross-entity search that feeds the ⌘K palette.
@@ -22,6 +23,9 @@ export async function search(query: string, limit = 8): Promise<SearchResult[]> 
   const q = query.trim();
   if (q.length < 2) return [];
   const contains = { contains: q, mode: "insensitive" as const };
+  const metadata = await Promise.all(["contact", "company", "deal", "lead", "task"].map(resolveEntity));
+  const searchableKeys = new Map(metadata.map((meta) => [meta?.key, meta?.fields.filter((field) => field.searchable && !field.archived && !field.system).map((field) => field.key) ?? []]));
+  const jsonFilters = (entityKey: string) => (searchableKeys.get(entityKey) ?? []).map((key) => ({ customFields: { path: [key], string_contains: q, mode: "insensitive" as const } }));
 
   const [contacts, companies, deals, leads, tasks] = await Promise.all([
     db.contact.findMany({
@@ -30,14 +34,15 @@ export async function search(query: string, limit = 8): Promise<SearchResult[]> 
           { firstName: contains },
           { lastName: contains },
           { email: contains },
+          ...(jsonFilters("contact") as Prisma.ContactWhereInput[]),
         ],
       },
       take: limit,
     }),
-    db.company.findMany({ where: { name: contains }, take: limit }),
-    db.deal.findMany({ where: { title: contains }, take: limit }),
-    db.lead.findMany({ where: { title: contains }, take: limit }),
-    db.task.findMany({ where: { title: contains }, take: limit }),
+    db.company.findMany({ where: { OR: [{ name: contains }, ...(jsonFilters("company") as Prisma.CompanyWhereInput[])] }, take: limit }),
+    db.deal.findMany({ where: { OR: [{ title: contains }, ...(jsonFilters("deal") as Prisma.DealWhereInput[])] }, take: limit }),
+    db.lead.findMany({ where: { OR: [{ title: contains }, ...(jsonFilters("lead") as Prisma.LeadWhereInput[])] }, take: limit }),
+    db.task.findMany({ where: { OR: [{ title: contains }, ...(jsonFilters("task") as Prisma.TaskWhereInput[])] }, take: limit }),
   ]);
 
   const results: SearchResult[] = [

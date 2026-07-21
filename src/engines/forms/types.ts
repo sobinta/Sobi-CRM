@@ -1,4 +1,5 @@
 import type { ExprNode } from "@/core/rules/expression";
+import type { FieldDefinition } from "@/core/metadata/types";
 
 /**
  * Form definitions — the Form Builder's output, layered over entity metadata.
@@ -36,6 +37,8 @@ export interface FormDefinition {
   entityKey: string;
   key: string;
   name: string;
+  /** Tenant-owned fields carried with each version for deterministic previews. */
+  fieldDefinitions?: FieldDefinition[];
   sections: FormSection[];
 }
 
@@ -44,6 +47,6 @@ export function emptyForm(entityKey: string, name: string): FormDefinition {
     entityKey,
     key: "default",
     name,
-    sections: [{ id: crypto.randomUUID(), title: "Details", fields: [] }],
+    sections: [{ id: crypto.randomUUID(), title: { en: "Details", fa: "جزئیات", de: "Details" }, fields: [] }],
   };
 }

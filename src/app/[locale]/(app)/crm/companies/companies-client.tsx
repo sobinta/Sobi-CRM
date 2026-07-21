@@ -16,11 +16,13 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { createCompanyAction } from "../actions";
+import { BusinessCustomFields } from "@/components/patterns/business-custom-fields";
 
 export function CompaniesToolbar() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [customFields, setCustomFields] = useState<Record<string, unknown>>({});
 
   function onCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -32,6 +34,7 @@ export function CompaniesToolbar() {
         website: form.get("website"),
         phone: form.get("phone"),
         size: form.get("size"),
+        customFields,
       });
       if (res.ok) {
         setOpen(false);
@@ -75,6 +78,7 @@ export function CompaniesToolbar() {
                 <Input id="website" name="website" dir="ltr" />
               </div>
             </div>
+            <BusinessCustomFields entityKey="company" onChange={setCustomFields} />
           </DialogBody>
           <DialogFooter>
             <DialogClose asChild>

@@ -15,6 +15,7 @@ import { addNote } from "@/engines/timeline/timeline";
 import { search } from "@/engines/search/search-service";
 import { saveDashboard } from "@/engines/dashboards/dashboard-service";
 import type { LayoutItem } from "@/components/patterns/widgets/widget-types";
+import { validatePublishedCustomFields } from "@/engines/forms/service";
 
 /** Universal search used by the command palette. */
 export async function searchAction(query: string) {
@@ -37,15 +38,17 @@ const contactSchema = z.object({
   phone: z.string().optional(),
   jobTitle: z.string().optional(),
   lifecycle: z.string().optional(),
+  customFields: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function createContactAction(input: unknown) {
   const parsed = contactSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "invalid" };
-  const contact = await withActionContext(() =>
+  const contact = await withActionContext(async () =>
     createContact({
       ...parsed.data,
       email: parsed.data.email || null,
+      customFields: await validatePublishedCustomFields("contact", parsed.data.customFields),
     }),
   );
   revalidatePath("/[locale]/(app)/crm/contacts", "page");
@@ -55,7 +58,7 @@ export async function createContactAction(input: unknown) {
 export async function updateContactAction(id: string, input: unknown) {
   const parsed = contactSchema.partial().safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "invalid" };
-  await withActionContext(() => updateContact(id, parsed.data));
+  await withActionContext(async () => updateContact(id, { ...parsed.data, customFields: parsed.data.customFields ? await validatePublishedCustomFields("contact", parsed.data.customFields) : undefined }));
   revalidatePath("/[locale]/(app)/crm/contacts", "page");
   return { ok: true as const };
 }
@@ -69,12 +72,13 @@ export async function deleteContactAction(id: string) {
 const dealSchema = z.object({
   title: z.string().trim().min(1),
   value: z.coerce.number().min(0).optional(),
+  customFields: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function createDealAction(input: unknown) {
   const parsed = dealSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "invalid" };
-  const deal = await withActionContext(() => createDeal(parsed.data));
+  const deal = await withActionContext(async () => createDeal({ ...parsed.data, customFields: await validatePublishedCustomFields("deal", parsed.data.customFields) }));
   revalidatePath("/[locale]/(app)/crm/deals", "page");
   return { ok: true as const, id: deal.id };
 }
@@ -102,18 +106,20 @@ const companySchema = z.object({
   website: z.string().optional(),
   phone: z.string().optional(),
   size: z.string().optional(),
+  customFields: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function createCompanyAction(input: unknown) {
   const parsed = companySchema.safeParse(input);
   if (!parsed.success) return { ok: false as const };
-  const company = await withActionContext(() =>
+  const company = await withActionContext(async () =>
     createCompany({
       name: parsed.data.name,
       industry: parsed.data.industry || null,
       website: parsed.data.website || null,
       phone: parsed.data.phone || null,
       size: parsed.data.size || null,
+      customFields: await validatePublishedCustomFields("company", parsed.data.customFields),
     }),
   );
   revalidatePath("/[locale]/(app)/crm/companies", "page");

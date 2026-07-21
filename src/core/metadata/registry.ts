@@ -30,9 +30,19 @@ export async function resolveEntity(
   key: string,
 ): Promise<EntityMetadata | null> {
   const builtin = builtins.get(key);
-  if (builtin) return builtin;
-
   const ctx = getContext();
+  if (builtin) {
+    if (!ctx) return builtin;
+    const extension = await db.entityDefinition.findFirst({
+      where: { key, tenantId: ctx.tenantId, source: "extension", deletedAt: null },
+      select: { fields: true },
+    });
+    const baseKeys = new Set(builtin.fields.map((field) => field.key));
+    const tenantFields = ((extension?.fields as unknown as FieldDefinition[]) ?? [])
+      .filter((field) => !baseKeys.has(field.key));
+    return { ...builtin, fields: [...builtin.fields, ...tenantFields] };
+  }
+
   if (!ctx) return null;
 
   const def = await db.entityDefinition.findFirst({
@@ -56,13 +66,18 @@ export async function resolveEntity(
 /** List all entities available to the current tenant (built-ins + custom). */
 export async function listEntities(): Promise<EntityMetadata[]> {
   const ctx = getContext();
-  const result = [...builtins.values()];
-  if (!ctx) return result;
+  const result: EntityMetadata[] = [];
+  if (!ctx) return [...builtins.values()];
+
+  for (const builtin of builtins.values()) {
+    result.push((await resolveEntity(builtin.key)) ?? builtin);
+  }
 
   const custom = await db.entityDefinition.findMany({
     where: { tenantId: ctx.tenantId },
   });
   for (const def of custom) {
+    if (def.source === "extension") continue;
     if (builtins.has(def.key)) continue;
     result.push({
       key: def.key,

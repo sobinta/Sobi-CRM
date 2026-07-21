@@ -21,6 +21,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { createCampaignAction } from "./actions";
+import { BusinessCustomFields } from "@/components/patterns/business-custom-fields";
 
 export interface CampaignRow {
   id: string;
@@ -61,6 +62,7 @@ export function CampaignsClient({
   const [open, setOpen] = useState(false);
   const [segmentKey, setSegmentKey] = useState(segments[0]?.key ?? "");
   const [pending, startTransition] = useTransition();
+  const [customFields, setCustomFields] = useState<Record<string, unknown>>({});
 
   function onCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -70,6 +72,7 @@ export function CampaignsClient({
         name: form.get("name"),
         segmentKey: form.get("segmentKey"),
         goal: form.get("goal"),
+        customFields,
       });
       if (res.ok) {
         setOpen(false);
@@ -121,6 +124,7 @@ export function CampaignsClient({
                     placeholder="دعوت مجدد به همکاری و معرفی خدمات مشاوره‌ی جدید"
                   />
                 </div>
+                <BusinessCustomFields entityKey="campaign" onChange={setCustomFields} />
               </DialogBody>
               <DialogFooter>
                 <DialogClose asChild>

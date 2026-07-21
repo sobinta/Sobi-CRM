@@ -22,6 +22,7 @@ export interface ContactInput {
   lifecycle?: string;
   source?: string | null;
   ownerId?: string | null;
+  customFields?: Record<string, unknown>;
 }
 
 export interface ListParams {
@@ -96,6 +97,7 @@ export async function createContact(input: ContactInput) {
       source: input.source,
       ownerId: input.ownerId ?? ctx.membershipId,
       createdById: ctx.membershipId,
+      customFields: (input.customFields ?? {}) as Prisma.InputJsonValue,
     },
   });
 
@@ -145,6 +147,7 @@ export async function updateContact(id: string, input: Partial<ContactInput>) {
       lifecycle: input.lifecycle,
       source: input.source,
       ownerId: input.ownerId,
+      customFields: input.customFields as Prisma.InputJsonValue | undefined,
     },
   });
 

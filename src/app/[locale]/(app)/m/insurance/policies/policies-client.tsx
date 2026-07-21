@@ -17,11 +17,13 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { createPolicyAction } from "../actions";
+import { BusinessCustomFields } from "@/components/patterns/business-custom-fields";
 
 export function NewPolicyButton() {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
+  const [customFields, setCustomFields] = useState<Record<string, unknown>>({});
 
   function onCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -33,6 +35,7 @@ export function NewPolicyButton() {
         premium: form.get("premium"),
         commission: form.get("commission"),
         expiresAt: form.get("expiresAt"),
+        customFields,
       });
       if (res.ok) {
         setOpen(false);
@@ -82,6 +85,7 @@ export function NewPolicyButton() {
               <Label htmlFor="expiresAt">Expiry date</Label>
               <Input id="expiresAt" name="expiresAt" type="date" dir="ltr" />
             </div>
+            <BusinessCustomFields entityKey="policy" onChange={setCustomFields} />
           </DialogBody>
           <DialogFooter>
             <DialogClose asChild>

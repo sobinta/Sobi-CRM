@@ -20,6 +20,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { createContractAction } from "./actions";
+import { BusinessCustomFields } from "@/components/patterns/business-custom-fields";
 
 export interface ContractRow {
   id: string;
@@ -62,6 +63,7 @@ export function ContractsClient({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [customFields, setCustomFields] = useState<Record<string, unknown>>({});
 
   function onCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -73,6 +75,7 @@ export function ContractsClient({
         subject: form.get("subject"),
         amount: form.get("amount"),
         durationLabel: form.get("durationLabel"),
+        customFields,
       });
       if (res.ok) {
         setOpen(false);
@@ -121,6 +124,7 @@ export function ContractsClient({
                     <Input id="durationLabel" name="durationLabel" placeholder="۳ ماه" />
                   </div>
                 </div>
+                <BusinessCustomFields entityKey="contract" onChange={setCustomFields} />
               </DialogBody>
               <DialogFooter>
                 <DialogClose asChild>

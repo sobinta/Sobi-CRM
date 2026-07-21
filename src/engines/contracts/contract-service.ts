@@ -49,6 +49,7 @@ export interface CreateContractInput {
   currency?: string;
   startDate?: Date;
   durationLabel?: string;
+  customFields?: Record<string, unknown>;
 }
 
 export async function createContract(input: CreateContractInput) {
@@ -108,6 +109,7 @@ export async function createContract(input: CreateContractInput) {
       status: "draft",
       shareToken: crypto.randomBytes(24).toString("base64url"),
       createdById: ctx.membershipId,
+      customFields: (input.customFields ?? {}) as Prisma.InputJsonValue,
     },
   });
 

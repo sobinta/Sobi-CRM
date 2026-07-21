@@ -50,6 +50,7 @@ import {
   searchCalendarAction,
   updateEventAction,
 } from "../actions";
+import { BusinessCustomFields } from "@/components/patterns/business-custom-fields";
 
 const SOURCE_STYLES: Record<CalendarSource, string> = {
   event: "border-brand bg-brand-subtle text-brand-subtle-ink",
@@ -184,6 +185,7 @@ export function CalendarWorkspace({
       location: String(form.get("location") ?? ""),
       tone: String(form.get("tone") ?? "brand"),
       reminderOffsets,
+      customFields: JSON.parse(String(form.get("customFields") || "{}")),
     };
 
     if (demo) {
@@ -414,6 +416,7 @@ function EventForm({
   onDelete?: () => void;
 }) {
   const t = useTranslations("calendar");
+  const [customFields, setCustomFields] = useState<Record<string, unknown>>({});
   const date = item?.startAt.slice(0, 10) ?? dateKey(new Date());
   const start = item?.startAt.slice(11, 16) ?? "09:00";
   const end = item?.endAt.slice(11, 16) ?? "10:00";
@@ -431,6 +434,8 @@ function EventForm({
         <div className="sm:col-span-2"><Label htmlFor="event-location">{t("location")}</Label><div className="relative"><MapPin aria-hidden="true" className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" /><Input id="event-location" name="location" defaultValue={item?.location ?? ""} className="ps-9" maxLength={300} /></div></div>
         <div className="sm:col-span-2"><Label htmlFor="event-description">{t("eventDescription")}</Label><textarea id="event-description" name="description" defaultValue={item?.description ?? ""} rows={3} maxLength={4000} className="w-full rounded-md border border-line bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" /></div>
         <fieldset className="sm:col-span-2"><legend className="text-xs font-semibold text-ink-muted">{t("reminders")}</legend><div className="mt-2 flex flex-wrap gap-2">{REMINDER_OPTIONS.map((offset) => <label key={offset} className="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-lg border border-line px-3 text-xs text-ink-muted"><input type="checkbox" name={`reminder-${offset}`} defaultChecked={item?.reminderOffsets?.includes(offset)} className="accent-brand" />{t(`reminderOptions.${offset}`)}</label>)}</div></fieldset>
+        <input type="hidden" name="customFields" value={JSON.stringify(customFields)} />
+        <div className="sm:col-span-2"><BusinessCustomFields entityKey="event" onChange={setCustomFields} /></div>
       </DialogBody>
       <DialogFooter className="justify-between sm:justify-between">
         <div>{onDelete && <Button type="button" variant="ghost" onClick={onDelete} disabled={pending} className="text-danger hover:text-danger"><Trash2 aria-hidden="true" className="h-4 w-4" />{t("deleteEvent")}</Button>}</div>
