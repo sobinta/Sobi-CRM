@@ -11,6 +11,7 @@ import {
 } from "@/engines/platform-admin/announcement-service";
 import { AppShell } from "@/components/layout/app-shell";
 import type { SessionUser } from "@/components/layout/session-context";
+import { getTenantPlanSummary } from "@/core/billing/subscription-summary";
 
 export default async function AppLayout({
   children,
@@ -29,15 +30,19 @@ export default async function AppLayout({
   }
 
   const s = session!;
-  const enabledModuleKeys = await withPlatformContext(async () => {
+  const workspaceData = await withPlatformContext(async () => {
     const { loadTenantFeatures } = await import("@/core/features/features");
     const { MODULE_CATALOG } = await import(
       "@/core/module-registry/catalog"
     );
-    const features = await loadTenantFeatures();
-    return MODULE_CATALOG.filter(
+    const [features, plan] = await Promise.all([
+      loadTenantFeatures(),
+      getTenantPlanSummary(locale),
+    ]);
+    const enabledModuleKeys = MODULE_CATALOG.filter(
       (m) => features.get(`module.${m.key}`) === true,
     ).map((m) => m.key);
+    return { enabledModuleKeys, plan };
   });
   const branding = await getTenantBranding(s.active!.tenantId);
   const brandCss = isCustomBranding(branding)
@@ -70,6 +75,11 @@ export default async function AppLayout({
       id: m.tenantId,
       name: m.tenantName,
     })),
+    plan: workspaceData?.plan ?? {
+      key: "free",
+      name: "Free",
+      upgradeAvailable: false,
+    },
     isSuperAdmin: s.isSuperAdmin,
     accessMode: s.active!.accessMode,
   };
@@ -84,7 +94,7 @@ export default async function AppLayout({
       )}
       <AppShell
         user={user}
-        enabledModuleKeys={enabledModuleKeys ?? []}
+        enabledModuleKeys={workspaceData?.enabledModuleKeys ?? []}
         announcement={announcement}
         skipLabel={
           locale === "fa"

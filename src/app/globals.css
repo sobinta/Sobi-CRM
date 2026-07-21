@@ -183,31 +183,50 @@ textarea {
   color: var(--brand-subtle-ink);
 }
 
-/* Dashboard signature: a restrained outer neon halo. It never changes the
-   card's dimensions and also appears for keyboard focus within the card. */
+/* Dashboard signature: the brand light stays on the edge itself. There is no
+   broad halo, lift, or scaling that competes with operational content. */
 .dashboard-glow-card {
   isolation: isolate;
   transition:
     border-color var(--motion-base) var(--ease-out),
-    box-shadow var(--motion-base) var(--ease-out),
-    transform var(--motion-base) var(--ease-out);
+    box-shadow var(--motion-base) var(--ease-out);
 }
 
 .dashboard-glow-card:hover,
 .dashboard-glow-card:focus-within {
-  border-color: color-mix(in oklch, var(--dashboard-neon) 72%, var(--line));
-  box-shadow:
-    0 0 0 2px color-mix(in oklch, var(--dashboard-neon) 55%, transparent),
-    0 0 22px color-mix(in oklch, var(--dashboard-neon) 48%, transparent),
-    0 16px 38px color-mix(in oklch, var(--brand) 22%, transparent);
-  transform: translateY(-1px);
+  border-color: color-mix(in oklch, var(--dashboard-neon) 78%, var(--line));
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--dashboard-neon) 42%, transparent);
+}
+
+/* The reference reserves pulse exclusively for finding the collapsed rail
+   control. It is intentionally slow and low-opacity. */
+.rail-collapse-discovery {
+  position: relative;
+}
+
+.rail-collapse-discovery::after {
+  content: "";
+  position: absolute;
+  inset: 0.22rem;
+  border: 1px solid color-mix(in oklch, var(--brand-300) 44%, transparent);
+  border-radius: calc(var(--radius-lg) + 0.1rem);
+  pointer-events: none;
+  animation: rail-discovery-pulse 2.8s var(--ease-out) infinite;
+}
+
+@keyframes rail-discovery-pulse {
+  0%, 100% {
+    opacity: 0.08;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 0.38;
+    transform: scale(1.04);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dashboard-glow-card:hover,
-  .dashboard-glow-card:focus-within {
-    transform: none;
-  }
+  .rail-collapse-discovery::after { animation: none; opacity: 0.22; }
 }
 
 /* Thin, unobtrusive scrollbars that match theme */

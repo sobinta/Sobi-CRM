@@ -8,12 +8,19 @@ export interface SessionTenant {
   name: string;
 }
 
+export interface SessionPlan {
+  key: string;
+  name: string;
+  upgradeAvailable: boolean;
+}
+
 export interface SessionUser {
   name: string;
   email: string;
   initials: string;
   activeTenantId: string;
   tenants: SessionTenant[];
+  plan: SessionPlan;
   isSuperAdmin: boolean;
   accessMode: AccessMode;
 }

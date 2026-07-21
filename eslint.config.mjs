@@ -26,6 +26,7 @@ const databaseCapabilityRule = {
               "core/jobs/runner.ts",
               "core/event-bus/outbox.ts",
               "core/billing/quota.ts",
+              "core/billing/plan-gateway.ts",
               "core/tenancy/rls.integration.test.ts",
               "core/tenancy/provisioning.ts",
               "core/demo/provision-demo.ts",

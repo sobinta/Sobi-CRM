@@ -18,6 +18,7 @@ import { useMobileNav } from "./mobile-nav-context";
 import { ChevronsLeft, ChevronsRight, Globe } from "lucide-react";
 import { localeMeta, type AppLocale } from "@/i18n/routing";
 import { getRailChevronDirection } from "./rail-direction";
+import { RailAccountUtility } from "./rail-account-utility";
 
 const RAIL_STORAGE_KEY = "sobi:rail-expanded";
 
@@ -148,6 +149,8 @@ export function ModuleRail({ mobile = false }: { mobile?: boolean }) {
         })}
       </div>
 
+      <RailAccountUtility expanded={expanded} onNavigate={close} />
+
       {/* Utilities */}
       <div className={cn("flex shrink-0 gap-1", expanded ? "flex-row" : "flex-col items-center")}>
         <LocaleSwitcher />
@@ -192,7 +195,7 @@ export function ModuleRail({ mobile = false }: { mobile?: boolean }) {
             "mt-1 flex min-h-11 shrink-0 items-center justify-center rounded-lg text-ink-on-rail/55 outline-none",
             "transition-colors duration-(--motion-fast) hover:bg-white/8 hover:text-ink-on-rail",
             "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring",
-            expanded ? "w-full gap-2.5" : "h-11 w-11",
+            expanded ? "w-full gap-2.5" : "rail-collapse-discovery h-11 w-11",
           )}
         >
         {chevron === "left" ? (

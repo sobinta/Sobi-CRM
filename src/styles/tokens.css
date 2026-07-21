@@ -56,8 +56,9 @@
 
 /* ---------- Tier 2: semantic tokens — LIGHT ---------- */
 :root {
-  --surface-sunken: var(--gray-100);
-  --surface: var(--gray-50);
+  /* A quiet green-tinted workspace canvas; raised operational surfaces stay white. */
+  --surface-sunken: color-mix(in oklch, var(--brand-100) 44%, var(--gray-100));
+  --surface: color-mix(in oklch, var(--brand-50) 54%, var(--gray-50));
   --surface-raised: var(--gray-0);
   --surface-overlay: var(--gray-0);
   --surface-rail: var(--gray-950);
@@ -68,8 +69,8 @@
   --ink-on-brand: oklch(0.985 0.005 192);
   --ink-on-rail: oklch(0.93 0.005 80);
 
-  --line: var(--gray-200);
-  --line-strong: var(--gray-300);
+  --line: color-mix(in oklch, var(--brand-100) 24%, var(--gray-200));
+  --line-strong: color-mix(in oklch, var(--brand-200) 22%, var(--gray-300));
 
   --brand: var(--brand-600);
   --brand-hover: var(--brand-700);
@@ -98,20 +99,16 @@
   --shadow-raised: 0 1px 2px oklch(0.2 0.01 75 / 0.06), 0 1px 3px oklch(0.2 0.01 75 / 0.08);
   --shadow-overlay: 0 4px 12px oklch(0.2 0.01 75 / 0.1), 0 12px 32px oklch(0.2 0.01 75 / 0.14);
   --scrim: oklch(0.15 0.01 75 / 0.5);
-  --dashboard-neon: color-mix(
-    in oklch,
-    var(--brand) 62%,
-    oklch(0.86 0.2 180)
-  );
+  --dashboard-neon: color-mix(in oklch, var(--brand) 82%, var(--brand-300));
 }
 
 /* ---------- Tier 2: semantic tokens — DARK ---------- */
 .dark {
-  --surface-sunken: var(--gray-950);
-  --surface: var(--gray-925);
-  --surface-raised: oklch(0.235 0.009 74);
-  --surface-overlay: var(--gray-850);
-  --surface-rail: oklch(0.14 0.008 74);
+  --surface-sunken: color-mix(in oklch, var(--brand-950) 42%, var(--gray-950));
+  --surface: color-mix(in oklch, var(--brand-950) 28%, var(--gray-925));
+  --surface-raised: color-mix(in oklch, var(--brand-900) 14%, oklch(0.235 0.009 74));
+  --surface-overlay: color-mix(in oklch, var(--brand-900) 12%, var(--gray-850));
+  --surface-rail: color-mix(in oklch, var(--brand-950) 18%, oklch(0.14 0.008 74));
 
   --ink: oklch(0.925 0.004 80);
   --ink-muted: oklch(0.7 0.008 78);
@@ -119,8 +116,8 @@
   --ink-on-brand: oklch(0.985 0.005 192);
   --ink-on-rail: oklch(0.9 0.005 80);
 
-  --line: oklch(0.3 0.009 74);
-  --line-strong: oklch(0.37 0.01 74);
+  --line: color-mix(in oklch, var(--brand-800) 20%, oklch(0.3 0.009 74));
+  --line-strong: color-mix(in oklch, var(--brand-700) 18%, oklch(0.37 0.01 74));
 
   --brand: var(--brand-400);
   --brand-hover: var(--brand-300);
@@ -149,11 +146,7 @@
   --shadow-raised: 0 1px 2px oklch(0 0 0 / 0.3), 0 1px 3px oklch(0 0 0 / 0.35);
   --shadow-overlay: 0 4px 12px oklch(0 0 0 / 0.4), 0 12px 32px oklch(0 0 0 / 0.5);
   --scrim: oklch(0.05 0 0 / 0.6);
-  --dashboard-neon: color-mix(
-    in oklch,
-    var(--brand) 52%,
-    oklch(0.84 0.18 180)
-  );
+  --dashboard-neon: color-mix(in oklch, var(--brand) 88%, var(--brand-200));
 }
 
 /* ---------- Reduced motion ---------- */
