@@ -1,8 +1,7 @@
 "use client";
 
 import { Moon, Sun, Monitor } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import {
   DropdownMenu,
@@ -15,10 +14,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { localeMeta, type AppLocale } from "@/i18n/routing";
+import { useAppTheme } from "@/components/theme-provider";
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useAppTheme();
   const t = useTranslations("theme");
+  const locale = useLocale() as AppLocale;
+  const side = localeMeta[locale].dir === "rtl" ? "left" : "right";
 
   // Theme is only known on the client. Render a stable Sun on the server and
   // until mounted, then swap to the resolved icon — avoids a hydration
@@ -34,14 +37,14 @@ export function ThemeToggle() {
         <TooltipTrigger asChild>
           <DropdownMenuTrigger
             aria-label={t("label")}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-on-rail/60 outline-none transition-colors duration-(--motion-fast) hover:bg-white/10 hover:text-ink-on-rail focus-visible:outline-2 focus-visible:outline-focus-ring cursor-pointer"
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-lg text-ink-on-rail/60 outline-none transition-colors duration-(--motion-fast) hover:bg-white/10 hover:text-ink-on-rail focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
           >
             <Icon className="h-4.5 w-4.5" />
           </DropdownMenuTrigger>
         </TooltipTrigger>
-        <TooltipContent side="right">{t("label")}</TooltipContent>
+        <TooltipContent side={side}>{t("label")}</TooltipContent>
       </Tooltip>
-      <DropdownMenuContent side="right" align="end">
+      <DropdownMenuContent side={side} align="end">
         <DropdownMenuCheckboxItem
           checked={theme === "light"}
           onCheckedChange={() => setTheme("light")}

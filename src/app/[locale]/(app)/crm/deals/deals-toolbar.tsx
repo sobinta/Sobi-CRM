@@ -16,8 +16,10 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { createDealAction } from "../actions";
+import { useTranslations } from "next-intl";
 
 export function DealsToolbar() {
+  const t = useTranslations("deals");
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
@@ -40,22 +42,22 @@ export function DealsToolbar() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button variant="primary" onClick={() => setOpen(true)}>
-        <Plus className="h-4 w-4" /> New deal
+        <Plus className="h-4 w-4" /> {t("newDeal")}
       </Button>
       <DialogContent>
         <form onSubmit={onCreate}>
           <DialogHeader>
-            <DialogTitle>New deal</DialogTitle>
+            <DialogTitle>{t("newDeal")}</DialogTitle>
           </DialogHeader>
           <DialogBody className="space-y-3">
             <div>
               <Label htmlFor="title" required>
-                Title
+                {t("dealTitle")}
               </Label>
               <Input id="title" name="title" required autoFocus />
             </div>
             <div>
-              <Label htmlFor="value">Value</Label>
+              <Label htmlFor="value">{t("value")}</Label>
               <Input
                 id="value"
                 name="value"
@@ -70,11 +72,11 @@ export function DealsToolbar() {
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="ghost" type="button">
-                Cancel
+                {t("cancel")}
               </Button>
             </DialogClose>
             <Button variant="primary" type="submit" disabled={pending}>
-              {pending ? "Creating…" : "Create deal"}
+              {pending ? t("creating") : t("createDeal")}
             </Button>
           </DialogFooter>
         </form>

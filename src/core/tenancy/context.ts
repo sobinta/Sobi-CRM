@@ -19,7 +19,21 @@ export interface PlatformContext {
   readonly userAgent?: string;
 }
 
-const storage = new AsyncLocalStorage<PlatformContext>();
+// Keep the ALS instance stable across Next.js development HMR. The Prisma
+// client is also cached on `globalThis`; if this module created a fresh store
+// after a hot reload, that long-lived client would keep reading the old store
+// and tenant-scoped queries would fail even though the request was wrapped in
+// `runWithContext`. Production gets the same singleton semantics without any
+// behavioural difference.
+const globalForContext = globalThis as unknown as {
+  __platformContextStorage?: AsyncLocalStorage<PlatformContext>;
+};
+
+const storage =
+  globalForContext.__platformContextStorage ??
+  new AsyncLocalStorage<PlatformContext>();
+
+globalForContext.__platformContextStorage = storage;
 
 export function runWithContext<T>(ctx: PlatformContext, fn: () => T): T {
   if (!ctx.tenantId.trim() || !ctx.membershipId.trim() || !ctx.userId.trim()) {

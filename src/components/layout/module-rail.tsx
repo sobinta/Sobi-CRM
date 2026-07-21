@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useWorkspaces } from "./workspaces-context";
 import { useSessionUser } from "./session-context";
@@ -16,6 +16,8 @@ import { LocaleSwitcher } from "./locale-switcher";
 import { LogoMark } from "@/components/brand/logo";
 import { useMobileNav } from "./mobile-nav-context";
 import { ChevronsLeft, ChevronsRight, Globe } from "lucide-react";
+import { localeMeta, type AppLocale } from "@/i18n/routing";
+import { getRailChevronDirection } from "./rail-direction";
 
 const RAIL_STORAGE_KEY = "sobi:rail-expanded";
 
@@ -25,13 +27,21 @@ function useRailExpanded() {
   useEffect(() => {
     // localStorage is only available client-side; read once after mount to
     // avoid a server/client hydration mismatch (server always renders collapsed).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setExpanded(localStorage.getItem(RAIL_STORAGE_KEY) === "1");
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate browser preference after SSR
+      setExpanded(localStorage.getItem(RAIL_STORAGE_KEY) === "1");
+    } catch {
+      // Storage may be blocked in privacy modes; collapsed remains a safe default.
+    }
   }, []);
   function toggle() {
     setExpanded((prev) => {
       const next = !prev;
-      localStorage.setItem(RAIL_STORAGE_KEY, next ? "1" : "0");
+      try {
+        localStorage.setItem(RAIL_STORAGE_KEY, next ? "1" : "0");
+      } catch {
+        // The in-memory preference still works for the current page session.
+      }
       return next;
     });
   }
@@ -44,7 +54,7 @@ function useRailExpanded() {
  * icon-only by default (with tooltips), expandable to show labels directly.
  * Same collapsible behavior on desktop and inside the mobile drawer.
  */
-export function ModuleRail() {
+export function ModuleRail({ mobile = false }: { mobile?: boolean }) {
   const t = useTranslations("workspaces");
   const tApp = useTranslations("app");
   const tShell = useTranslations("shell");
@@ -52,14 +62,19 @@ export function ModuleRail() {
   const workspaces = useWorkspaces();
   const user = useSessionUser();
   const { close } = useMobileNav();
-  const { expanded, toggle } = useRailExpanded();
+  const railState = useRailExpanded();
+  const expanded = mobile || railState.expanded;
+  const locale = useLocale() as AppLocale;
+  const direction = localeMeta[locale].dir;
+  const tooltipSide = direction === "rtl" ? "left" : "right";
+  const chevron = getRailChevronDirection(direction, expanded);
 
   return (
     <nav
       aria-label={tApp("name")}
       className={cn(
-        "flex h-full shrink-0 flex-col bg-surface-rail py-3 transition-[width] duration-(--motion-base)",
-        expanded ? "w-56 items-stretch px-2" : "w-14 items-center",
+        "flex h-full shrink-0 flex-col bg-surface-rail py-2 transition-[width] duration-(--motion-base) motion-reduce:transition-none",
+        expanded ? "w-[210px] items-stretch px-2" : "w-[72px] items-center px-1",
       )}
     >
       {/* Logo mark */}
@@ -67,12 +82,12 @@ export function ModuleRail() {
         href="/crm"
         onClick={close}
         className={cn(
-          "mb-3 flex h-9 shrink-0 items-center rounded-lg focus-visible:outline-2 focus-visible:outline-focus-ring",
-          expanded ? "gap-2.5 px-2" : "w-9 justify-center",
+          "mb-2 flex h-16 shrink-0 items-center rounded-xl outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring",
+          expanded ? "gap-3 px-1.5" : "w-16 justify-center",
         )}
         aria-label={tApp("name")}
       >
-        <LogoMark size={28} className="shrink-0" />
+        <LogoMark size={56} className="shrink-0" />
         {expanded && (
           <span className="truncate text-sm font-semibold text-ink-on-rail">
             {tApp("name")}
@@ -83,7 +98,7 @@ export function ModuleRail() {
       {/* Workspaces */}
       <div
         className={cn(
-          "flex flex-1 flex-col gap-1 overflow-y-auto",
+            "flex flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden py-1",
           expanded ? "items-stretch" : "items-center",
         )}
       >
@@ -98,12 +113,12 @@ export function ModuleRail() {
               aria-label={expanded ? undefined : t(ws.labelKey)}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "relative flex items-center rounded-lg outline-none",
+                "relative flex min-h-11 items-center rounded-lg outline-none",
                 "transition-colors duration-(--motion-fast)",
                 "focus-visible:outline-2 focus-visible:outline-focus-ring",
                 expanded
-                  ? "h-9 gap-2.5 px-2.5 text-sm"
-                  : "h-9 w-9 justify-center",
+                  ? "gap-2.5 px-3 text-sm"
+                  : "h-11 w-11 justify-center",
                 active
                   ? "bg-white/12 text-ink-on-rail"
                   : "text-ink-on-rail/55 hover:bg-white/8 hover:text-ink-on-rail",
@@ -111,13 +126,10 @@ export function ModuleRail() {
             >
               <Icon aria-hidden="true" className="h-4.5 w-4.5 shrink-0" />
               {expanded && <span className="truncate">{t(ws.labelKey)}</span>}
-              {!expanded && (
+              {active && (
                 <span
                   aria-hidden
-                  className={cn(
-                    "absolute -start-2.5 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-brand transition-opacity duration-(--motion-fast)",
-                    active ? "opacity-100" : "opacity-0",
-                  )}
+                  className="absolute start-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full bg-accent"
                 />
               )}
             </Link>
@@ -130,7 +142,7 @@ export function ModuleRail() {
           return (
             <Tooltip key={ws.key}>
               <TooltipTrigger asChild>{link}</TooltipTrigger>
-              <TooltipContent side="right">{t(ws.labelKey)}</TooltipContent>
+              <TooltipContent side={tooltipSide}>{t(ws.labelKey)}</TooltipContent>
             </Tooltip>
           );
         })}
@@ -150,10 +162,10 @@ export function ModuleRail() {
               href="/"
               onClick={close}
               className={cn(
-                "mt-1 flex h-9 shrink-0 items-center rounded-lg text-ink-on-rail/55 outline-none",
+                "mt-1 flex min-h-11 shrink-0 items-center rounded-lg text-ink-on-rail/55 outline-none",
                 "transition-colors duration-(--motion-fast) hover:bg-white/8 hover:text-ink-on-rail",
                 "focus-visible:outline-2 focus-visible:outline-focus-ring",
-                expanded ? "gap-2.5 px-2.5 text-sm" : "w-9 justify-center",
+                expanded ? "gap-2.5 px-3 text-sm" : "h-11 w-11 justify-center",
               )}
             >
               <Globe className="h-4.5 w-4.5 shrink-0" />
@@ -164,29 +176,32 @@ export function ModuleRail() {
           return (
             <Tooltip>
               <TooltipTrigger asChild>{backLink}</TooltipTrigger>
-              <TooltipContent side="right">{tShell("backToSite")}</TooltipContent>
+              <TooltipContent side={tooltipSide}>{tShell("backToSite")}</TooltipContent>
             </Tooltip>
           );
         })()}
 
       {/* Expand/collapse toggle */}
-      <button
-        type="button"
-        onClick={toggle}
-        aria-label={expanded ? tShell("collapseSidebar") : tShell("expandSidebar")}
-        className={cn(
-          "mt-1 flex h-9 shrink-0 items-center justify-center rounded-lg text-ink-on-rail/55 outline-none",
-          "transition-colors duration-(--motion-fast) hover:bg-white/8 hover:text-ink-on-rail",
-          "focus-visible:outline-2 focus-visible:outline-focus-ring",
-          expanded ? "w-full gap-2.5" : "w-9",
-        )}
-      >
-        {expanded ? (
+      {!mobile && (
+        <button
+          type="button"
+          onClick={railState.toggle}
+          aria-expanded={expanded}
+          aria-label={expanded ? tShell("collapseSidebar") : tShell("expandSidebar")}
+          className={cn(
+            "mt-1 flex min-h-11 shrink-0 items-center justify-center rounded-lg text-ink-on-rail/55 outline-none",
+            "transition-colors duration-(--motion-fast) hover:bg-white/8 hover:text-ink-on-rail",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring",
+            expanded ? "w-full gap-2.5" : "h-11 w-11",
+          )}
+        >
+        {chevron === "left" ? (
           <ChevronsLeft className="h-4 w-4" />
         ) : (
           <ChevronsRight className="h-4 w-4" />
         )}
-      </button>
+        </button>
+      )}
     </nav>
   );
 }

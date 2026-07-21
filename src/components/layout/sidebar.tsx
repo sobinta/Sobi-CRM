@@ -16,11 +16,11 @@ export function Sidebar() {
   const { close } = useMobileNav();
 
   return (
-    <div className="flex h-12 shrink-0 items-center gap-3 border-b border-line bg-surface px-3 sm:px-4">
+    <div className="flex h-[52px] shrink-0 items-center gap-3 border-b border-line bg-surface px-3 sm:px-4">
       <span className="shrink-0 border-e border-line pe-3 text-xs font-semibold tracking-wide text-ink-faint uppercase">
         {tWs(workspace.labelKey)}
       </span>
-      <nav className="flex flex-1 items-center gap-1 overflow-x-auto">
+      <nav aria-label={tWs(workspace.labelKey)} className="flex flex-1 items-center gap-1 overflow-x-auto">
         {workspace.nav.map((item) => {
           const active =
             pathname === item.href ||
@@ -33,7 +33,7 @@ export function Sidebar() {
               onClick={close}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "shrink-0 rounded-md px-3 py-1.5 text-sm whitespace-nowrap outline-none",
+                "flex min-h-9 shrink-0 items-center rounded-lg px-3 py-1.5 text-sm whitespace-nowrap outline-none",
                 "transition-colors duration-(--motion-fast)",
                 "focus-visible:outline-2 focus-visible:outline-focus-ring",
                 active

@@ -17,10 +17,11 @@ import {
 } from "@/components/ui/tooltip";
 
 export function LocaleSwitcher() {
-  const locale = useLocale();
+  const locale = useLocale() as AppLocale;
   const t = useTranslations("language");
   const pathname = usePathname();
   const router = useRouter();
+  const side = localeMeta[locale].dir === "rtl" ? "left" : "right";
 
   function switchTo(next: AppLocale) {
     router.replace(pathname, { locale: next });
@@ -32,14 +33,14 @@ export function LocaleSwitcher() {
         <TooltipTrigger asChild>
           <DropdownMenuTrigger
             aria-label={t("label")}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-on-rail/60 outline-none transition-colors duration-(--motion-fast) hover:bg-white/10 hover:text-ink-on-rail focus-visible:outline-2 focus-visible:outline-focus-ring cursor-pointer"
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-lg text-ink-on-rail/60 outline-none transition-colors duration-(--motion-fast) hover:bg-white/10 hover:text-ink-on-rail focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
           >
             <Languages className="h-4.5 w-4.5" />
           </DropdownMenuTrigger>
         </TooltipTrigger>
-        <TooltipContent side="right">{t("label")}</TooltipContent>
+        <TooltipContent side={side}>{t("label")}</TooltipContent>
       </Tooltip>
-      <DropdownMenuContent side="right" align="end">
+      <DropdownMenuContent side={side} align="end">
         {routing.locales.map((l) => (
           <DropdownMenuCheckboxItem
             key={l}

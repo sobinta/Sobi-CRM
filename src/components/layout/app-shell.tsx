@@ -43,7 +43,7 @@ export function AppShell({
             <ModuleRail />
           </div>
           <MobileNavOverlay>
-            <ModuleRail />
+            <ModuleRail mobile />
           </MobileNavOverlay>
 
           <div className="flex min-w-0 flex-1 flex-col">

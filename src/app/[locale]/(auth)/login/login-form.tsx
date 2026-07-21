@@ -56,8 +56,8 @@ export function LoginForm({ logoSrc }: { logoSrc?: string }) {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <Logo size={26} src={logoSrc} />
+      <div className="mb-7 flex flex-wrap items-start justify-between gap-3">
+        <Logo size={78} src={logoSrc} />
         <select
           aria-label="Language"
           value={locale}

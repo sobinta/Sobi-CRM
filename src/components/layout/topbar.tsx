@@ -8,15 +8,17 @@ import { useMobileNav } from "./mobile-nav-context";
 
 export function Topbar() {
   const t = useTranslations();
-  const { toggle } = useMobileNav();
+  const { open, toggle } = useMobileNav();
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-line bg-surface px-3 sm:gap-4 sm:px-4">
+    <header className="flex h-[52px] shrink-0 items-center justify-between gap-2 border-b border-line bg-surface px-3 sm:gap-4 sm:px-4">
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <button
           type="button"
           onClick={toggle}
-          aria-label="Menu"
+          aria-label={t("shell.menu")}
+          aria-expanded={open}
+          aria-controls="mobile-primary-navigation"
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-ink-muted outline-none hover:bg-surface-sunken focus-visible:outline-2 focus-visible:outline-focus-ring lg:hidden"
         >
           <Menu aria-hidden="true" className="h-4.5 w-4.5" />

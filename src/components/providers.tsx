@@ -1,18 +1,13 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { ThemeProvider } from "next-themes";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AppThemeProvider } from "@/components/theme-provider";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
+    <AppThemeProvider>
       <TooltipProvider delayDuration={250}>{children}</TooltipProvider>
-    </ThemeProvider>
+    </AppThemeProvider>
   );
 }
