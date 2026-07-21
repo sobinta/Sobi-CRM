@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
+import type { AccessMode } from "@/core/tenancy/context";
 
 export interface SessionTenant {
   id: string;
@@ -14,6 +15,7 @@ export interface SessionUser {
   activeTenantId: string;
   tenants: SessionTenant[];
   isSuperAdmin: boolean;
+  accessMode: AccessMode;
 }
 
 const SessionContext = createContext<SessionUser | null>(null);
@@ -36,4 +38,8 @@ export function useSessionUser(): SessionUser {
     throw new Error("useSessionUser must be used within SessionProvider");
   }
   return ctx;
+}
+
+export function useDemoMode(): boolean {
+  return useSessionUser().accessMode === "read-only";
 }

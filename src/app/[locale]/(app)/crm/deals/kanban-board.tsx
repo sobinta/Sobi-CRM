@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -16,6 +16,8 @@ import { useRouter } from "@/i18n/navigation";
 import { Chip, type ChipProps } from "@/components/ui/chip";
 import { moveDealAction } from "../actions";
 import { cn } from "@/lib/utils";
+import { useDemoMode } from "@/components/layout/session-context";
+import { useTranslations } from "next-intl";
 
 export interface KanbanDeal {
   id: string;
@@ -98,12 +100,36 @@ function Column({ column }: { column: KanbanColumn }) {
 }
 
 export function KanbanBoard({ columns: initial }: { columns: KanbanColumn[] }) {
+  const demoMode = useDemoMode();
+  const tShell = useTranslations("shell");
   const [columns, setColumns] = useState(initial);
   const [activeDeal, setActiveDeal] = useState<KanbanDeal | null>(null);
+  const [simulated, setSimulated] = useState(false);
   const router = useRouter();
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
+
+  useEffect(() => {
+    if (!demoMode) return;
+    function addLocalDeal(event: Event) {
+      const deal = (event as CustomEvent<KanbanDeal>).detail;
+      setColumns((current) =>
+        current.map((column, index) =>
+          index === 0
+            ? {
+                ...column,
+                total: column.total + deal.value,
+                deals: [deal, ...column.deals],
+              }
+            : column,
+        ),
+      );
+      setSimulated(true);
+    }
+    window.addEventListener("sobi:demo-deal-created", addLocalDeal);
+    return () => window.removeEventListener("sobi:demo-deal-created", addLocalDeal);
+  }, [demoMode]);
 
   function onDragStart(e: DragStartEvent) {
     for (const col of columns) {
@@ -132,13 +158,21 @@ export function KanbanBoard({ columns: initial }: { columns: KanbanColumn[] }) {
     setColumns((cols) =>
       cols.map((c) => {
         if (c.stageId === sourceCol.stageId)
-          return { ...c, deals: c.deals.filter((d) => d.id !== dealId) };
+          return {
+            ...c,
+            total: c.total - deal.value,
+            deals: c.deals.filter((d) => d.id !== dealId),
+          };
         if (c.stageId === targetStageId)
-          return { ...c, deals: [deal, ...c.deals] };
+          return { ...c, total: c.total + deal.value, deals: [deal, ...c.deals] };
         return c;
       }),
     );
 
+    if (demoMode) {
+      setSimulated(true);
+      return;
+    }
     void moveDealAction(dealId, targetStageId).then(() => router.refresh());
   }
 
@@ -148,6 +182,11 @@ export function KanbanBoard({ columns: initial }: { columns: KanbanColumn[] }) {
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
+      {simulated && (
+        <p role="status" className="px-6 pt-3 text-xs font-medium text-brand">
+          {tShell("demoSimulation")}
+        </p>
+      )}
       <div className="flex gap-4 overflow-x-auto px-6 py-4">
         {columns.map((column) => (
           <Column key={column.stageId} column={column} />

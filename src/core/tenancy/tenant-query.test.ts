@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { scopeTenantOperation } from "./tenant-query";
+import { isTenantReadOperation, scopeTenantOperation } from "./tenant-query";
 
 describe("scopeTenantOperation", () => {
   it("overwrites caller tenant ids on create", () => {
@@ -114,5 +114,35 @@ describe("scopeTenantOperation", () => {
         ],
       },
     });
+  });
+});
+
+describe("tenant operation classification", () => {
+  it.each([
+    "findFirst",
+    "findFirstOrThrow",
+    "findMany",
+    "findUnique",
+    "findUniqueOrThrow",
+    "count",
+    "aggregate",
+    "groupBy",
+  ])("classifies %s as read-only", (operation) => {
+    expect(isTenantReadOperation(operation)).toBe(true);
+  });
+
+  it.each([
+    "create",
+    "createMany",
+    "createManyAndReturn",
+    "update",
+    "updateMany",
+    "delete",
+    "deleteMany",
+    "upsert",
+    "$queryRaw",
+    "$executeRaw",
+  ])("does not classify %s as a safe model read", (operation) => {
+    expect(isTenantReadOperation(operation)).toBe(false);
   });
 });

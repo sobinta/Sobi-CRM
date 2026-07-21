@@ -18,8 +18,12 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { createContactAction } from "../actions";
+import { useDemoMode } from "@/components/layout/session-context";
+import { useTranslations } from "next-intl";
 
 export function ContactsToolbar() {
+  const demoMode = useDemoMode();
+  const tShell = useTranslations("shell");
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -27,6 +31,7 @@ export function ContactsToolbar() {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string>();
+  const [simulated, setSimulated] = useState(false);
 
   const applySearch = useCallback(
     (value: string) => {
@@ -43,6 +48,12 @@ export function ContactsToolbar() {
     e.preventDefault();
     setError(undefined);
     const form = new FormData(e.currentTarget);
+    if (demoMode) {
+      setOpen(false);
+      setSimulated(true);
+      e.currentTarget.reset();
+      return;
+    }
     startTransition(async () => {
       const res = await createContactAction({
         firstName: form.get("firstName"),
@@ -62,7 +73,8 @@ export function ContactsToolbar() {
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 px-6 py-3">
+    <div className="px-6 py-3">
+      <div className="flex items-center justify-between gap-3">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -142,6 +154,12 @@ export function ContactsToolbar() {
           </form>
         </DialogContent>
       </Dialog>
+      </div>
+      {simulated && (
+        <p role="status" className="mt-2 text-xs font-medium text-brand">
+          {tShell("demoSimulation")}
+        </p>
+      )}
     </div>
   );
 }

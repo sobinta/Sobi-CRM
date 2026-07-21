@@ -1,6 +1,7 @@
 import { db, Prisma } from "@/core/db";
 import { systemDb } from "@/core/db/system";
 import type { PlatformEvent } from "./types";
+import { DEMO_TENANT_SLUG } from "@/core/demo/constants";
 
 export const DURABLE_EVENT_CONSUMERS = ["automation", "webhooks"] as const;
 
@@ -8,6 +9,12 @@ export async function dispatchPersistedEvent(
   eventId: string,
   tenantId: string,
 ): Promise<void> {
+  const tenant = await systemDb.tenant.findUnique({
+    where: { id: tenantId },
+    select: { slug: true },
+  });
+  if (tenant?.slug === DEMO_TENANT_SLUG) return;
+
   const jobs = DURABLE_EVENT_CONSUMERS.map((consumer) => ({
     tenantId,
     kind: `event.consume.${consumer}`,
@@ -27,7 +34,10 @@ export async function dispatchPersistedEvent(
 
 export async function repairUndispatchedEvents(limit = 100): Promise<number> {
   const events = await systemDb.event.findMany({
-    where: { dispatchedAt: null },
+    where: {
+      dispatchedAt: null,
+      tenant: { slug: { not: DEMO_TENANT_SLUG } },
+    },
     orderBy: { occurredAt: "asc" },
     take: Math.max(1, Math.min(limit, 500)),
     select: { id: true, tenantId: true },

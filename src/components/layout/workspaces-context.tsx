@@ -14,15 +14,17 @@ const WorkspacesContext = createContext<WorkspaceDef[]>([]);
 export function WorkspacesProvider({
   enabledModuleKeys,
   isSuperAdmin = false,
+  readOnly = false,
   children,
 }: {
   enabledModuleKeys: string[];
   isSuperAdmin?: boolean;
+  readOnly?: boolean;
   children: ReactNode;
 }) {
   const value = useMemo(
-    () => composeWorkspaces(enabledModuleKeys, isSuperAdmin),
-    [enabledModuleKeys, isSuperAdmin],
+    () => composeWorkspaces(enabledModuleKeys, isSuperAdmin, readOnly),
+    [enabledModuleKeys, isSuperAdmin, readOnly],
   );
   return (
     <WorkspacesContext.Provider value={value}>

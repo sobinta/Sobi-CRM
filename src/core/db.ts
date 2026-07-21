@@ -6,11 +6,13 @@ import {
   SystemCapabilityRequiredError,
   TenantContextRequiredError,
   TenantMismatchError,
+  ReadOnlyContextError,
 } from "./tenancy/errors";
 import { getModelScope } from "./tenancy/model-metadata";
 import {
   scopeTenantOperation,
   TENANT_READ_OPERATIONS,
+  isTenantReadOperation,
 } from "./tenancy/tenant-query";
 
 /**
@@ -44,6 +46,18 @@ function makeClient() {
           // before SQL when no request/system tenant context exists.
           if (!ctx) {
             throw new TenantContextRequiredError(model, operation);
+          }
+
+          // Raw queries are intentionally unavailable in read-only mode. Even
+          // `$queryRaw` can contain a data-modifying CTE, so model reads are the
+          // only capability exposed to public demo sessions.
+          if (
+            ctx.accessMode === "read-only" &&
+            (!model || !isTenantReadOperation(operation))
+          ) {
+            throw new ReadOnlyContextError(
+              model ? `${model}.${operation}` : operation,
+            );
           }
 
           if (model) {

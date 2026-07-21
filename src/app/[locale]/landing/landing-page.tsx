@@ -25,7 +25,13 @@ import {
  * a super admin, the live site itself with `editMode` enabling hover-to-edit
  * on the content pulled from the platform-admin overrides.
  */
-export async function LandingPage({ editMode = false }: { editMode?: boolean }) {
+export async function LandingPage({
+  editMode = false,
+  demoEnabled = false,
+}: {
+  editMode?: boolean;
+  demoEnabled?: boolean;
+}) {
   const locale = await getLocale();
   const [assets, dbPlans, overrides, announcementRow] = await Promise.all([
     getSiteAssetsPublic(),
@@ -49,8 +55,8 @@ export async function LandingPage({ editMode = false }: { editMode?: boolean }) 
             linkUrl={announcementRow.linkUrl}
           />
         )}
-        <LandingNav logoSrc={assets.logo} />
-        <Hero editMode={editMode} />
+        <LandingNav logoSrc={assets.logo} demoEnabled={demoEnabled} />
+        <Hero editMode={editMode} demoEnabled={demoEnabled} />
         <ProblemSection />
         <StepsSection />
         <AnalyticsSection />
@@ -67,9 +73,9 @@ export async function LandingPage({ editMode = false }: { editMode?: boolean }) 
           editMode={editMode}
         />
         <FaqSection />
-        <CtaBanner editMode={editMode} />
+        <CtaBanner editMode={editMode} demoEnabled={demoEnabled} />
         <LandingFooter />
-        <LandingMobileTabBar />
+        <LandingMobileTabBar demoEnabled={demoEnabled} />
       </div>
     </LandingMobileMenuProvider>
   );

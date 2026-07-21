@@ -40,6 +40,9 @@ function validEncryptionKey(value: string | undefined): boolean {
 
 export function productionEnvironmentProblems(env: Environment): string[] {
   const problems: string[] = [];
+  if (!["true", "false"].includes(env.PUBLIC_DEMO_ENABLED ?? "")) {
+    problems.push("PUBLIC_DEMO_ENABLED must be explicitly true or false");
+  }
   for (const key of [
     "DATABASE_URL",
     "IDENTITY_DATABASE_URL",

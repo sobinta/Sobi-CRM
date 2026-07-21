@@ -17,6 +17,7 @@ export async function switchTenantAction(
   if (!raw?.session) return { ok: false };
 
   const session = await resolveSession();
+  if (session?.active?.accessMode === "read-only") return { ok: false };
   const isMember = session?.memberships.some((m) => m.tenantId === tenantId);
   if (!isMember) return { ok: false };
 

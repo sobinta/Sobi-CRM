@@ -9,6 +9,12 @@ settings, and SMTP settings. Optional: AI provider keys
 (`OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `AI_LOCAL_ENDPOINT`) — omit to run AI
 in mock mode. See `.env.example`.
 
+Public demo deployments must set `PUBLIC_DEMO_ENABLED` explicitly. When it is
+`true`, run `npm run demo:provision` after migrations. The demo credential is
+derived server-side from `BETTER_AUTH_SECRET`; never expose that secret or add a
+demo password to a `NEXT_PUBLIC_` variable. Set `DEMO_LOGIN_EMAIL` only when the
+default stable demo identity must be changed.
+
 The four database URLs are security capabilities, not aliases:
 
 - `DATABASE_URL` is the pooled, least-privilege tenant runtime connection.
@@ -89,8 +95,10 @@ durable event outbox. Multiple workers may tick concurrently. Set
 5. Verify Redis/S3 connectivity, CSP/HSTS headers, and AI keys (if any).
 6. Confirm the intended billing mode, active plans, limits, and a test tenant's
    subscription/usage counters.
-7. Confirm `npm audit --audit-level=moderate` reports zero known issues.
-8. Smoke: register → onboard → activate a module → create records → export a
+7. When public demo is enabled, run `npm run demo:provision` and verify a full
+   walkthrough leaves database counts unchanged.
+8. Confirm `npm audit --audit-level=moderate` reports zero known issues.
+9. Smoke: register → onboard → activate a module → create records → export a
    report → check the health dashboard.
 
 See [TESTING.md](TESTING.md) for the full verification checklist.

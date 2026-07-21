@@ -1,13 +1,18 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Check } from "lucide-react";
-import { DEMO_LOGIN_ENABLED } from "@/core/auth/demo-login";
 import { getContentOverridesPublic } from "@/engines/platform-admin/content-service";
 import type { EditableContentKey } from "@/engines/platform-admin/content-keys";
 import { EditableField } from "./editable-field";
 import { DemoCtaButton } from "./demo-cta-button";
 
-export async function Hero({ editMode = false }: { editMode?: boolean }) {
+export async function Hero({
+  editMode = false,
+  demoEnabled,
+}: {
+  editMode?: boolean;
+  demoEnabled: boolean;
+}) {
   const t = await getTranslations("landing.hero");
   const tAuth = await getTranslations("auth");
   const locale = await getLocale();
@@ -57,7 +62,7 @@ export async function Hero({ editMode = false }: { editMode?: boolean }) {
             >
               {c("hero.ctaPrimary", t("ctaPrimary"))}
             </Link>
-            {DEMO_LOGIN_ENABLED ? (
+            {demoEnabled ? (
               <DemoCtaButton
                 pendingLabel={tAuth("signingInDemo")}
                 className="rounded-md border border-[#dde4e0] bg-white px-5 py-3 text-sm font-semibold text-[#14211e] hover:bg-[#f0f3f1] disabled:opacity-60"

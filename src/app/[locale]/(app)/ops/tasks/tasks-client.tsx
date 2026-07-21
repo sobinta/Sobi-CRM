@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/dialog";
 import { createTaskAction, setTaskStatusAction } from "../actions";
 import { cn } from "@/lib/utils";
+import { useDemoMode } from "@/components/layout/session-context";
+import { useTranslations } from "next-intl";
 
 export interface TaskRow {
   id: string;
@@ -39,8 +41,12 @@ const priorityTone: Record<string, ChipProps["tone"]> = {
 };
 
 export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
+  const demoMode = useDemoMode();
+  const tShell = useTranslations("shell");
   const router = useRouter();
+  const [rows, setRows] = useState(tasks);
   const [open, setOpen] = useState(false);
+  const [simulated, setSimulated] = useState(false);
   const [pending, startTransition] = useTransition();
   // Snapshot "now" once at mount for overdue comparison (kept out of render).
   const [now] = useState(() => Date.now());
@@ -48,6 +54,24 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
   function onCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
+    if (demoMode) {
+      setRows((current) => [
+        {
+          id: `demo-local-task-${crypto.randomUUID()}`,
+          title: String(form.get("title")),
+          status: "todo",
+          priority: String(form.get("priority") || "normal"),
+          dueAt: form.get("dueAt") ? String(form.get("dueAt")) : null,
+          subtaskCount: 0,
+          commentCount: 0,
+        },
+        ...current,
+      ]);
+      setOpen(false);
+      setSimulated(true);
+      e.currentTarget.reset();
+      return;
+    }
     startTransition(async () => {
       const res = await createTaskAction({
         title: form.get("title"),
@@ -64,6 +88,15 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
 
   function toggle(task: TaskRow) {
     const next = task.status === "done" ? "todo" : "done";
+    if (demoMode) {
+      setRows((current) =>
+        current.map((row) =>
+          row.id === task.id ? { ...row, status: next } : row,
+        ),
+      );
+      setSimulated(true);
+      return;
+    }
     startTransition(async () => {
       await setTaskStatusAction(task.id, next);
       router.refresh();
@@ -129,7 +162,13 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
         </Dialog>
       </div>
 
-      {tasks.length === 0 ? (
+      {simulated && (
+        <p role="status" className="mb-3 text-xs font-medium text-brand">
+          {tShell("demoSimulation")}
+        </p>
+      )}
+
+      {rows.length === 0 ? (
         <EmptyState
           icon={CheckCircle2}
           title="No tasks yet"
@@ -137,7 +176,7 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
         />
       ) : (
         <ul className="space-y-1.5">
-          {tasks.map((task) => {
+          {rows.map((task) => {
             const done = task.status === "done";
             const overdue =
               !done && task.dueAt && new Date(task.dueAt).getTime() < now;

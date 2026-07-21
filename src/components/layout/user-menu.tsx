@@ -55,7 +55,7 @@ export function UserMenu() {
         </div>
         <DropdownMenuSeparator />
 
-        {user.tenants.length > 1 && (
+        {user.accessMode !== "read-only" && user.tenants.length > 1 && (
           <>
             <DropdownMenuLabel>
               <span className="flex items-center gap-1.5">

@@ -17,9 +17,11 @@ import {
 } from "@/components/ui/dialog";
 import { createDealAction } from "../actions";
 import { useTranslations } from "next-intl";
+import { useDemoMode } from "@/components/layout/session-context";
 
 export function DealsToolbar() {
   const t = useTranslations("deals");
+  const demoMode = useDemoMode();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
@@ -27,6 +29,21 @@ export function DealsToolbar() {
   function onCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
+    if (demoMode) {
+      window.dispatchEvent(
+        new CustomEvent("sobi:demo-deal-created", {
+          detail: {
+            id: `demo-local-deal-${crypto.randomUUID()}`,
+            title: String(form.get("title")),
+            value: Number(form.get("value") ?? 0),
+            currency: "EUR",
+          },
+        }),
+      );
+      setOpen(false);
+      e.currentTarget.reset();
+      return;
+    }
     startTransition(async () => {
       const res = await createDealAction({
         title: form.get("title"),

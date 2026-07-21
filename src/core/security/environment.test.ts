@@ -12,6 +12,7 @@ const secure = {
   FIELD_ENCRYPTION_KEY: Buffer.alloc(32, 7).toString("base64"),
   BETTER_AUTH_URL: "https://crm.example.test",
   NEXT_PUBLIC_APP_URL: "https://crm.example.test",
+  PUBLIC_DEMO_ENABLED: "false",
   WEBHOOK_ALLOW_PRIVATE_NETWORKS: "false",
   RATE_LIMIT_BACKEND: "redis",
   RATE_LIMIT_REDIS_URL: "rediss://cache.example.test:6379",
@@ -54,6 +55,14 @@ describe("production environment policy", () => {
     expect(problems).toContain("FILE_STORAGE_DRIVER must be s3 in production");
     expect(problems).toContain(
       "S3 server-side encryption cannot be disabled in production",
+    );
+  });
+
+  it("requires an explicit public-demo decision in production", () => {
+    const withoutFlag: Record<string, string | undefined> = { ...secure };
+    delete withoutFlag.PUBLIC_DEMO_ENABLED;
+    expect(productionEnvironmentProblems(withoutFlag)).toContain(
+      "PUBLIC_DEMO_ENABLED must be explicitly true or false",
     );
   });
 });

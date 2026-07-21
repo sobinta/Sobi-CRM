@@ -14,10 +14,14 @@ export interface PlatformContext {
   readonly permissions: ReadonlySet<string>;
   readonly isAdmin: boolean;
   readonly isSuperAdmin: boolean;
+  /** Server-derived capability mode. Never accept this value from clients. */
+  readonly accessMode: AccessMode;
   readonly locale: string;
   readonly ipAddress?: string;
   readonly userAgent?: string;
 }
+
+export type AccessMode = "read-write" | "read-only";
 
 // Keep the ALS instance stable across Next.js development HMR. The Prisma
 // client is also cached on `globalThis`; if this module created a fresh store
@@ -88,6 +92,7 @@ export function publicTenantContext(
     permissions: new Set<string>(),
     isAdmin: false,
     isSuperAdmin: false,
+    accessMode: "read-write",
     locale,
   };
 }
@@ -105,6 +110,7 @@ export function systemTenantContext(
     permissions: new Set(["*"]),
     isAdmin: true,
     isSuperAdmin: false,
+    accessMode: "read-write",
     locale: "en",
   };
 }

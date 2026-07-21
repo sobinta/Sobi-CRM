@@ -4,7 +4,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing, localeMeta, type AppLocale } from "@/i18n/routing";
 import { Logo } from "@/components/brand/logo";
-import { DEMO_LOGIN_ENABLED } from "@/core/auth/demo-login";
 import { DemoCtaButton } from "./demo-cta-button";
 import { useLandingMobileMenu } from "./landing-mobile-menu-context";
 import { Menu, X } from "lucide-react";
@@ -42,7 +41,13 @@ function LocaleSelect({
   );
 }
 
-export function LandingNav({ logoSrc }: { logoSrc?: string }) {
+export function LandingNav({
+  logoSrc,
+  demoEnabled,
+}: {
+  logoSrc?: string;
+  demoEnabled: boolean;
+}) {
   const t = useTranslations("landing.nav");
   const tAuth = useTranslations("auth");
   const locale = useLocale();
@@ -80,7 +85,7 @@ export function LandingNav({ logoSrc }: { logoSrc?: string }) {
           >
             {t("signIn")}
           </Link>
-          {DEMO_LOGIN_ENABLED && (
+          {demoEnabled && (
             <DemoCtaButton
               pendingLabel={tAuth("signingInDemo")}
               className="rounded-md border border-[#dde4e0] bg-white px-3 py-2 text-sm font-medium text-[#14211e] hover:bg-[#f0f3f1] disabled:opacity-60"
@@ -139,7 +144,7 @@ export function LandingNav({ logoSrc }: { logoSrc?: string }) {
             >
               {t("signIn")}
             </Link>
-            {DEMO_LOGIN_ENABLED && (
+            {demoEnabled && (
               <DemoCtaButton
                 pendingLabel={tAuth("signingInDemo")}
                 className="rounded-md border border-[#dde4e0] bg-white px-3 py-2.5 text-sm font-medium text-[#14211e] hover:bg-[#f0f3f1] disabled:opacity-60"

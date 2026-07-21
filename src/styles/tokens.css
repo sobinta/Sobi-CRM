@@ -98,6 +98,11 @@
   --shadow-raised: 0 1px 2px oklch(0.2 0.01 75 / 0.06), 0 1px 3px oklch(0.2 0.01 75 / 0.08);
   --shadow-overlay: 0 4px 12px oklch(0.2 0.01 75 / 0.1), 0 12px 32px oklch(0.2 0.01 75 / 0.14);
   --scrim: oklch(0.15 0.01 75 / 0.5);
+  --dashboard-neon: color-mix(
+    in oklch,
+    var(--brand) 62%,
+    oklch(0.86 0.2 180)
+  );
 }
 
 /* ---------- Tier 2: semantic tokens — DARK ---------- */
@@ -144,6 +149,11 @@
   --shadow-raised: 0 1px 2px oklch(0 0 0 / 0.3), 0 1px 3px oklch(0 0 0 / 0.35);
   --shadow-overlay: 0 4px 12px oklch(0 0 0 / 0.4), 0 12px 32px oklch(0 0 0 / 0.5);
   --scrim: oklch(0.05 0 0 / 0.6);
+  --dashboard-neon: color-mix(
+    in oklch,
+    var(--brand) 52%,
+    oklch(0.84 0.18 180)
+  );
 }
 
 /* ---------- Reduced motion ---------- */

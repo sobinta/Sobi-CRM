@@ -89,9 +89,18 @@ function KpiCard({
     positive: "bg-positive-subtle text-positive-subtle-ink",
     info: "bg-info-subtle text-info-subtle-ink",
   };
+  const toneLines = {
+    brand: "bg-brand",
+    accent: "bg-accent",
+    positive: "bg-positive",
+    info: "bg-info",
+  };
   return (
-    <Card className="relative min-h-32 overflow-hidden p-4 shadow-none">
-      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-0.5 bg-brand/70" />
+    <Card className="dashboard-glow-card relative min-h-[116px] overflow-hidden p-4">
+      <span
+        aria-hidden="true"
+        className={cn("absolute inset-x-0 top-0 h-0.5 opacity-75", toneLines[tone])}
+      />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-medium text-ink-muted">{label}</p>
@@ -145,7 +154,7 @@ export async function CrmDashboard({
     );
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+    <div className="mx-auto w-full max-w-[1280px] px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
       <header className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="mb-1 text-xs font-semibold tracking-[0.16em] text-brand uppercase">
@@ -194,7 +203,7 @@ export async function CrmDashboard({
       </section>
 
       {isEmpty && (
-        <section className="mt-4 flex flex-col gap-4 rounded-xl border border-dashed border-line-strong bg-surface-raised/55 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <section className="dashboard-glow-card mt-4 flex flex-col gap-4 rounded-xl border border-dashed border-line-strong bg-surface-raised/70 p-5 shadow-raised sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-subtle text-brand-subtle-ink">
               <Inbox aria-hidden="true" className="h-5 w-5" />
@@ -208,8 +217,8 @@ export async function CrmDashboard({
         </section>
       )}
 
-      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.85fr)]">
-        <Card className="overflow-hidden shadow-none">
+      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
+        <Card className="dashboard-glow-card overflow-hidden">
           <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
             <div>
               <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
@@ -244,7 +253,7 @@ export async function CrmDashboard({
           </div>
         </Card>
 
-        <Card className="overflow-hidden shadow-none">
+        <Card className="dashboard-glow-card overflow-hidden">
           <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
             <div>
               <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
@@ -277,7 +286,7 @@ export async function CrmDashboard({
         </Card>
       </div>
 
-      <Card className="mt-4 overflow-hidden shadow-none">
+      <Card className="dashboard-glow-card mt-4 overflow-hidden">
         <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
           <div>
             <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">

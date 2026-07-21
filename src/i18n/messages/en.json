@@ -106,7 +106,9 @@
     "menu": "Menu",
     "mobileNav": "Primary",
     "closeMenu": "Close menu",
-    "backToSite": "Back to main site"
+    "backToSite": "Back to main site",
+    "demoStatus": "Demo mode — explore freely; test changes stay in this browser and are never saved.",
+    "demoSimulation": "Demo preview updated locally. Reload the page to reset it."
   },
   "dashboard": {
     "welcome": "Welcome back, {name}",
@@ -237,7 +239,7 @@
       "ctaSecondary": "Explore live demo",
       "check1": "No credit card",
       "check2": "Local demo data",
-      "check3": "Editable results"
+      "check3": "Safe, non-persistent testing"
     },
     "problem": {
       "eyebrow": "FROM LEAD TO CLOSED DEAL",
@@ -309,7 +311,7 @@
         { "q": "Do I need an AI API key?", "a": "No. Every AI feature has a graceful, keyless fallback — lead scoring, content suggestions, and drafts still work; connecting a real provider just improves quality." },
         { "q": "Is my data isolated from other tenants?", "a": "Yes. Tenant isolation is enforced at the data layer, not just per-screen — it's structurally impossible for one workspace to read another's records." },
         { "q": "Can I activate only the modules I need?", "a": "Yes. Insurance, Real Estate, Immigration, and the service-booking modules are each opt-in per workspace." },
-        { "q": "What happens to demo data?", "a": "The demo workspace uses realistic seeded data you can freely edit, convert, and delete — nothing here represents a real customer." },
+        { "q": "What happens to demo data?", "a": "The workspace starts with realistic fictional data. You can test selected actions in your browser, but nothing is saved to the database or sent to external services." },
         { "q": "Is the contract template legally reviewed?", "a": "It's a generated starting point, not legal advice — review any contract with your own counsel before sending it to a real client." }
       ]
     },

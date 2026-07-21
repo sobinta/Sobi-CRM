@@ -2,7 +2,6 @@
 
 import { Sparkles, Shapes, Tag, PlayCircle, Menu, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { DEMO_LOGIN_ENABLED } from "@/core/auth/demo-login";
 import { DemoCtaButton } from "./demo-cta-button";
 import { useLandingMobileMenu } from "./landing-mobile-menu-context";
 
@@ -21,7 +20,7 @@ const itemClass =
  * this bar is a thumb-reach shortcut to the sections and actions that matter
  * most while scrolling, plus a "Menu" toggle for everything else.
  */
-export function LandingMobileTabBar() {
+export function LandingMobileTabBar({ demoEnabled }: { demoEnabled: boolean }) {
   const t = useTranslations("landing.nav");
   const tAuth = useTranslations("auth");
   const tShell = useTranslations("shell");
@@ -41,7 +40,7 @@ export function LandingMobileTabBar() {
           </a>
         );
       })}
-      {DEMO_LOGIN_ENABLED && (
+      {demoEnabled && (
         <DemoCtaButton pendingLabel={tAuth("signingInDemo")} className={itemClass}>
           <PlayCircle className="h-5 w-5" />
           {t("tryDemo")}

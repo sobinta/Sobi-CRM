@@ -183,6 +183,33 @@ textarea {
   color: var(--brand-subtle-ink);
 }
 
+/* Dashboard signature: a restrained outer neon halo. It never changes the
+   card's dimensions and also appears for keyboard focus within the card. */
+.dashboard-glow-card {
+  isolation: isolate;
+  transition:
+    border-color var(--motion-base) var(--ease-out),
+    box-shadow var(--motion-base) var(--ease-out),
+    transform var(--motion-base) var(--ease-out);
+}
+
+.dashboard-glow-card:hover,
+.dashboard-glow-card:focus-within {
+  border-color: color-mix(in oklch, var(--dashboard-neon) 72%, var(--line));
+  box-shadow:
+    0 0 0 2px color-mix(in oklch, var(--dashboard-neon) 55%, transparent),
+    0 0 22px color-mix(in oklch, var(--dashboard-neon) 48%, transparent),
+    0 16px 38px color-mix(in oklch, var(--brand) 22%, transparent);
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-glow-card:hover,
+  .dashboard-glow-card:focus-within {
+    transform: none;
+  }
+}
+
 /* Thin, unobtrusive scrollbars that match theme */
 * {
   scrollbar-width: thin;

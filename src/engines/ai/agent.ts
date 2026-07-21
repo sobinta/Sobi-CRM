@@ -28,7 +28,13 @@ export async function runAgent(
 ): Promise<{ text: string; trace: AgentTrace }> {
   const ctx = requireContext();
   const setting = await db.aiSetting.findUnique({ where: { tenantId: ctx.tenantId } });
-  const provider = getProvider(setting ?? { provider: "mock", model: null });
+  // Public demo requests must never reach a paid/external provider, even if a
+  // setting is accidentally attached to the seeded tenant.
+  const provider = getProvider(
+    ctx.accessMode === "read-only"
+      ? { provider: "mock", model: null }
+      : (setting ?? { provider: "mock", model: null }),
+  );
 
   const messages: AiMessage[] = [
     { role: "system", content: SYSTEM_PROMPT },
@@ -70,6 +76,10 @@ export async function runAgent(
 
   if (!finalText) {
     finalText = "متأسفانه نتوانستم پاسخ کاملی تولید کنم. لطفاً سؤال را واضح‌تر بپرسید.";
+  }
+
+  if (ctx.accessMode === "read-only") {
+    return { text: finalText, trace: { toolsUsed } };
   }
 
   await Promise.all([

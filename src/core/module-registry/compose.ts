@@ -12,6 +12,7 @@ import "./module-manifests"; // register all module manifests (client-safe)
 export function composeWorkspaces(
   enabledModuleKeys: string[],
   isSuperAdmin = false,
+  readOnly = false,
 ): WorkspaceDef[] {
   const moduleWorkspaces: WorkspaceDef[] = enabledModuleKeys
     .map((key) => getModuleManifest(key))
@@ -20,10 +21,13 @@ export function composeWorkspaces(
 
   // Core order: CRM, then modules, then the rest.
   const [crm, ...rest] = workspaces;
+  const visibleCore = readOnly
+    ? rest.filter((workspace) => workspace.key !== "admin")
+    : rest;
   return [
     crm,
     ...moduleWorkspaces,
-    ...rest,
-    ...(isSuperAdmin ? [platformAdminWorkspace] : []),
+    ...visibleCore,
+    ...(isSuperAdmin && !readOnly ? [platformAdminWorkspace] : []),
   ];
 }

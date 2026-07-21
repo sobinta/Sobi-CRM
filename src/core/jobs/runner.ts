@@ -6,6 +6,7 @@ import {
   systemTenantContext,
 } from "@/core/tenancy/context";
 import type { Job } from "@/generated/prisma/client";
+import { DEMO_TENANT_SLUG } from "@/core/demo/constants";
 
 export interface JobContext {
   jobId: string;
@@ -152,9 +153,14 @@ export async function runDueJobs(limit = 25): Promise<{
         const actor = await systemDb.membership.findFirst({
           where: { tenantId: job.tenantId, status: "ACTIVE", deletedAt: null },
           orderBy: { createdAt: "asc" },
-          select: { id: true, userId: true },
+          select: {
+            id: true,
+            userId: true,
+            tenant: { select: { slug: true } },
+          },
         });
         if (!actor) throw new Error("Tenant job has no active system actor.");
+        if (actor.tenant.slug === DEMO_TENANT_SLUG) return;
         return runWithContext(
           systemTenantContext(job.tenantId, actor.id, actor.userId),
           () => handler(handlerContext),

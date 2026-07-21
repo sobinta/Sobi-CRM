@@ -94,10 +94,12 @@ simulations.
 **Work**
 
 1. Add stable, non-secret demo tenant/role identifiers.
-2. Read `PUBLIC_DEMO_ENABLED`, `DEMO_LOGIN_EMAIL`, and
-   `DEMO_LOGIN_PASSWORD` only from a server-only config module.
-3. Require a non-placeholder 32+ character demo password when public demo is
-   enabled in production.
+2. Read `PUBLIC_DEMO_ENABLED` and optional `DEMO_LOGIN_EMAIL` only from a
+   server-only config module; derive the credential with HMAC from the existing
+   strong `BETTER_AUTH_SECRET` so no shared demo password is configured or sent
+   to the browser.
+3. Reuse production validation for the strong `BETTER_AUTH_SECRET` and require
+   an explicit production decision for `PUBLIC_DEMO_ENABLED`.
 4. Document explicit provisioning and default the public demo to disabled.
 
 **Verification**

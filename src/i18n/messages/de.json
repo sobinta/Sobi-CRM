@@ -105,7 +105,9 @@
     "menu": "Menü",
     "mobileNav": "Primär",
     "closeMenu": "Menü schließen",
-    "backToSite": "Zurück zur Hauptseite"
+    "backToSite": "Zurück zur Hauptseite",
+    "demoStatus": "Demo-Modus — frei erkunden; Teständerungen bleiben in diesem Browser und werden nie gespeichert.",
+    "demoSimulation": "Demo-Vorschau lokal aktualisiert. Zum Zurücksetzen Seite neu laden."
   },
   "dashboard": {
     "welcome": "Willkommen zurück, {name}",
@@ -236,7 +238,7 @@
       "ctaSecondary": "Live-Demo entdecken",
       "check1": "Keine Kreditkarte",
       "check2": "Lokale Demo-Daten",
-      "check3": "Bearbeitbare Ergebnisse"
+      "check3": "Sicher testen ohne Speicherung"
     },
     "problem": {
       "eyebrow": "VOM LEAD ZUM ABGESCHLOSSENEN DEAL",
@@ -308,7 +310,7 @@
         { "q": "Brauche ich einen KI-API-Schlüssel?", "a": "Nein. Jede KI-Funktion hat einen soliden Fallback ohne Schlüssel — Lead-Bewertung, Inhaltsvorschläge und Entwürfe funktionieren trotzdem; ein echter Anbieter verbessert nur die Qualität." },
         { "q": "Ist meine Daten von anderen Mandanten isoliert?", "a": "Ja. Die Mandantentrennung wird auf Datenebene erzwungen, nicht nur pro Bildschirm — ein Arbeitsbereich kann strukturell nicht auf die Daten eines anderen zugreifen." },
         { "q": "Kann ich nur die Module aktivieren, die ich brauche?", "a": "Ja. Versicherung, Immobilien, Einwanderung und die Buchungsmodule sind jeweils pro Arbeitsbereich zubuchbar." },
-        { "q": "Was passiert mit Demo-Daten?", "a": "Der Demo-Arbeitsbereich nutzt realistische Beispieldaten, die Sie frei bearbeiten, konvertieren und löschen können — nichts davon ist ein echter Kunde." },
+        { "q": "Was passiert mit Demo-Daten?", "a": "Der Arbeitsbereich startet mit realistischen fiktiven Daten. Ausgewählte Aktionen lassen sich im Browser testen, aber nichts wird in der Datenbank gespeichert oder an externe Dienste gesendet." },
         { "q": "Wurde die Vertragsvorlage juristisch geprüft?", "a": "Es ist ein generierter Ausgangspunkt, keine Rechtsberatung — lassen Sie jeden Vertrag von Ihrem eigenen Anwalt prüfen, bevor Sie ihn an einen echten Kunden senden." }
       ]
     },

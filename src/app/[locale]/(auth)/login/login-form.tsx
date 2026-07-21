@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { signIn } from "@/core/auth/client";
-import { DEMO_LOGIN_ENABLED, signInDemoAndRedirect } from "@/core/auth/demo-login";
+import { signInDemoAndRedirect } from "@/core/auth/demo-login";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +12,13 @@ import { Logo } from "@/components/brand/logo";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing, localeMeta, type AppLocale } from "@/i18n/routing";
 
-export function LoginForm({ logoSrc }: { logoSrc?: string }) {
+export function LoginForm({
+  logoSrc,
+  demoEnabled,
+}: {
+  logoSrc?: string;
+  demoEnabled: boolean;
+}) {
   const t = useTranslations("auth");
   const locale = useLocale();
   const pathname = usePathname();
@@ -120,7 +126,7 @@ export function LoginForm({ logoSrc }: { logoSrc?: string }) {
         </Button>
       </form>
 
-      {DEMO_LOGIN_ENABLED && (
+      {demoEnabled && (
         <>
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-line" />

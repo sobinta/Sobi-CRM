@@ -3,6 +3,7 @@ import { cache } from "react";
 import { auth } from "./auth";
 import { identityDb } from "@/core/db/identity";
 import type { PlatformContext } from "@/core/tenancy/context";
+import { accessModeForRoleKeys } from "@/core/demo/constants";
 
 /**
  * Bridges Better Auth's user session to the platform's tenant-aware context.
@@ -19,6 +20,7 @@ export interface ResolvedMembership {
   tenantSlug: string;
   isAdmin: boolean;
   permissions: string[];
+  accessMode: PlatformContext["accessMode"];
 }
 
 export interface ResolvedSession {
@@ -59,6 +61,7 @@ export const resolveSession = cache(
       .filter((m) => m.tenant.deletedAt === null)
       .map((m) => {
         const isAdmin = m.roles.some((mr) => mr.role.isAdmin);
+        const roleKeys = m.roles.map((mr) => mr.role.key);
         const permissions = new Set<string>();
         for (const mr of m.roles) {
           for (const p of mr.role.permissions) permissions.add(p.permission);
@@ -70,6 +73,7 @@ export const resolveSession = cache(
           tenantSlug: m.tenant.slug,
           isAdmin,
           permissions: [...permissions],
+          accessMode: accessModeForRoleKeys(roleKeys),
         };
       });
 
@@ -107,6 +111,7 @@ export function toPlatformContext(
     permissions: new Set(session.active.permissions),
     isAdmin: session.active.isAdmin,
     isSuperAdmin: session.isSuperAdmin,
+    accessMode: session.active.accessMode,
     locale: session.locale,
     ipAddress: opts?.ipAddress,
     userAgent: opts?.userAgent,

@@ -5,6 +5,7 @@ import { notify } from "@/engines/notifications/notification-service";
 import { publish } from "@/core/event-bus/bus";
 import { runWithContext } from "@/core/tenancy/context";
 import { logger } from "@/core/observability/logger";
+import { DEMO_TENANT_SLUG } from "@/core/demo/constants";
 
 /**
  * Overdue-task detection job. Scans across tenants for tasks past due that
@@ -13,11 +14,16 @@ import { logger } from "@/core/observability/logger";
  */
 registerJob("tasks.detect_overdue", async () => {
   const now = new Date();
+  const demoTenant = await systemDb.tenant.findUnique({
+    where: { slug: DEMO_TENANT_SLUG },
+    select: { id: true },
+  });
   const overdue = await systemDb.task.findMany({
     where: {
       deletedAt: null,
       status: { notIn: ["done", "cancelled"] },
       dueAt: { lt: now },
+      ...(demoTenant ? { tenantId: { not: demoTenant.id } } : {}),
     },
     take: 200,
     select: { id: true, tenantId: true, assigneeId: true },
@@ -43,6 +49,7 @@ registerJob("tasks.detect_overdue", async () => {
         permissions: new Set(["*"]),
         isAdmin: true,
         isSuperAdmin: false,
+        accessMode: "read-write",
         locale: "en",
       },
       async () => {

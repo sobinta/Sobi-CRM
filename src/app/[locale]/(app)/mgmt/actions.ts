@@ -16,6 +16,8 @@ export async function saveDashboardAction(
 
 /** Universal search used by the ⌘K palette. */
 export async function searchAction(query: string) {
-  const results = await withActionContext(() => search(query));
+  const results = await withActionContext(() => search(query), {
+    intent: "read",
+  });
   return { results };
 }

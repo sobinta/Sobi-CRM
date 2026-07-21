@@ -28,6 +28,8 @@ const databaseCapabilityRule = {
               "core/billing/quota.ts",
               "core/tenancy/rls.integration.test.ts",
               "core/tenancy/provisioning.ts",
+              "core/demo/provision-demo.ts",
+              "core/demo/session-gateway.ts",
               "engines/tasks/jobs.ts",
               "engines/portal/portal-service.ts",
               "engines/integrations/api-key-service.ts",

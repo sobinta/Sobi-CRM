@@ -103,7 +103,9 @@ export async function markNotificationsReadAction() {
 }
 
 export async function loadNotificationsAction() {
-  const data = await withActionContext(() => listNotifications({ take: 15 }));
+  const data = await withActionContext(() => listNotifications({ take: 15 }), {
+    intent: "read",
+  });
   return {
     unread: data.unread,
     items: data.items.map((n) => ({

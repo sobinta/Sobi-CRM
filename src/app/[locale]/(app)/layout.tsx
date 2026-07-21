@@ -71,6 +71,7 @@ export default async function AppLayout({
       name: m.tenantName,
     })),
     isSuperAdmin: s.isSuperAdmin,
+    accessMode: s.active!.accessMode,
   };
 
   return (

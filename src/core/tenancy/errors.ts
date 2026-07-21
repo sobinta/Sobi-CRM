@@ -35,3 +35,14 @@ export class SystemCapabilityRequiredError extends TenantSecurityError {
     );
   }
 }
+
+/** A mutation or raw SQL operation was attempted from a read-only context. */
+export class ReadOnlyContextError extends TenantSecurityError {
+  constructor(operation?: string) {
+    super(
+      operation
+        ? `Read-only access does not permit ${operation}.`
+        : "Read-only access does not permit this operation.",
+    );
+  }
+}

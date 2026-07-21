@@ -12,6 +12,7 @@ const context: PlatformContext = {
   permissions: new Set(),
   isAdmin: false,
   isSuperAdmin: false,
+  accessMode: "read-write",
   locale: "en",
 };
 
@@ -37,6 +38,16 @@ describe("runWithContext", () => {
     });
 
     expect(observed).toBe("tenant-a");
+  });
+
+  it("keeps the access mode immutable for the callback lifetime", async () => {
+    const mutable = { ...context } as { accessMode: PlatformContext["accessMode"] } & PlatformContext;
+    const observed = await runWithContext(mutable, async () => {
+      mutable.accessMode = "read-only";
+      return getContext()?.accessMode;
+    });
+
+    expect(observed).toBe("read-write");
   });
 
   it("rejects an empty security identity", () => {

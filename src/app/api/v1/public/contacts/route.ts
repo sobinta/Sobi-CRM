@@ -74,6 +74,7 @@ function context(tenantId: string, permission: string) {
     permissions: new Set([permission]),
     isAdmin: false,
     isSuperAdmin: false,
+    accessMode: "read-write",
     locale: "en",
   } as const;
 }

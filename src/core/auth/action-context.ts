@@ -2,6 +2,12 @@ import { headers } from "next/headers";
 import { runWithContext } from "@/core/tenancy/context";
 import { authorize } from "@/core/rbac/guard";
 import { resolveSession, toPlatformContext } from "./session";
+import { assertWritableContext } from "@/core/tenancy/access";
+
+export interface ActionContextOptions {
+  permission?: string;
+  intent?: "read" | "write";
+}
 
 /**
  * Run a server action inside the caller's PlatformContext, optionally
@@ -10,7 +16,7 @@ import { resolveSession, toPlatformContext } from "./session";
  */
 export async function withActionContext<T>(
   fn: () => Promise<T>,
-  options?: { permission?: string },
+  options?: ActionContextOptions,
 ): Promise<T> {
   const session = await resolveSession();
   if (!session) throw new Error("Unauthenticated");
@@ -23,6 +29,9 @@ export async function withActionContext<T>(
   if (!ctx) throw new Error("No active tenant");
 
   return runWithContext(ctx, async () => {
+    if ((options?.intent ?? "write") === "write") {
+      assertWritableContext(ctx);
+    }
     if (options?.permission) authorize(options.permission);
     return fn();
   });

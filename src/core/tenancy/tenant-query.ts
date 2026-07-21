@@ -139,3 +139,7 @@ export function scopeTenantOperation(
 }
 
 export const TENANT_READ_OPERATIONS = READ_OPS;
+
+export function isTenantReadOperation(operation: string): boolean {
+  return READ_OPS.has(operation);
+}

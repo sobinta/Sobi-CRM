@@ -146,6 +146,7 @@ export async function provisionTenant(
       permissions: new Set(["*"]),
       isAdmin: true,
       isSuperAdmin: result.isSuperAdmin,
+      accessMode: "read-write",
       locale: input.locale ?? "en",
     },
     () =>

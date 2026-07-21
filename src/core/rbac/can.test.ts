@@ -10,6 +10,7 @@ function ctx(overrides: Partial<PlatformContext>): PlatformContext {
     permissions: new Set<string>(),
     isAdmin: false,
     isSuperAdmin: false,
+    accessMode: "read-write",
     locale: "en",
     ...overrides,
   };

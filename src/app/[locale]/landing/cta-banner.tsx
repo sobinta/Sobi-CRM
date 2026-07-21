@@ -1,13 +1,18 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ShieldCheck, ArrowRight } from "lucide-react";
-import { DEMO_LOGIN_ENABLED } from "@/core/auth/demo-login";
 import { getContentOverridesPublic } from "@/engines/platform-admin/content-service";
 import type { EditableContentKey } from "@/engines/platform-admin/content-keys";
 import { EditableField } from "./editable-field";
 import { DemoCtaButton } from "./demo-cta-button";
 
-export async function CtaBanner({ editMode = false }: { editMode?: boolean }) {
+export async function CtaBanner({
+  editMode = false,
+  demoEnabled,
+}: {
+  editMode?: boolean;
+  demoEnabled: boolean;
+}) {
   const t = await getTranslations("landing.cta");
   const tAuth = await getTranslations("auth");
   const locale = await getLocale();
@@ -38,7 +43,7 @@ export async function CtaBanner({ editMode = false }: { editMode?: boolean }) {
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          {DEMO_LOGIN_ENABLED && (
+          {demoEnabled && (
             <DemoCtaButton
               pendingLabel={tAuth("signingInDemo")}
               className="flex items-center gap-2 rounded-md bg-[#aee1d3] px-5 py-3 text-sm font-semibold text-[#14211e] hover:bg-[#98d4c4] disabled:opacity-60"
