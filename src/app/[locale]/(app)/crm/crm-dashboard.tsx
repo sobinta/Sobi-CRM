@@ -1,15 +1,21 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import {
   Activity,
+  AlertTriangle,
   ArrowDownRight,
   ArrowUpRight,
   CalendarCheck2,
   CircleDollarSign,
+  CircleCheckBig,
   Clock3,
+  ChartNoAxesColumnIncreasing,
   Handshake,
   Inbox,
   Percent,
+  Settings2,
+  PieChart,
   UserRoundPlus,
+  UsersRound,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Card } from "@/components/ui/card";
@@ -19,6 +25,7 @@ import type {
 } from "@/engines/crm/crm-dashboard-service";
 import { cn } from "@/lib/utils";
 import { QuickActions } from "./quick-actions";
+import { ActivityBarChart, LeadSourceDonut } from "./dashboard-charts";
 
 function formatNumber(locale: string, value: number) {
   return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(value);
@@ -167,7 +174,12 @@ export async function CrmDashboard({
             {t("workspaceSnapshot", { tenant: tenantName, date: dateLabel })}
           </p>
         </div>
-        <QuickActions {...data.permissions} />
+        <div className="flex flex-wrap items-center gap-2">
+          <Link href="/crm/customize" className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-line bg-surface-raised px-3 text-sm font-medium text-ink-muted shadow-raised hover:border-line-strong hover:text-ink">
+            <Settings2 aria-hidden="true" className="h-4 w-4" /> {t("customize")}
+          </Link>
+          <QuickActions {...data.permissions} />
+        </div>
       </header>
 
       <section aria-labelledby="dashboard-kpis" className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -216,6 +228,52 @@ export async function CrmDashboard({
           {data.permissions.contacts && <Link href="/crm/contacts" className="text-sm font-medium text-brand hover:text-brand-hover">{t("goToContacts")}</Link>}
         </section>
       )}
+
+      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.85fr)]">
+        <Card className="dashboard-glow-card overflow-hidden" data-tour="dashboard-performance">
+          <div className="border-b border-line px-5 py-4">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
+              <ChartNoAxesColumnIncreasing aria-hidden="true" className="h-4 w-4 text-brand" />
+              {t("activityTrend")}
+            </h2>
+            <p className="mt-1 text-xs text-ink-muted">{t("activityTrendDescription")}</p>
+          </div>
+          <div className="px-3 pb-3 pt-1">
+            <ActivityBarChart data={data.activityTrend} locale={locale} countLabel={t("activityCount")} />
+          </div>
+        </Card>
+
+        <Card className="dashboard-glow-card overflow-hidden" data-tour="manager-attention">
+          <div className="border-b border-line px-5 py-4">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
+              <AlertTriangle aria-hidden="true" className="h-4 w-4 text-accent" />
+              {t("managerAttention")}
+            </h2>
+            <p className="mt-1 text-xs text-ink-muted">{t("managerAttentionDescription")}</p>
+          </div>
+          <div className="p-3">
+            {data.attention.length === 0 ? (
+              <p className="py-16 text-center text-sm text-ink-faint">{t("attentionRestricted")}</p>
+            ) : (
+              <ul className="space-y-2">
+                {data.attention.map((item) => (
+                  <li key={item.key}>
+                    <Link href={item.href} className="group flex min-h-16 items-center gap-3 rounded-lg border border-line bg-surface px-3 py-2 transition-colors hover:border-brand-300 hover:bg-brand-subtle/60">
+                      <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-base font-semibold tabular-nums", item.count === 0 ? "bg-positive-subtle text-positive-subtle-ink" : item.tone === "danger" ? "bg-danger-subtle text-danger-subtle-ink" : item.tone === "warning" ? "bg-warning-subtle text-warning-subtle-ink" : "bg-brand-subtle text-brand-subtle-ink")}>
+                        {item.count === 0 ? <CircleCheckBig aria-hidden="true" className="h-4 w-4" /> : formatNumber(locale, item.count)}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium text-ink">{t(`attention.${item.key}`)}</span>
+                        <span className="mt-0.5 block text-xs text-ink-faint">{item.count === 0 ? t("attentionClear") : t("attentionOpen")}</span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </Card>
+      </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
         <Card className="dashboard-glow-card overflow-hidden">
@@ -285,6 +343,57 @@ export async function CrmDashboard({
           </div>
         </Card>
       </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card className="dashboard-glow-card overflow-hidden">
+          <div className="border-b border-line px-5 py-4">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
+              <PieChart aria-hidden="true" className="h-4 w-4 text-brand" />
+              {t("leadSources")}
+            </h2>
+            <p className="mt-1 text-xs text-ink-muted">{t("leadSourcesDescription")}</p>
+          </div>
+          <LeadSourceDonut
+            data={data.leadSources}
+            labels={{ website: t("sources.website"), chatbot: t("sources.chatbot"), manual: t("sources.manual"), unknown: t("sources.unknown") }}
+            emptyLabel={t("leadSourcesEmpty")}
+          />
+        </Card>
+
+        <Card className="dashboard-glow-card overflow-hidden">
+          <div className="border-b border-line px-5 py-4">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
+              <UsersRound aria-hidden="true" className="h-4 w-4 text-positive" />
+              {t("teamWorkload")}
+            </h2>
+            <p className="mt-1 text-xs text-ink-muted">{t("teamWorkloadDescription")}</p>
+          </div>
+          {data.teamWorkload.length === 0 ? (
+            <p className="grid min-h-56 place-items-center px-4 text-center text-sm text-ink-faint">{t("teamWorkloadEmpty")}</p>
+          ) : (
+            <ul className="divide-y divide-line px-5 py-2">
+              {data.teamWorkload.map((member) => {
+                const maximum = Math.max(1, ...data.teamWorkload.map((item) => item.openTasks));
+                return (
+                  <li key={member.membershipId} className="py-3">
+                    <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+                      <span className="truncate font-medium text-ink">{member.name}</span>
+                      <span className="shrink-0 text-xs text-ink-muted">{t("openTaskCount", { count: member.openTasks })}</span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-surface-sunken"><div className="h-full rounded-full bg-positive" style={{ width: `${Math.max(8, (member.openTasks / maximum) * 100)}%` }} /></div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </Card>
+      </div>
+
+      {data.sourceErrors.length > 0 && (
+        <p role="status" className="mt-4 rounded-lg border border-warning/30 bg-warning-subtle px-4 py-3 text-xs text-warning-subtle-ink">
+          {t("partialDataNotice")}
+        </p>
+      )}
 
       <Card className="dashboard-glow-card mt-4 overflow-hidden">
         <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">

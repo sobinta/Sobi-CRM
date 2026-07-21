@@ -7,7 +7,6 @@ import type { LucideIcon } from "lucide-react";
 import {
   Users,
   ClipboardCheck,
-  BarChart3,
   Landmark,
   Sparkles,
   ShieldCheck,
@@ -47,6 +46,8 @@ export const workspaces: WorkspaceDef[] = [
       { key: "campaigns", labelKey: "campaigns", href: "/crm/campaigns" },
       { key: "knowledge", labelKey: "knowledge", href: "/crm/knowledge" },
       { key: "graph", labelKey: "graph", href: "/crm/graph" },
+      { key: "reports", labelKey: "reports", href: "/crm/reports" },
+      { key: "feed", labelKey: "feed", href: "/crm/activity" },
     ],
   },
   {
@@ -58,17 +59,6 @@ export const workspaces: WorkspaceDef[] = [
       { key: "tasks", labelKey: "tasks", href: "/ops/tasks" },
       { key: "calendar", labelKey: "calendar", href: "/ops/calendar" },
       { key: "files", labelKey: "files", href: "/ops/files" },
-    ],
-  },
-  {
-    key: "management",
-    labelKey: "management",
-    icon: BarChart3,
-    href: "/mgmt",
-    nav: [
-      { key: "dashboard", labelKey: "dashboard", href: "/mgmt" },
-      { key: "reports", labelKey: "reports", href: "/mgmt/reports" },
-      { key: "feed", labelKey: "feed", href: "/mgmt/feed" },
     ],
   },
   {

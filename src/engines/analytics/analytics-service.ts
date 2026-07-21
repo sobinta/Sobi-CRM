@@ -1,5 +1,4 @@
 import { db } from "@/core/db";
-import { Prisma } from "@/core/db";
 import { requireContext } from "@/core/tenancy/context";
 import { toJalali, jalaliMonthName } from "@/core/i18n/jalali";
 
@@ -84,23 +83,30 @@ export interface ActivityPoint {
 }
 
 /** Daily event volume for the last N days (activity trend). */
-export async function getActivityTrend(days = 14): Promise<ActivityPoint[]> {
-  const ctx = requireContext();
+export async function getActivityTrend(days = 14, eventTypes?: string[]): Promise<ActivityPoint[]> {
+  requireContext();
   const since = new Date();
   since.setDate(since.getDate() - days);
 
-  const rows = await db.$queryRaw<Array<{ day: Date; count: bigint }>>(
-    Prisma.sql`
-      SELECT date_trunc('day', "occurredAt") AS day, count(*)::bigint AS count
-      FROM "Event"
-      WHERE "tenantId" = ${ctx.tenantId} AND "occurredAt" >= ${since}
-      GROUP BY day ORDER BY day ASC
-    `,
-  );
+  // Prisma reads remain compatible with read-only demo enforcement. The cap
+  // bounds memory for unusually busy tenants while preserving a useful trend.
+  const rows = await db.event.findMany({
+    where: {
+      occurredAt: { gte: since },
+      type: eventTypes?.length ? { in: eventTypes } : undefined,
+    },
+    select: { occurredAt: true },
+    orderBy: { occurredAt: "asc" },
+    take: 50_000,
+  });
 
   // Fill gaps so the chart has a continuous axis.
   const map = new Map(
-    rows.map((r) => [new Date(r.day).toISOString().slice(0, 10), Number(r.count)]),
+    rows.reduce((counts, row) => {
+      const key = row.occurredAt.toISOString().slice(0, 10);
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+      return counts;
+    }, new Map<string, number>()),
   );
   const points: ActivityPoint[] = [];
   for (let i = days - 1; i >= 0; i--) {

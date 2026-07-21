@@ -7,6 +7,11 @@ import {
   calculateConversionRate,
   calculatePercentChange,
 } from "./crm-dashboard-metrics";
+import {
+  getActivityTrend,
+  getLeadSourceBreakdown,
+  type ActivityPoint,
+} from "@/engines/analytics/analytics-service";
 
 export interface DashboardMoneyTotal {
   currency: string;
@@ -40,6 +45,24 @@ export interface DashboardActivity {
   occurredAt: string;
 }
 
+export interface DashboardLeadSource {
+  source: string;
+  count: number;
+}
+
+export interface DashboardAttentionItem {
+  key: "overdueTasks" | "staleDeals" | "unassignedLeads";
+  count: number;
+  href: "/ops/tasks" | "/crm/deals" | "/crm/leads";
+  tone: "danger" | "warning" | "brand";
+}
+
+export interface DashboardWorkloadItem {
+  membershipId: string;
+  name: string;
+  openTasks: number;
+}
+
 export interface CrmDashboardData {
   generatedAt: string;
   metrics: {
@@ -54,12 +77,73 @@ export interface CrmDashboardData {
   pipeline: DashboardPipelineStage[];
   followUps: DashboardFollowUp[];
   activity: DashboardActivity[];
+  activityTrend: ActivityPoint[];
+  leadSources: DashboardLeadSource[];
+  attention: DashboardAttentionItem[];
+  teamWorkload: DashboardWorkloadItem[];
+  sourceErrors: string[];
   permissions: {
     contacts: boolean;
     leads: boolean;
     deals: boolean;
     tasks: boolean;
   };
+}
+
+async function loadDealAttention(now: Date) {
+  return db.deal.count({
+    where: {
+      status: "open",
+      expectedCloseAt: { lt: now },
+    },
+  });
+}
+
+async function loadLeadAttention() {
+  return db.lead.count({
+    where: {
+      status: { notIn: ["converted", "unqualified"] },
+      ownerId: null,
+    },
+  });
+}
+
+async function loadTeamWorkload(): Promise<DashboardWorkloadItem[]> {
+  const grouped = await db.task.groupBy({
+    by: ["assigneeId"],
+    where: {
+      assigneeId: { not: null },
+      status: { notIn: ["done", "cancelled"] },
+    },
+    _count: { _all: true },
+    orderBy: { _count: { assigneeId: "desc" } },
+    take: 6,
+  });
+  const membershipIds = grouped.flatMap((row) => row.assigneeId ? [row.assigneeId] : []);
+  const memberships = membershipIds.length
+    ? await db.membership.findMany({
+        where: { id: { in: membershipIds } },
+        select: { id: true, user: { select: { name: true } } },
+      })
+    : [];
+  const names = new Map(memberships.map((membership) => [membership.id, membership.user.name]));
+  return grouped.flatMap((row) => row.assigneeId ? [{
+    membershipId: row.assigneeId,
+    name: names.get(row.assigneeId) ?? "—",
+    openTasks: row._count._all,
+  }] : []);
+}
+
+async function safelyLoad<T>(
+  key: string,
+  load: () => Promise<T>,
+  fallback: T,
+): Promise<{ value: T; error: string | null }> {
+  try {
+    return { value: await load(), error: null };
+  } catch {
+    return { value: fallback, error: key };
+  }
 }
 
 function reportingWindows(now: Date) {
@@ -237,11 +321,11 @@ export async function getCrmDashboardData(): Promise<CrmDashboardData> {
   };
   const activityTypes = permittedActivityTypes(permissions);
 
-  const [leadMetrics, pipeline, followUps, activity] = await Promise.all([
-    permissions.leads ? loadLeadMetrics(now) : null,
-    permissions.deals ? loadPipeline() : null,
-    permissions.tasks ? loadFollowUps(now) : null,
-    activityTypes.length
+  const [leadResult, pipelineResult, followUpResult, activityResult, trendResult, sourceResult, dealAttentionResult, leadAttentionResult, workloadResult] = await Promise.all([
+    safelyLoad("leadMetrics", () => permissions.leads ? loadLeadMetrics(now) : Promise.resolve(null), null),
+    safelyLoad("pipeline", () => permissions.deals ? loadPipeline() : Promise.resolve(null), null),
+    safelyLoad("followUps", () => permissions.tasks ? loadFollowUps(now) : Promise.resolve(null), null),
+    safelyLoad("activity", () => activityTypes.length
       ? db.event.findMany({
           where: { type: { in: activityTypes } },
           select: {
@@ -254,8 +338,24 @@ export async function getCrmDashboardData(): Promise<CrmDashboardData> {
           orderBy: { occurredAt: "desc" },
           take: 6,
         })
-      : [],
+      : Promise.resolve([]), []),
+    safelyLoad("activityTrend", () => activityTypes.length ? getActivityTrend(14, activityTypes) : Promise.resolve([]), []),
+    safelyLoad("leadSources", () => permissions.leads ? getLeadSourceBreakdown() : Promise.resolve([]), []),
+    safelyLoad("dealAttention", () => permissions.deals ? loadDealAttention(now) : Promise.resolve(0), 0),
+    safelyLoad("leadAttention", () => permissions.leads ? loadLeadAttention() : Promise.resolve(0), 0),
+    safelyLoad("teamWorkload", () => permissions.tasks ? loadTeamWorkload() : Promise.resolve([]), []),
   ]);
+
+  const leadMetrics = leadResult.value;
+  const pipeline = pipelineResult.value;
+  const followUps = followUpResult.value;
+  const activity = activityResult.value;
+  const attention: DashboardAttentionItem[] = [];
+  if (permissions.tasks) attention.push({ key: "overdueTasks", count: followUps?.overdue ?? 0, href: "/ops/tasks", tone: "danger" });
+  if (permissions.deals) attention.push({ key: "staleDeals", count: dealAttentionResult.value, href: "/crm/deals", tone: "warning" });
+  if (permissions.leads) attention.push({ key: "unassignedLeads", count: leadAttentionResult.value, href: "/crm/leads", tone: "brand" });
+  const sourceErrors = [leadResult, pipelineResult, followUpResult, activityResult, trendResult, sourceResult, dealAttentionResult, leadAttentionResult, workloadResult]
+    .flatMap((result) => result.error ? [result.error] : []);
 
   return {
     generatedAt: now.toISOString(),
@@ -274,6 +374,11 @@ export async function getCrmDashboardData(): Promise<CrmDashboardData> {
       ...item,
       occurredAt: item.occurredAt.toISOString(),
     })),
+    activityTrend: trendResult.value,
+    leadSources: sourceResult.value.map((source) => ({ source: source.source, count: source.count })),
+    attention,
+    teamWorkload: workloadResult.value,
+    sourceErrors,
     permissions,
   };
 }

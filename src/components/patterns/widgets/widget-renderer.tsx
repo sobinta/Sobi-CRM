@@ -12,6 +12,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { CheckSquare, Activity } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Chip } from "@/components/ui/chip";
 import type { LayoutItem, WidgetData } from "./widget-types";
 
@@ -39,41 +40,44 @@ export function WidgetRenderer({
   }
 }
 
-function formatKpi(value: number, format: string) {
+function formatKpi(value: number, format: string, locale: string) {
   if (format === "currency")
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat(locale, {
       style: "currency",
       currency: "EUR",
       maximumFractionDigits: 0,
     }).format(value);
   if (format === "percent") return `${value}%`;
-  return new Intl.NumberFormat().format(value);
+  return new Intl.NumberFormat(locale).format(value);
 }
 
 function KpiWidget({ item, data }: { item: LayoutItem; data: WidgetData }) {
+  const t = useTranslations("dashboard");
+  const locale = useLocale();
   const key = (item.config?.kpiKey as string) ?? data.kpis[0]?.key;
   const kpi = data.kpis.find((k) => k.key === key) ?? data.kpis[0];
   if (!kpi) return null;
   return (
     <div className="flex h-full flex-col justify-center p-4">
       <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">
-        {kpi.label}
+        {t(`widgetKpis.${kpi.key}`)}
       </p>
       <p className="mt-1 tabular text-3xl font-semibold text-ink">
-        {formatKpi(kpi.value, kpi.format)}
+        {formatKpi(kpi.value, kpi.format, locale)}
       </p>
     </div>
   );
 }
 
 function PipelineWidget({ data }: { data: WidgetData }) {
+  const t = useTranslations("dashboard");
   const chartData = data.pipeline.map((p) => ({
     name: p.stage,
     value: p.value,
     count: p.count,
   }));
   return (
-    <WidgetFrame title="Pipeline breakdown">
+    <WidgetFrame title={t("widgets.pipeline")}>
       <ResponsiveContainer width="100%" height="100%" debounce={80}>
         <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" vertical={false} />
@@ -100,12 +104,13 @@ function PipelineWidget({ data }: { data: WidgetData }) {
 }
 
 function TrendWidget({ data }: { data: WidgetData }) {
+  const t = useTranslations("dashboard");
   const chartData = data.trend.map((p) => ({
     name: p.date.slice(5),
     value: p.count,
   }));
   return (
-    <WidgetFrame title="Activity trend">
+    <WidgetFrame title={t("widgets.trend")}>
       <ResponsiveContainer width="100%" height="100%" debounce={80}>
         <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" vertical={false} />
@@ -133,11 +138,12 @@ function TrendWidget({ data }: { data: WidgetData }) {
 }
 
 function TasksWidget({ data }: { data: WidgetData }) {
+  const t = useTranslations("dashboard");
   return (
-    <WidgetFrame title="My tasks" icon={CheckSquare}>
+    <WidgetFrame title={t("widgets.tasks")} icon={CheckSquare}>
       <ul className="space-y-1.5 overflow-y-auto">
         {data.tasks.length === 0 && (
-          <li className="text-sm text-ink-faint">No open tasks.</li>
+          <li className="text-sm text-ink-faint">{t("widgetEmptyTasks")}</li>
         )}
         {data.tasks.map((t) => (
           <li key={t.id} className="flex items-center gap-2 text-sm">
@@ -151,17 +157,19 @@ function TasksWidget({ data }: { data: WidgetData }) {
 }
 
 function FeedWidget({ data }: { data: WidgetData }) {
+  const t = useTranslations("dashboard");
+  const locale = useLocale();
   return (
-    <WidgetFrame title="Activity feed" icon={Activity}>
+    <WidgetFrame title={t("widgets.feed")} icon={Activity}>
       <ul className="space-y-2 overflow-y-auto">
         {data.feed.length === 0 && (
-          <li className="text-sm text-ink-faint">No recent activity.</li>
+          <li className="text-sm text-ink-faint">{t("widgetEmptyActivity")}</li>
         )}
         {data.feed.map((f) => (
           <li key={f.id} className="text-sm">
-            <span className="text-ink">Someone {f.label}</span>
+            <span className="text-ink">{t("widgetActivityActor")} {f.label}</span>
             <time className="ms-1.5 text-xs text-ink-faint">
-              {new Date(f.occurredAt).toLocaleDateString()}
+              {new Date(f.occurredAt).toLocaleDateString(locale)}
             </time>
           </li>
         ))}

@@ -23,6 +23,14 @@ export default function CrmDashboardLoading() {
         <div className="h-80 animate-pulse rounded-xl border border-line bg-surface-raised motion-reduce:animate-none" />
         <div className="h-80 animate-pulse rounded-xl border border-line bg-surface-raised motion-reduce:animate-none" />
       </div>
+      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
+        <div className="h-72 animate-pulse rounded-xl border border-line bg-surface-raised motion-reduce:animate-none" />
+        <div className="h-72 animate-pulse rounded-xl border border-line bg-surface-raised motion-reduce:animate-none" />
+      </div>
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="h-72 animate-pulse rounded-xl border border-line bg-surface-raised motion-reduce:animate-none" />
+        <div className="h-72 animate-pulse rounded-xl border border-line bg-surface-raised motion-reduce:animate-none" />
+      </div>
     </div>
   );
 }

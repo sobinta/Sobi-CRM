@@ -10,4 +10,17 @@ describe("workspace composition", () => {
     expect(keys).not.toContain("platform-admin");
     expect(keys).toContain("crm");
   });
+
+  it("consolidates management destinations under the CRM workspace", () => {
+    const result = composeWorkspaces([], false, false);
+    expect(result.map((workspace) => workspace.key)).not.toContain("management");
+
+    const crm = result.find((workspace) => workspace.key === "crm");
+    expect(crm?.nav).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ href: "/crm/reports" }),
+        expect.objectContaining({ href: "/crm/activity" }),
+      ]),
+    );
+  });
 });

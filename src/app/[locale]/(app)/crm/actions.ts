@@ -12,6 +12,23 @@ import { createDeal, moveDealToStage } from "@/engines/crm/deal-service";
 import { createCompany } from "@/engines/crm/company-service";
 import { convertLead } from "@/engines/crm/lead-service";
 import { addNote } from "@/engines/timeline/timeline";
+import { search } from "@/engines/search/search-service";
+import { saveDashboard } from "@/engines/dashboards/dashboard-service";
+import type { LayoutItem } from "@/components/patterns/widgets/widget-types";
+
+/** Universal search used by the command palette. */
+export async function searchAction(query: string) {
+  const results = await withActionContext(() => search(query), {
+    intent: "read",
+  });
+  return { results };
+}
+
+export async function saveDashboardAction(layout: LayoutItem[]) {
+  await withActionContext(() => saveDashboard(layout));
+  revalidatePath("/[locale]/(app)/crm", "page");
+  return { ok: true as const };
+}
 
 const contactSchema = z.object({
   firstName: z.string().trim().min(1),

@@ -1,6 +1,6 @@
 import { db, Prisma } from "@/core/db";
 import { requireContext } from "@/core/tenancy/context";
-import type { LayoutItem } from "@/components/patterns/widgets/widget-types";
+import { WIDGET_CATALOG, type LayoutItem, type WidgetType } from "@/components/patterns/widgets/widget-types";
 
 /**
  * Dashboard engine — loads and persists a member's dashboard layout. The first
@@ -18,6 +18,37 @@ const DEFAULT_LAYOUT: LayoutItem[] = [
   { i: "tasks1", x: 0, y: 6, w: 6, h: 5, type: "tasks" },
   { i: "feed1", x: 6, y: 6, w: 6, h: 5, type: "feed" },
 ];
+
+const widgetTypes = new Set<WidgetType>(WIDGET_CATALOG.map((widget) => widget.type));
+const kpiKeys = new Set(["contacts", "openDeals", "wonValue", "openTasks", "conversion"]);
+
+/** Validate and normalize untrusted client layout data before persistence. */
+export function normalizeDashboardLayout(input: unknown): LayoutItem[] {
+  if (!Array.isArray(input) || input.length > 24) throw new Error("Invalid dashboard layout.");
+  const ids = new Set<string>();
+  return input.map((candidate) => {
+    if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error("Invalid dashboard item.");
+    const item = candidate as Record<string, unknown>;
+    const id = typeof item.i === "string" ? item.i.trim() : "";
+    const type = item.type as WidgetType;
+    const values = [item.x, item.y, item.w, item.h];
+    if (!id || id.length > 80 || ids.has(id) || !widgetTypes.has(type) || values.some((value) => !Number.isSafeInteger(value))) {
+      throw new Error("Invalid dashboard item.");
+    }
+    const x = item.x as number;
+    const y = item.y as number;
+    const w = item.w as number;
+    const h = item.h as number;
+    if (x < 0 || x > 11 || y < 0 || y > 999 || w < 1 || w > 12 || h < 1 || h > 12 || x + w > 12) {
+      throw new Error("Invalid dashboard dimensions.");
+    }
+    ids.add(id);
+    const config = type === "kpi" && item.config && typeof item.config === "object" && !Array.isArray(item.config)
+      ? { kpiKey: kpiKeys.has(String((item.config as Record<string, unknown>).kpiKey)) ? String((item.config as Record<string, unknown>).kpiKey) : "openDeals" }
+      : undefined;
+    return { i: id, type, x, y, w, h, ...(config ? { config } : {}) };
+  });
+}
 
 export async function loadDashboard(): Promise<{
   id: string | null;
@@ -38,6 +69,7 @@ export async function loadDashboard(): Promise<{
 
 export async function saveDashboard(layout: LayoutItem[]): Promise<string> {
   const ctx = requireContext();
+  const safeLayout = normalizeDashboardLayout(layout);
   const existing = await db.dashboard.findFirst({
     where: { ownerId: ctx.membershipId, scope: "personal" },
   });
@@ -45,7 +77,7 @@ export async function saveDashboard(layout: LayoutItem[]): Promise<string> {
   if (existing) {
     await db.dashboard.update({
       where: { id: existing.id },
-      data: { layout: layout as unknown as Prisma.InputJsonValue },
+      data: { layout: safeLayout as unknown as Prisma.InputJsonValue },
     });
     return existing.id;
   }
@@ -56,7 +88,7 @@ export async function saveDashboard(layout: LayoutItem[]): Promise<string> {
       name: "My dashboard",
       scope: "personal",
       ownerId: ctx.membershipId,
-      layout: layout as unknown as Prisma.InputJsonValue,
+      layout: safeLayout as unknown as Prisma.InputJsonValue,
       createdById: ctx.membershipId,
     },
   });

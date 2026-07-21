@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition, useCallback, useRef } from "react";
+import { useState, useTransition, useCallback, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import GridLayout, {
   useContainerWidth,
   type Layout as RGLLayout,
@@ -20,7 +21,7 @@ import {
   type WidgetData,
   type WidgetType,
 } from "@/components/patterns/widgets/widget-types";
-import { saveDashboardAction } from "./actions";
+import { saveDashboardAction } from "@/app/[locale]/(app)/crm/actions";
 import { cn } from "@/lib/utils";
 import "react-grid-layout/css/styles.css";
 
@@ -30,16 +31,34 @@ const ROW_HEIGHT = 56;
 export function DashboardClient({
   initialLayout,
   data,
+  direction,
+  readOnly,
 }: {
   initialLayout: LayoutItem[];
   data: WidgetData;
+  direction: "ltr" | "rtl";
+  readOnly: boolean;
 }) {
+  const t = useTranslations("dashboard");
   const [items, setItems] = useState<LayoutItem[]>(initialLayout);
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
   const [pending, startTransition] = useTransition();
   const idCounter = useRef(0);
   const { width, containerRef, mounted } = useContainerWidth();
+
+  useEffect(() => {
+    if (!readOnly) return;
+    const timer = window.setTimeout(() => {
+      try {
+        const stored = window.localStorage.getItem("sobi-crm:demo-dashboard-layout");
+        if (stored) setItems(JSON.parse(stored) as LayoutItem[]);
+      } catch {
+        // Invalid local demo state resets to the trusted server default.
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [readOnly]);
 
   const onLayoutChange = useCallback(
     (layout: RGLLayout) => {
@@ -76,7 +95,11 @@ export function DashboardClient({
 
   function save() {
     startTransition(async () => {
-      await saveDashboardAction(items);
+      if (readOnly) {
+        window.localStorage.setItem("sobi-crm:demo-dashboard-layout", JSON.stringify(items));
+      } else {
+        await saveDashboardAction(items);
+      }
       setSaved(true);
       setEditing(false);
       setTimeout(() => setSaved(false), 2000);
@@ -88,7 +111,7 @@ export function DashboardClient({
       <div className="mb-3 flex items-center justify-end gap-2 px-6">
         {saved && (
           <span className="flex items-center gap-1 text-sm text-positive">
-            <Check className="h-4 w-4" /> Saved
+            <Check className="h-4 w-4" /> {readOnly ? t("savedForDemo") : t("layoutSaved")}
           </span>
         )}
         {editing ? (
@@ -96,7 +119,7 @@ export function DashboardClient({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="secondary">
-                  <Plus className="h-4 w-4" /> Add widget
+                  <Plus className="h-4 w-4" /> {t("addWidget")}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -105,26 +128,26 @@ export function DashboardClient({
                     key={w.type}
                     onSelect={() => addWidget(w.type)}
                   >
-                    {w.name}
+                    {t(`widgets.${w.type}`)}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
             <Button variant="ghost" onClick={() => setEditing(false)}>
-              <X className="h-4 w-4" /> Cancel
+              <X className="h-4 w-4" /> {t("cancelCustomization")}
             </Button>
             <Button variant="primary" onClick={save} disabled={pending}>
-              <Check className="h-4 w-4" /> {pending ? "Saving…" : "Save layout"}
+              <Check className="h-4 w-4" /> {pending ? t("savingLayout") : t("saveLayout")}
             </Button>
           </>
         ) : (
           <Button variant="secondary" onClick={() => setEditing(true)}>
-            <Pencil className="h-4 w-4" /> Edit dashboard
+            <Pencil className="h-4 w-4" /> {t("editDashboard")}
           </Button>
         )}
       </div>
 
-      <div className="px-4" ref={containerRef}>
+      <div className="px-4" ref={containerRef} dir="ltr">
         {mounted && (
         <GridLayout
           className="layout"
@@ -138,6 +161,7 @@ export function DashboardClient({
           {items.map((item) => (
             <div
               key={item.i}
+              dir={direction}
               className={cn(
                 "group relative overflow-x-auto rounded-xl border bg-surface-raised shadow-raised",
                 editing ? "cursor-move border-brand/40" : "border-line",
@@ -147,7 +171,7 @@ export function DashboardClient({
                 <button
                   onClick={() => removeWidget(item.i)}
                   className="widget-remove absolute end-2 top-2 z-10 rounded-md bg-surface-sunken p-1 text-ink-faint opacity-0 transition-opacity hover:text-danger group-hover:opacity-100"
-                  aria-label="Remove widget"
+                  aria-label={t("removeWidget")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

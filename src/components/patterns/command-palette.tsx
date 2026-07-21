@@ -8,7 +8,7 @@ import { Search } from "lucide-react";
 import { getCommands, subscribe, registerCommands } from "@/core/commands/registry";
 import { buildNavigationCommands } from "@/core/commands/navigation-commands";
 import type { Command } from "@/core/commands/types";
-import { searchAction } from "@/app/[locale]/(app)/mgmt/actions";
+import { searchAction } from "@/app/[locale]/(app)/crm/actions";
 import { cn } from "@/lib/utils";
 
 interface SearchHit {
