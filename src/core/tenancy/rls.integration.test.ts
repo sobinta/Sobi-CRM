@@ -4,6 +4,7 @@ import { identityDb } from "@/core/db/identity";
 import { systemDb } from "@/core/db/system";
 import { publicTenantContext, runWithContext } from "./context";
 import { registerBuiltinEntity, resolveEntity } from "@/core/metadata/registry";
+import { assignOperatorTicket } from "@/engines/support/operator-service";
 
 const enabled = process.env.RUN_DATABASE_INTEGRATION_TESTS === "true";
 const suite = enabled ? describe : describe.skip;
@@ -59,6 +60,8 @@ suite("PostgreSQL tenant RLS", () => {
 
   afterAll(async () => {
     if (tenantA && tenantB) {
+      await systemDb.supportMessage.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
+      await systemDb.supportTicket.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.calendarReminder.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.calendarEvent.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.entityDefinition.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
@@ -157,7 +160,7 @@ suite("PostgreSQL tenant RLS", () => {
             firstName: "Nested",
             lastName: "Connect",
             company: { connect: { id: companyB } },
-          },
+          } as never,
         }),
       ),
     ).rejects.toThrow();
@@ -275,6 +278,41 @@ suite("PostgreSQL tenant RLS", () => {
         }),
       ),
     ).rejects.toThrow();
+  });
+
+  it("isolates support conversations by requester and deduplicates client messages", async () => {
+    const contextFor = (tenantId: string, membershipId: string, userId: string) => ({
+      ...publicTenantContext(tenantId), membershipId, userId,
+    });
+    const ticket = await runWithContext(contextFor(tenantA, membershipA, userA), () =>
+      db.supportTicket.create({
+        data: {
+          tenantId: tenantA,
+          requesterMembershipId: membershipA,
+          subject: `Support ${nonce}`,
+          messages: { create: { senderMembershipId: membershipA, senderUserId: userA, senderKind: "CUSTOMER", body: "Safe test body", clientMessageId: `initial_${nonce.replace(/[^a-z0-9]/gi, "_")}` } },
+        },
+      }),
+    );
+
+    await expect(runWithContext(contextFor(tenantA, membershipA, userA), () => db.supportTicket.findMany({ select: { id: true } }))).resolves.toEqual([{ id: ticket.id }]);
+    await expect(runWithContext(contextFor(tenantA, membershipA2, userA2), () => db.supportTicket.findMany({ select: { id: true } }))).resolves.toEqual([]);
+    await expect(runWithContext(contextFor(tenantB, membershipB, userB), () => db.supportTicket.findMany({ select: { id: true } }))).resolves.toEqual([]);
+
+    await expect(runWithContext(contextFor(tenantA, membershipA, userA), () => db.supportTicket.create({ data: { tenantId: tenantA, requesterMembershipId: membershipB, subject: "Forged requester" } }))).rejects.toThrow();
+
+    const duplicateInput = { tenantId: tenantA, ticketId: ticket.id, senderMembershipId: membershipA, senderUserId: userA, senderKind: "CUSTOMER" as const, body: "Retry-safe", clientMessageId: `retry_${nonce.replace(/[^a-z0-9]/gi, "_")}` };
+    await runWithContext(contextFor(tenantA, membershipA, userA), () => db.supportMessage.create({ data: duplicateInput }));
+    await expect(runWithContext(contextFor(tenantA, membershipA, userA), () => db.supportMessage.create({ data: duplicateInput }))).rejects.toMatchObject({ code: "P2002" });
+
+    await systemDb.supportMessage.create({ data: { tenantId: tenantA, ticketId: ticket.id, senderUserId: userB, senderKind: "OPERATOR", body: "Operator response" } });
+    const visible = await runWithContext(contextFor(tenantA, membershipA, userA), () => db.supportMessage.findMany({ where: { ticketId: ticket.id }, select: { senderKind: true } }));
+    expect(visible.map((message) => message.senderKind)).toContain("OPERATOR");
+
+    await expect(runWithContext(contextFor(tenantA, membershipA, userA), () => assignOperatorTicket(ticket.id, userA))).rejects.toThrow("platform.super-admin");
+    await runWithContext({ ...contextFor(tenantA, membershipA, userA), isSuperAdmin: true }, () => assignOperatorTicket(ticket.id, userA));
+    const audit = await systemDb.auditLog.findFirst({ where: { tenantId: tenantA, action: "support.ticket.assign", entityId: ticket.id } });
+    expect(audit?.after).toMatchObject({ targetTenantId: tenantA, assigned: true });
   });
 
   it("merges only the active tenant's built-in field extensions", async () => {

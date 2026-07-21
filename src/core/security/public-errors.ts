@@ -6,6 +6,7 @@ import {
 import { logger } from "@/core/observability/logger";
 import { UnsafeOutboundUrlError } from "./outbound-url";
 import { UnsafeUploadError } from "./upload-policy";
+import { EntitlementRequiredError } from "@/core/billing/quota";
 
 export type PublicErrorCode =
   | "conflict"
@@ -18,6 +19,7 @@ export type PublicErrorCode =
 export function publicErrorCode(error: unknown): PublicErrorCode {
   if (error instanceof TenantMismatchError) return "not_found";
   if (error instanceof ForbiddenError) return "forbidden";
+  if (error instanceof EntitlementRequiredError) return "forbidden";
   if (error instanceof UnsafeOutboundUrlError || error instanceof UnsafeUploadError) {
     return "invalid";
   }

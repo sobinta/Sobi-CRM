@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleHelp, Compass } from "lucide-react";
+import { CircleHelp, Compass, Headphones } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   DropdownMenu,
@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useOnboardingTour } from "@/components/onboarding/onboarding-tour";
+import { Link } from "@/i18n/navigation";
 
 export function HelpUtility() {
   const t = useTranslations("help");
@@ -29,6 +30,12 @@ export function HelpUtility() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>{t("title")}</DropdownMenuLabel>
+        <DropdownMenuItem asChild>
+          <Link href="/support">
+            <Headphones aria-hidden="true" className="h-4 w-4 text-brand" />
+            {t("openSupport")}
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={replay}>
           <Compass aria-hidden="true" className="h-4 w-4 text-brand" />
           {t("replayTour")}

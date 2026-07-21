@@ -45,6 +45,8 @@ model Tenant {
   usageCounters UsageCounter[]
   imports       ImportRun[]
   onboardingProgress OnboardingProgress[]
+  supportTickets SupportTicket[]
+  supportMessages SupportMessage[]
 
   @@index([status])
 }
@@ -89,6 +91,8 @@ model Membership {
   roles       MembershipRole[]
   teamMembers TeamMember[]
   onboardingProgress OnboardingProgress[]
+  supportTickets SupportTicket[] @relation("SupportTicketRequester")
+  supportMessages SupportMessage[] @relation("SupportMessageSender")
 
   @@unique([tenantId, userId])
   @@index([tenantId])

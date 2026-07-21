@@ -93,7 +93,9 @@
     "contracts": "Verträge",
     "pricingPlans": "Preispläne",
     "landingContent": "Landingpage-Inhalte",
-    "branding": "Branding"
+    "branding": "Branding",
+    "announcementBar": "Ankündigungsleiste",
+    "supportInbox": "Support-Postfach"
   },
   "shell": {
     "commandHint": "Drücken Sie {shortcut} zum Suchen",
@@ -501,7 +503,11 @@
   },
   "help": {
     "title": "Hilfe und Support",
-    "replayTour": "Produkttour erneut starten"
+    "replayTour": "Produkttour erneut starten",
+    "openSupport": "Support-Center öffnen"
+  },
+  "support": {
+    "title": "Support-Center", "description": "Tickets und planabhängige Live-Hilfe in einem sicheren Verlauf.", "newTicket": "Neue Anfrage", "myTickets": "Meine Anfragen", "empty": "Noch keine Support-Anfragen.", "ticket": "Ticket", "live": "Live-Chat", "messages": "Nachrichten", "newRequest": "Wie können wir helfen?", "newRequestHint": "Geben Sie genug Kontext an, damit das Sobinta-Team schnell antworten kann.", "liveUpgrade": "Live-Chat ist in ausgewählten professionellen Plänen verfügbar. Tickets gibt es in jedem Plan.", "subject": "Betreff", "category": "Kategorie", "general": "Allgemein", "technical": "Technisch", "billing": "Abrechnung", "feature": "Funktionswunsch", "message": "Nachricht", "cancel": "Abbrechen", "startChat": "Chat starten", "sendTicket": "Ticket senden", "status": "Status", "connected": "Live-Kanal aktiv", "replyPlaceholder": "Antwort schreiben…", "send": "Senden", "selectTitle": "Unterhaltung auswählen", "selectHint": "Öffnen Sie eine Anfrage oder kontaktieren Sie den Sobinta-Support.", "demoSaved": "Demo lokal aktualisiert; nichts wurde gespeichert.", "failed": "Anfrage konnte nicht gesendet werden. Ihr Text bleibt erhalten; bitte erneut versuchen."
   },
   "imports": {
     "title": "Datenimporte",

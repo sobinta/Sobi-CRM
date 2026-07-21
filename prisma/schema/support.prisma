@@ -1,0 +1,79 @@
+// ============================================================
+// Sobinta product support — tenant-owned tickets with a platform operator
+// surface. Customer access always flows through the tenant capability; the
+// cross-tenant inbox is restricted to the audited system capability.
+// ============================================================
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_ON_CUSTOMER
+  RESOLVED
+  CLOSED
+}
+
+enum SupportPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum SupportChannel {
+  TICKET
+  LIVE_CHAT
+}
+
+enum SupportSenderKind {
+  CUSTOMER
+  OPERATOR
+  SYSTEM
+}
+
+model SupportTicket {
+  id                    String              @id @default(cuid())
+  tenantId              String
+  requesterMembershipId String
+  subject               String
+  category              String              @default("general")
+  priority              SupportPriority     @default(NORMAL)
+  status                SupportTicketStatus @default(OPEN)
+  channel               SupportChannel      @default(TICKET)
+  assignedToUserId      String?
+  requesterLastReadAt   DateTime?
+  operatorLastReadAt    DateTime?
+  lastMessageAt         DateTime            @default(now())
+  resolvedAt            DateTime?
+  closedAt              DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  requester Membership       @relation("SupportTicketRequester", fields: [requesterMembershipId], references: [id], onDelete: Restrict)
+  messages  SupportMessage[]
+
+  @@unique([tenantId, id])
+  @@index([tenantId, requesterMembershipId, updatedAt])
+  @@index([tenantId, status, priority, lastMessageAt])
+  @@index([assignedToUserId, status, lastMessageAt])
+}
+
+model SupportMessage {
+  id                 String            @id @default(cuid())
+  tenantId           String
+  ticketId           String
+  senderMembershipId String?
+  senderUserId       String?
+  senderKind         SupportSenderKind
+  body               String
+  clientMessageId    String?
+  createdAt          DateTime          @default(now())
+
+  tenant Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticket SupportTicket @relation(fields: [tenantId, ticketId], references: [tenantId, id], onDelete: Cascade)
+  sender Membership?   @relation("SupportMessageSender", fields: [senderMembershipId], references: [id], onDelete: SetNull)
+
+  @@unique([tenantId, ticketId, clientMessageId])
+  @@index([tenantId, ticketId, createdAt])
+  @@index([tenantId, senderMembershipId])
+}

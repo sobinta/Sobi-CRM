@@ -76,6 +76,7 @@ model ImportRun {
   updatedAt   DateTime     @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  contacts Contact[]
 
   @@unique([tenantId, id])
   @@index([tenantId, status, createdAt])

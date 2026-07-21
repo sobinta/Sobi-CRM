@@ -94,7 +94,8 @@
     "pricingPlans": "Pricing Plans",
     "landingContent": "Landing Content",
     "branding": "Branding",
-    "announcementBar": "Announcement Bar"
+    "announcementBar": "Announcement Bar",
+    "supportInbox": "Support inbox"
   },
   "shell": {
     "commandHint": "Press {shortcut} to search",
@@ -503,7 +504,11 @@
   },
   "help": {
     "title": "Help and support",
-    "replayTour": "Replay product tour"
+    "replayTour": "Replay product tour",
+    "openSupport": "Open support center"
+  },
+  "support": {
+    "title": "Support center", "description": "Tickets and plan-enabled live help, in one secure conversation history.", "newTicket": "New request", "myTickets": "My requests", "empty": "No support requests yet.", "ticket": "Ticket", "live": "Live chat", "messages": "messages", "newRequest": "How can we help?", "newRequestHint": "Share enough context to help the Sobinta team respond quickly.", "liveUpgrade": "Live chat is available on eligible professional plans. Tickets remain available on every plan.", "subject": "Subject", "category": "Category", "general": "General", "technical": "Technical", "billing": "Billing", "feature": "Feature request", "message": "Message", "cancel": "Cancel", "startChat": "Start chat", "sendTicket": "Send ticket", "status": "Status", "connected": "Live channel active", "replyPlaceholder": "Write a reply…", "send": "Send", "selectTitle": "Choose a conversation", "selectHint": "Open an existing request or start a new one to contact Sobinta support.", "demoSaved": "Demo simulation updated locally; nothing was saved.", "failed": "The request could not be sent. Your text is preserved; please retry."
   },
   "imports": {
     "title": "Data imports",

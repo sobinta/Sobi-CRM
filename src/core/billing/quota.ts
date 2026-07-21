@@ -95,6 +95,35 @@ export async function tenantEntitlements(): Promise<EntitlementSnapshot> {
   };
 }
 
+export async function hasTenantEntitlement(key: string): Promise<boolean> {
+  return (await tenantEntitlements()).entitlements.has(key);
+}
+
+export class EntitlementRequiredError extends Error {
+  readonly code = "entitlement_required";
+  constructor(readonly entitlement: string) {
+    super(`Entitlement required: ${entitlement}.`);
+    this.name = "EntitlementRequiredError";
+  }
+}
+
+export async function requireTenantEntitlement(key: string): Promise<void> {
+  if (!(await hasTenantEntitlement(key))) throw new EntitlementRequiredError(key);
+}
+
+/** Trusted cross-tenant check for already-authorized platform operations. */
+export async function systemTenantHasEntitlement(tenantId: string, key: string): Promise<boolean> {
+  const now = new Date();
+  const subscription = await systemDb.tenantSubscription.findUnique({
+    where: { tenantId },
+    include: { plan: true },
+  });
+  if (!subscription || !["TRIALING", "ACTIVE"].includes(subscription.status) || subscription.currentPeriodEnd <= now || !subscription.plan.active) {
+    return false;
+  }
+  return Array.isArray(subscription.plan.entitlements) && subscription.plan.entitlements.includes(key);
+}
+
 export async function assertRecordQuota(
   metric: QuotaMetric,
   current: number,

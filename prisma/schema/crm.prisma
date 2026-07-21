@@ -58,6 +58,7 @@ model Contact {
   deletedAt   DateTime?
 
   company Company? @relation(fields: [companyId], references: [id])
+  importRun ImportRun? @relation(fields: [tenantId, importRunId], references: [tenantId, id], onDelete: Restrict)
   leads   Lead[]
   deals   Deal[]
 
