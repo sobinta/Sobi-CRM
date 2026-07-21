@@ -1,0 +1,22 @@
+// ============================================================
+// Versioned onboarding progress. Each membership owns its own progress
+// inside a tenant so tours do not leak between users or workspaces.
+// ============================================================
+
+model OnboardingProgress {
+  id           String    @id @default(cuid())
+  tenantId     String
+  membershipId String
+  tourKey      String
+  version      Int
+  completedAt  DateTime?
+  skippedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  membership Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, membershipId, tourKey, version])
+  @@index([tenantId, membershipId])
+}

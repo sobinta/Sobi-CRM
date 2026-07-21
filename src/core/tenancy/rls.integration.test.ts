@@ -13,6 +13,12 @@ suite("PostgreSQL tenant RLS", () => {
   let tenantB = "";
   let companyA = "";
   let companyB = "";
+  let userA = "";
+  let userA2 = "";
+  let userB = "";
+  let membershipA = "";
+  let membershipA2 = "";
+  let membershipB = "";
 
   beforeAll(async () => {
     const [a, b] = await Promise.all([
@@ -31,13 +37,32 @@ suite("PostgreSQL tenant RLS", () => {
     ]);
     companyA = aCompany.id;
     companyB = bCompany.id;
+    const [aUser, aUser2, bUser] = await Promise.all([
+      systemDb.user.create({ data: { email: `rls-a-${nonce}@example.test`, name: "RLS A" } }),
+      systemDb.user.create({ data: { email: `rls-a2-${nonce}@example.test`, name: "RLS A2" } }),
+      systemDb.user.create({ data: { email: `rls-b-${nonce}@example.test`, name: "RLS B" } }),
+    ]);
+    userA = aUser.id;
+    userA2 = aUser2.id;
+    userB = bUser.id;
+    const [aMembership, aMembership2, bMembership] = await Promise.all([
+      systemDb.membership.create({ data: { tenantId: tenantA, userId: userA } }),
+      systemDb.membership.create({ data: { tenantId: tenantA, userId: userA2 } }),
+      systemDb.membership.create({ data: { tenantId: tenantB, userId: userB } }),
+    ]);
+    membershipA = aMembership.id;
+    membershipA2 = aMembership2.id;
+    membershipB = bMembership.id;
   });
 
   afterAll(async () => {
     if (tenantA && tenantB) {
+      await systemDb.onboardingProgress.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
+      await systemDb.membership.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.contact.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.company.deleteMany({ where: { tenantId: { in: [tenantA, tenantB] } } });
       await systemDb.tenant.deleteMany({ where: { id: { in: [tenantA, tenantB] } } });
+      await systemDb.user.deleteMany({ where: { id: { in: [userA, userA2, userB] } } });
     }
     await Promise.all([
       db.$disconnect(),
@@ -135,5 +160,53 @@ suite("PostgreSQL tenant RLS", () => {
 
   it("does not grant the identity capability access to CRM tables", async () => {
     await expect(identityDb.company.findMany({ take: 1 })).rejects.toThrow();
+  });
+
+  it("isolates onboarding progress by both tenant and membership", async () => {
+    const contextFor = (tenantId: string, membershipId: string, userId: string) => ({
+      ...publicTenantContext(tenantId),
+      membershipId,
+      userId,
+    });
+
+    const created = await runWithContext(contextFor(tenantA, membershipA, userA), () =>
+      db.onboardingProgress.create({
+        data: {
+          tenantId: tenantA,
+          membershipId: membershipA,
+          tourKey: "rls-tour",
+          version: 1,
+        },
+      }),
+    );
+
+    await expect(
+      runWithContext(contextFor(tenantA, membershipA, userA), () =>
+        db.onboardingProgress.findMany({ select: { id: true } }),
+      ),
+    ).resolves.toEqual([{ id: created.id }]);
+    await expect(
+      runWithContext(contextFor(tenantA, membershipA2, userA2), () =>
+        db.onboardingProgress.findMany({ select: { id: true } }),
+      ),
+    ).resolves.toEqual([]);
+    await expect(
+      runWithContext(contextFor(tenantB, membershipB, userB), () =>
+        db.onboardingProgress.findMany({ select: { id: true } }),
+      ),
+    ).resolves.toEqual([]);
+
+    await expect(
+      runWithContext(contextFor(tenantA, membershipA, userA), () =>
+        db.onboardingProgress.create({
+          data: {
+            tenantId: tenantA,
+            membershipId: membershipB,
+            tourKey: "forged-membership",
+            version: 1,
+          },
+        }),
+      ),
+    ).rejects.toThrow();
   });
 });

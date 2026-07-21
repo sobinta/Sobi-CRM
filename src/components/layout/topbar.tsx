@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { UserMenu, TenantBadge } from "./user-menu";
 import { NotificationCenter } from "./notification-center";
 import { useMobileNav } from "./mobile-nav-context";
+import { HelpUtility } from "./help-utility";
 
 export function Topbar() {
   const t = useTranslations();
@@ -15,6 +16,7 @@ export function Topbar() {
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <button
           type="button"
+          data-tour="global-search"
           onClick={toggle}
           aria-label={t("shell.menu")}
           aria-expanded={open}
@@ -44,6 +46,7 @@ export function Topbar() {
 
       <div className="flex shrink-0 items-center gap-1.5">
         <TenantBadge />
+        <HelpUtility />
         <NotificationCenter />
         <UserMenu />
       </div>

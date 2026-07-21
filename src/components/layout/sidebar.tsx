@@ -16,7 +16,7 @@ export function Sidebar() {
   const { close } = useMobileNav();
 
   return (
-    <div className="flex h-[52px] shrink-0 items-center gap-3 border-b border-line bg-surface px-3 sm:px-4">
+    <div data-tour="context-navigation" className="flex h-[52px] shrink-0 items-center gap-3 border-b border-line bg-surface px-3 sm:px-4">
       <span className="shrink-0 border-e border-line pe-3 text-xs font-semibold tracking-wide text-ink-faint uppercase">
         {tWs(workspace.labelKey)}
       </span>

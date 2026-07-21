@@ -456,6 +456,27 @@
     "linkUrl": "Link-URL (optional)",
     "preview": "Vorschau"
   },
+  "onboardingTour": {
+    "progress": "Schritt {current} von {total}",
+    "skip": "Tour überspringen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "finish": "Fertig",
+    "steps": {
+      "dashboard": { "title": "Ihre CRM-Kommandozentrale", "description": "Hier sehen Sie Pipeline, Wiedervorlagen, Aktivitäten und Punkte mit Handlungsbedarf auf einen Blick." },
+      "rail": { "title": "Zwischen Sobinta-Produkten wechseln", "description": "Die Produktleiste verbindet CRM, Vorgänge, Finanzen, KI und Studio in einem konsistenten Arbeitsbereich." },
+      "navigation": { "title": "Im aktuellen Produkt arbeiten", "description": "Diese Zeile passt sich dem gewählten Produkt an und hält die täglichen Werkzeuge griffbereit." },
+      "search": { "title": "Alles schnell finden", "description": "Suchen Sie überall nach Datensätzen und Aktionen. Mit Strg K öffnen Sie die Suche direkt." },
+      "calendar": { "title": "Arbeit in einem Kalender planen", "description": "Unter Vorgänge finden Sie den gemeinsamen gregorianischen und persischen Kalender mit Erinnerungen." },
+      "forms": { "title": "Geschäftsformulare anpassen", "description": "Im Studio werden wiederverwendbare Felder und Formulare an Ihre Abläufe angepasst." },
+      "support": { "title": "Hilfe ist immer erreichbar", "description": "Hier können Sie diese Tour erneut starten. Tickets und tarifabhängiger Live-Support folgen ebenfalls hier." },
+      "profile": { "title": "Profil und Abonnement", "description": "Prüfen Sie Profil und Tarif und wechseln Sie bei wachsendem Bedarf in einen höheren Plan." }
+    }
+  },
+  "help": {
+    "title": "Hilfe und Support",
+    "replayTour": "Produkttour erneut starten"
+  },
   "imports": {
     "title": "Datenimporte",
     "description": "Kontakte aus einem anderen System in diesen Arbeitsbereich übernehmen.",

@@ -457,6 +457,27 @@
     "linkUrl": "Link URL (optional)",
     "preview": "Preview"
   },
+  "onboardingTour": {
+    "progress": "Step {current} of {total}",
+    "skip": "Skip tour",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "steps": {
+      "dashboard": { "title": "Your CRM command center", "description": "Start here for the health of your pipeline, follow-ups, activity, and items that need attention." },
+      "rail": { "title": "Move between Sobinta products", "description": "The product rail keeps CRM, operations, finance, AI, and Studio within one consistent workspace." },
+      "navigation": { "title": "Work within the current product", "description": "This row changes with the selected product and keeps its daily tools close at hand." },
+      "search": { "title": "Find anything quickly", "description": "Search records and actions from anywhere. You can also open it with Ctrl K." },
+      "calendar": { "title": "Plan work on one calendar", "description": "Open Operations for the shared Gregorian and Jalali calendar, reminders, and scheduled CRM work." },
+      "forms": { "title": "Adapt business forms", "description": "Studio is where reusable business fields and forms can be tailored to each workflow." },
+      "support": { "title": "Help is always within reach", "description": "Replay this tour here. Tickets and plan-enabled live support will also live in this utility." },
+      "profile": { "title": "Your profile and subscription", "description": "Review your profile and current plan here, then upgrade when your team needs more capacity." }
+    }
+  },
+  "help": {
+    "title": "Help and support",
+    "replayTour": "Replay product tour"
+  },
   "imports": {
     "title": "Data imports",
     "description": "Bring contacts from another system into this workspace.",

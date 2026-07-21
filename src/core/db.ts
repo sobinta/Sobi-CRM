@@ -86,8 +86,12 @@ function makeClient() {
           const setTenant = base.$executeRaw`
             SELECT set_config('app.tenant_id', ${ctx.tenantId}, true)
           `;
-          const [, result] = await base.$transaction([
+          const setMembership = base.$executeRaw`
+            SELECT set_config('app.membership_id', ${ctx.membershipId}, true)
+          `;
+          const [, , result] = await base.$transaction([
             setTenant,
+            setMembership,
             query(next),
           ]);
           // PostgreSQL may return no row for an UPSERT that conflicts with a

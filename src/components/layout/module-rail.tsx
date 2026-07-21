@@ -73,6 +73,7 @@ export function ModuleRail({ mobile = false }: { mobile?: boolean }) {
   return (
     <nav
       aria-label={tApp("name")}
+      data-tour="module-rail"
       className={cn(
         "flex h-full shrink-0 flex-col bg-surface-rail py-2 transition-[width] duration-(--motion-base) motion-reduce:transition-none",
         expanded ? "w-[210px] items-stretch px-2" : "w-[72px] items-center px-1",
@@ -110,6 +111,13 @@ export function ModuleRail({ mobile = false }: { mobile?: boolean }) {
           const link = (
             <Link
               href={ws.href}
+              data-tour={
+                ws.key === "operations"
+                  ? "calendar-entry"
+                  : ws.key === "studio"
+                    ? "form-entry"
+                    : undefined
+              }
               onClick={close}
               aria-label={expanded ? undefined : t(ws.labelKey)}
               aria-current={active ? "page" : undefined}

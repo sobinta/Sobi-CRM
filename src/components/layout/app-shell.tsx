@@ -9,6 +9,7 @@ import { MobileNavProvider } from "./mobile-nav-context";
 import { MobileNavOverlay } from "./mobile-nav-overlay";
 import { CommandPalette } from "@/components/patterns/command-palette";
 import { DemoStatusBar } from "./demo-status-bar";
+import { OnboardingTourProvider } from "@/components/onboarding/onboarding-tour";
 
 export interface AnnouncementBarData {
   text: string;
@@ -24,15 +25,22 @@ export function AppShell({
   enabledModuleKeys,
   announcement,
   skipLabel,
+  onboardingCompleted,
 }: {
   children: ReactNode;
   user: SessionUser;
   enabledModuleKeys: string[];
   announcement?: AnnouncementBarData | null;
   skipLabel: string;
+  onboardingCompleted: boolean;
 }) {
   return (
     <SessionProvider user={user}>
+    <OnboardingTourProvider
+      initialCompleted={onboardingCompleted}
+      tenantId={user.activeTenantId}
+      demo={user.accessMode === "read-only"}
+    >
     <WorkspacesProvider
       enabledModuleKeys={enabledModuleKeys}
       isSuperAdmin={user.isSuperAdmin}
@@ -62,6 +70,7 @@ export function AppShell({
       <CommandPalette />
     </MobileNavProvider>
     </WorkspacesProvider>
+    </OnboardingTourProvider>
     </SessionProvider>
   );
 }

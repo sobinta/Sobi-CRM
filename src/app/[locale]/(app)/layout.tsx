@@ -12,6 +12,7 @@ import {
 import { AppShell } from "@/components/layout/app-shell";
 import type { SessionUser } from "@/components/layout/session-context";
 import { getTenantPlanSummary } from "@/core/billing/subscription-summary";
+import { getDashboardTourCompleted } from "@/core/onboarding/tour-service";
 
 export default async function AppLayout({
   children,
@@ -35,14 +36,17 @@ export default async function AppLayout({
     const { MODULE_CATALOG } = await import(
       "@/core/module-registry/catalog"
     );
-    const [features, plan] = await Promise.all([
+    const [features, plan, onboardingCompleted] = await Promise.all([
       loadTenantFeatures(),
       getTenantPlanSummary(locale),
+      s.active!.accessMode === "read-only"
+        ? Promise.resolve(false)
+        : getDashboardTourCompleted(),
     ]);
     const enabledModuleKeys = MODULE_CATALOG.filter(
       (m) => features.get(`module.${m.key}`) === true,
     ).map((m) => m.key);
-    return { enabledModuleKeys, plan };
+    return { enabledModuleKeys, plan, onboardingCompleted };
   });
   const branding = await getTenantBranding(s.active!.tenantId);
   const brandCss = isCustomBranding(branding)
@@ -96,6 +100,7 @@ export default async function AppLayout({
         user={user}
         enabledModuleKeys={workspaceData?.enabledModuleKeys ?? []}
         announcement={announcement}
+        onboardingCompleted={workspaceData?.onboardingCompleted ?? false}
         skipLabel={
           locale === "fa"
             ? "رفتن به محتوای اصلی"

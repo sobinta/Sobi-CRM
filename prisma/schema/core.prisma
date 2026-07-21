@@ -44,6 +44,7 @@ model Tenant {
   subscription  TenantSubscription?
   usageCounters UsageCounter[]
   imports       ImportRun[]
+  onboardingProgress OnboardingProgress[]
 
   @@index([status])
 }
@@ -87,6 +88,7 @@ model Membership {
   user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   roles       MembershipRole[]
   teamMembers TeamMember[]
+  onboardingProgress OnboardingProgress[]
 
   @@unique([tenantId, userId])
   @@index([tenantId])

@@ -86,6 +86,7 @@ export const TENANT_SCOPED = new Set<string>([
   "TenantSubscription",
   "UsageCounter",
   "ImportRun",
+  "OnboardingProgress",
   // NB: EntityDefinition is intentionally NOT here — built-ins have a null
   // tenantId and are shared across tenants; its queries filter explicitly.
 ]);

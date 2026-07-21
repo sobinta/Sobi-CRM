@@ -24,7 +24,7 @@ export function RailAccountUtility({
     <Link
       href="/profile"
       onClick={onNavigate}
-      data-tour="profile-plan"
+      data-tour="profile-entry"
       aria-label={expanded ? undefined : t("openProfileFor", { name: user.name })}
       className={cn(
         "group flex min-h-11 items-center rounded-lg text-ink-on-rail outline-none",
