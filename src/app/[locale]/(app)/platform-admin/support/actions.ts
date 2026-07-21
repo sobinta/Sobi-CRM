@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { withActionContext } from "@/core/auth/action-context";
 import { requireContext } from "@/core/tenancy/context";
 import { reportPublicActionError } from "@/core/security/public-errors";
-import { assignOperatorTicket, getOperatorTicket, listOperatorTickets, replyAsOperator, setOperatorTicketStatus } from "@/engines/support/operator-service";
+import { assignOperatorTicket, getOperatorTicket, listOperatorTickets, replyAsOperator, setOperatorTicketStatus } from "@/engines/platform-admin/support-service";
 
 function detailDto(ticket: Awaited<ReturnType<typeof getOperatorTicket>>) {
   if (!ticket) return null;

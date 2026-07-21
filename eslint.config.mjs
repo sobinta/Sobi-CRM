@@ -119,6 +119,14 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // Integration tests verify cross-layer security boundaries and may exercise
+  // an engine through its public API. Production core modules remain isolated.
+  {
+    files: ["src/core/**/*.integration.test.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": "off",
+    },
+  },
   {
     files: ["src/engines/**/*.{ts,tsx}"],
     rules: {

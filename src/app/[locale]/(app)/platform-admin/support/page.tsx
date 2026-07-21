@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { resolveSession } from "@/core/auth/session";
 import { withPlatformContext } from "@/core/auth/with-context";
-import { listOperatorTickets } from "@/engines/support/operator-service";
+import { listOperatorTickets } from "@/engines/platform-admin/support-service";
 import { SupportInboxClient } from "./support-inbox-client";
 
 export default async function PlatformSupportPage() {

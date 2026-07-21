@@ -4,6 +4,21 @@ import { requireTenantEntitlement } from "@/core/billing/quota";
 import { requireContext } from "@/core/tenancy/context";
 import { publishSupportEvent } from "./live-events";
 import { createSupportTicketSchema, supportReplySchema, supportText } from "./schemas";
+import { limit, rateLimitKey } from "@/core/security/rate-limit";
+
+export class SupportRateLimitError extends Error {
+  readonly code = "support_rate_limited";
+  constructor(readonly unavailable = false) {
+    super("Support request rate limit exceeded.");
+    this.name = "SupportRateLimitError";
+  }
+}
+
+export async function enforceSupportRateLimit(action: string, max: number, windowMs: number): Promise<void> {
+  const ctx = requireContext();
+  const result = await limit(rateLimitKey(`support-${action}`, `${ctx.tenantId}:${ctx.userId}`), { max, windowMs });
+  if (!result.ok) throw new SupportRateLimitError(Boolean(result.unavailable));
+}
 
 export async function listCustomerTickets() {
   const ctx = requireContext();
@@ -37,6 +52,7 @@ export async function getCustomerTicket(ticketId: string) {
 export async function createCustomerTicket(input: unknown) {
   const parsed = createSupportTicketSchema.parse(input);
   const ctx = requireContext();
+  await enforceSupportRateLimit("ticket", 10, 60 * 60_000);
   if (parsed.channel === "LIVE_CHAT") await requireTenantEntitlement("support.live_chat");
   const now = new Date();
   const ticket = await db.supportTicket.create({
@@ -79,6 +95,7 @@ export async function createCustomerTicket(input: unknown) {
 export async function replyToCustomerTicket(input: unknown, requireLive = false) {
   const parsed = supportReplySchema.parse(input);
   const ctx = requireContext();
+  await enforceSupportRateLimit("reply", 30, 60_000);
   const ticket = await db.supportTicket.findFirst({
     where: { id: parsed.ticketId, requesterMembershipId: ctx.membershipId },
     select: { id: true, channel: true, status: true },

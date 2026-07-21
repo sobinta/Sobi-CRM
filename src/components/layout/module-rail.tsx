@@ -179,7 +179,7 @@ export function ModuleRail({ mobile = false }: { mobile?: boolean }) {
                 expanded ? "gap-2.5 px-3 text-sm" : "h-11 w-11 justify-center",
               )}
             >
-              <Globe className="h-4.5 w-4.5 shrink-0" />
+              <Globe aria-hidden="true" className="h-4.5 w-4.5 shrink-0" />
               {expanded && <span className="truncate">{tShell("backToSite")}</span>}
             </Link>
           );
@@ -207,9 +207,9 @@ export function ModuleRail({ mobile = false }: { mobile?: boolean }) {
           )}
         >
         {chevron === "left" ? (
-          <ChevronsLeft className="h-4 w-4" />
+          <ChevronsLeft aria-hidden="true" className="h-4 w-4" />
         ) : (
-          <ChevronsRight className="h-4 w-4" />
+          <ChevronsRight aria-hidden="true" className="h-4 w-4" />
         )}
         </button>
       )}

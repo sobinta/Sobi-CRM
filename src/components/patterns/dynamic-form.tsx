@@ -181,7 +181,7 @@ function FieldControl({
             value={selected}
             disabled={disabled}
             onChange={(event) => onChange(Array.from(event.target.selectedOptions, (option) => option.value))}
-            className="min-h-24 w-full rounded-md border border-line bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/15"
+            className="min-h-24 w-full rounded-md border border-line bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus-visible:border-brand focus-visible:ring-2 focus-visible:ring-brand/15"
           >
             {def.options?.map((option) => <option key={option.value} value={option.value}>{labelFor(option.label, locale)}</option>)}
           </select>

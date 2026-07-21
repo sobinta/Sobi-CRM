@@ -3,8 +3,9 @@ import { record } from "@/core/audit/audit";
 import { getContext } from "@/core/tenancy/context";
 import { requireSuperAdmin } from "@/core/rbac/guard";
 import { EntitlementRequiredError, systemTenantHasEntitlement } from "@/core/billing/quota";
-import { publishSupportEvent } from "./live-events";
-import { supportOperatorFilterSchema, supportReplySchema, supportText, ticketIdSchema } from "./schemas";
+import { limit, rateLimitKey } from "@/core/security/rate-limit";
+import { publishSupportEvent } from "@/engines/support/live-events";
+import { supportOperatorFilterSchema, supportReplySchema, supportText, ticketIdSchema } from "@/engines/support/schemas";
 
 export async function listOperatorTickets(input: unknown = {}) {
   requireSuperAdmin();
@@ -87,9 +88,11 @@ export async function replyAsOperator(input: unknown) {
   const parsed = supportReplySchema.parse(input);
   const ctx = getContext();
   if (!ctx) throw new Error("No operator context.");
+  const throttle = await limit(rateLimitKey("support-operator-reply", `${ctx.userId}:${parsed.ticketId}`), { max: 60, windowMs: 60_000 });
+  if (!throttle.ok) throw new Error("Operator support rate limited.");
   const target = await systemDb.supportTicket.findUnique({
     where: { id: parsed.ticketId },
-    select: { tenantId: true, channel: true },
+    select: { tenantId: true, channel: true, requester: { select: { user: { select: { locale: true } } } } },
   });
   if (!target) return null;
   if (target.channel === "LIVE_CHAT" && !(await systemTenantHasEntitlement(target.tenantId, "support.live_chat"))) {
@@ -131,7 +134,7 @@ export async function replyAsOperator(input: unknown) {
       tenantId: ticket.tenantId,
       membershipId: ticket.requesterMembershipId,
       kind: "support_reply",
-      title: "A support reply is ready",
+      title: supportReplyNotificationTitle(target.requester.user.locale),
       href: "/support",
       entityType: "supportTicket",
       entityId: ticket.id,
@@ -147,6 +150,12 @@ export async function replyAsOperator(input: unknown) {
     });
   }
   return message ?? null;
+}
+
+function supportReplyNotificationTitle(locale: string): string {
+  if (locale === "fa") return "پاسخ جدید پشتیبانی آماده است";
+  if (locale === "de") return "Eine neue Support-Antwort ist verfügbar";
+  return "A new support reply is ready";
 }
 
 async function auditOperator(action: string, ticket: { id: string; tenantId: string }, after: Record<string, unknown>) {

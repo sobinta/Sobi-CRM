@@ -4,7 +4,7 @@ import { identityDb } from "@/core/db/identity";
 import { systemDb } from "@/core/db/system";
 import { publicTenantContext, runWithContext } from "./context";
 import { registerBuiltinEntity, resolveEntity } from "@/core/metadata/registry";
-import { assignOperatorTicket } from "@/engines/support/operator-service";
+import { assignOperatorTicket } from "@/engines/platform-admin/support-service";
 
 const enabled = process.env.RUN_DATABASE_INTEGRATION_TESTS === "true";
 const suite = enabled ? describe : describe.skip;

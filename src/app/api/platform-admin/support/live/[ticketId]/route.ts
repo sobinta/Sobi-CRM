@@ -1,7 +1,7 @@
 import { createClient } from "redis";
 import { NextRequest, NextResponse } from "next/server";
 import { withPlatformContext } from "@/core/auth/with-context";
-import { assertOperatorLiveTicket } from "@/engines/support/operator-service";
+import { assertOperatorLiveTicket } from "@/engines/platform-admin/support-service";
 import { supportChannel, supportRedisUrl } from "@/engines/support/live-events";
 import { ticketIdSchema } from "@/engines/support/schemas";
 
