@@ -1145,6 +1145,10 @@
     "contacts": {
       "title": "About Contacts",
       "body": "A contact is a real person you're in a relationship with — a customer, prospect, or anyone converted from a lead. This is the 360-degree view: everything about them in one place.\n\nFrom this page you can:\n- See a full timeline from the moment they first arrived as a lead through conversion and every activity since — calls, notes, tasks, and stage changes, oldest to newest.\n- Add an activity or a task by hand, e.g. a reminder for what to do next with this person.\n- Read their AI \"customer knowledge\" summary, generated from a linked chatbot conversation.\n- See which company they belong to (if any) and jump straight to it.\n\nThe list view shows where each contact came from (website, manual entry, chatbot, Telegram, web chat) and their lifecycle stage, so you can tell a brand-new prospect from an existing customer at a glance."
+    },
+    "companies": {
+      "title": "About Companies",
+      "body": "A company is the organization a contact belongs to — created automatically when a lead with a business name is converted, or added directly here.\n\nFrom this page you can:\n- See every contact who works there, and every deal tied to it.\n- Add a call, meeting, or task the same way you would on a contact — it appears on the company's own timeline.\n- See a rolled-up timeline that also includes activity logged on any of its contacts, labeled with that contact's name, so nothing about the relationship gets lost across individual people."
     }
   },
   "leads": {
@@ -1275,5 +1279,42 @@
     "privacyDescription": "Export or erase all personal data held about this contact.",
     "exportData": "Export data (JSON)",
     "noValue": "—"
+  },
+  "companies": {
+    "title": "Companies",
+    "description": "{count, plural, =0 {No companies} =1 {# company} other {# companies}}",
+    "newCompany": "New company",
+    "searchPlaceholder": "Search companies…",
+    "nameLabel": "Company name",
+    "industryLabel": "Industry",
+    "sizeLabel": "Size",
+    "sizePlaceholder": "11-50",
+    "phoneLabel": "Phone",
+    "websiteLabel": "Website",
+    "cancel": "Cancel",
+    "create": "Create company",
+    "creating": "Creating…",
+    "noCompanies": "No companies yet",
+    "noCompaniesDescription": "Add your first company, or create one from lead conversion.",
+    "columnCompany": "Company",
+    "columnIndustry": "Industry",
+    "columnContacts": "Contacts",
+    "columnDeals": "Deals",
+    "noValue": "—",
+    "backToCompanies": "Back to companies",
+    "detailsTitle": "Company info",
+    "sizeRow": "Size",
+    "phoneRow": "Phone",
+    "websiteRow": "Website",
+    "edit": "Edit",
+    "editTitle": "Edit company",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "contactsTitle": "Contacts ({count})",
+    "noContacts": "No contacts yet.",
+    "dealsTitle": "Deals ({count})",
+    "noDeals": "No deals yet.",
+    "timelineTitle": "Timeline",
+    "timelineHint": "Includes activity from every contact at this company."
   }
 }

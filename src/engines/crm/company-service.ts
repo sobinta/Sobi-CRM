@@ -3,6 +3,7 @@ import { requireContext } from "@/core/tenancy/context";
 import { authorize } from "@/core/rbac/guard";
 import { publish } from "@/core/event-bus/bus";
 import { record } from "@/core/audit/audit";
+import { addActivity, getTimeline, type TimelineItem } from "@/engines/timeline/timeline";
 
 /**
  * Company service — CRUD + the find-or-create used by lead conversion.
@@ -81,7 +82,7 @@ export async function createCompany(input: CompanyInput) {
 
 export async function updateCompany(id: string, input: Partial<CompanyInput>) {
   authorize("crm.company.update");
-  return db.company.update({
+  const company = await db.company.update({
     where: { id },
     data: {
       name: input.name, industry: input.industry, website: input.website,
@@ -89,6 +90,39 @@ export async function updateCompany(id: string, input: Partial<CompanyInput>) {
       customFields: input.customFields as Prisma.InputJsonValue | undefined,
     },
   });
+  await Promise.all([
+    publish({ type: "company.updated", entityType: "company", entityId: id }),
+    record({ category: "DATA", action: "company.update", entityType: "company", entityId: id }),
+    addActivity({ entityType: "company", entityId: id, kind: "system", title: "Company updated" }),
+  ]);
+  return company;
+}
+
+/**
+ * The full history for a company: its own timeline merged with every one of
+ * its contacts' timelines (each item labeled with that contact's name) — so
+ * nothing about the relationship is lost across the people who work there.
+ */
+export async function getCompanyFullTimeline(
+  companyId: string,
+  contacts: { id: string; firstName: string; lastName: string }[],
+): Promise<TimelineItem[]> {
+  authorize("crm.company.read");
+  const [ownItems, ...contactItemLists] = await Promise.all([
+    getTimeline("company", companyId, { take: 100 }),
+    ...contacts.map((c) => getTimeline("contact", c.id, { take: 100 })),
+  ]);
+
+  const labeled = contacts.flatMap((contact, i) =>
+    contactItemLists[i].map((item) => ({
+      ...item,
+      title: `[${contact.firstName} ${contact.lastName}] ${item.title}`,
+    })),
+  );
+
+  return [...ownItems, ...labeled].sort(
+    (a, b) => b.occurredAt.getTime() - a.occurredAt.getTime(),
+  );
 }
 
 /** Find a company by exact (case-insensitive) name, else create it. */

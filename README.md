@@ -177,6 +177,11 @@ one-click **"Continue with demo workspace"** button (see
   first inbound moment through conversion and everything since — with a
   manual "Add activity" control (log a call/meeting, or create a real linked
   Task as a follow-up reminder, visible in the Ops → Tasks workspace too).
+  Companies get the same treatment — an editable details card and the same
+  "Add activity" control — plus a **rolled-up timeline**: activity logged on
+  any of the company's contacts appears there too, labeled with that
+  contact's name, so the relationship stays in sync across every person at
+  that business.
 - **Leads** — website-form and chatbot intake into one shared queue, each
   lead carrying `source`, `industry` (field of work), `conversationId`
   (linking a chatbot transcript), and free-form `customFields`. A card-based

@@ -18,6 +18,7 @@ export type EventType =
   | "contact.created"
   | "contact.updated"
   | "company.created"
+  | "company.updated"
   | "lead.created"
   | "lead.converted"
   | "deal.created"

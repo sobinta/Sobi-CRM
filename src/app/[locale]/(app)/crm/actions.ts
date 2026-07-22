@@ -9,7 +9,7 @@ import {
   deleteContact,
 } from "@/engines/crm/contact-service";
 import { createDeal, moveDealToStage } from "@/engines/crm/deal-service";
-import { createCompany } from "@/engines/crm/company-service";
+import { createCompany, updateCompany } from "@/engines/crm/company-service";
 import { convertLead, createManualLead, updateLead } from "@/engines/crm/lead-service";
 import { addNote, addActivity } from "@/engines/timeline/timeline";
 import { search } from "@/engines/search/search-service";
@@ -149,6 +149,22 @@ export async function createCompanyAction(input: unknown) {
   );
   revalidatePath("/[locale]/(app)/crm/companies", "page");
   return { ok: true as const, id: company.id };
+}
+
+export async function updateCompanyAction(id: string, input: unknown) {
+  const parsed = companySchema.partial().safeParse(input);
+  if (!parsed.success) return { ok: false as const };
+  await withActionContext(async () =>
+    updateCompany(id, {
+      ...parsed.data,
+      customFields: parsed.data.customFields
+        ? await validatePublishedCustomFields("company", parsed.data.customFields)
+        : undefined,
+    }),
+  );
+  revalidatePath("/[locale]/(app)/crm/companies", "page");
+  revalidatePath("/[locale]/(app)/crm/companies/[id]", "page");
+  return { ok: true as const };
 }
 
 const convertLeadSchema = z.object({

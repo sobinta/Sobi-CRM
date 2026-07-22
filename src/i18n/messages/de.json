@@ -1145,6 +1145,10 @@
     "contacts": {
       "title": "Über Kontakte",
       "body": "Ein Kontakt ist eine reale Person, mit der Sie in Beziehung stehen — ein Kunde, Interessent oder jemand, der aus einem Lead umgewandelt wurde. Dies ist die 360-Grad-Ansicht: alles über sie an einem Ort.\n\nAuf dieser Seite können Sie:\n- Eine vollständige Zeitleiste sehen, vom ersten Eintreffen als Lead über die Umwandlung bis zu jeder Aktivität seither — Anrufe, Notizen, Aufgaben und Phasenwechsel, vom ältesten zum neuesten.\n- Eine Aktivität oder Aufgabe von Hand hinzufügen, z. B. eine Erinnerung für den nächsten Schritt mit dieser Person.\n- Die KI-„Kundenkenntnis“-Zusammenfassung lesen, erstellt aus einer verknüpften Chatbot-Konversation.\n- Sehen, zu welchem Unternehmen sie gehören (falls vorhanden), und direkt dorthin springen.\n\nDie Listenansicht zeigt, woher jeder Kontakt kam (Website, manuelle Erfassung, Chatbot, Telegram, Webchat) und in welcher Lebenszyklusphase er sich befindet, damit Sie einen brandneuen Interessenten auf einen Blick von einem bestehenden Kunden unterscheiden können."
+    },
+    "companies": {
+      "title": "Über Firmen",
+      "body": "Eine Firma ist die Organisation, zu der ein Kontakt gehört — automatisch erstellt, wenn ein Lead mit Firmennamen umgewandelt wird, oder direkt hier hinzugefügt.\n\nAuf dieser Seite können Sie:\n- Jeden Kontakt sehen, der dort arbeitet, und jeden damit verbundenen Abschluss.\n- Einen Anruf, ein Meeting oder eine Aufgabe genauso hinzufügen wie bei einem Kontakt — sie erscheint auf der eigenen Zeitleiste der Firma.\n- Eine zusammengeführte Zeitleiste sehen, die auch Aktivitäten enthält, die bei einem ihrer Kontakte protokolliert wurden, jeweils mit dem Namen dieses Kontakts versehen, damit bei der Beziehung nichts zwischen einzelnen Personen verloren geht."
     }
   },
   "leads": {
@@ -1275,5 +1279,42 @@
     "privacyDescription": "Exportieren oder löschen Sie alle personenbezogenen Daten zu diesem Kontakt.",
     "exportData": "Daten exportieren (JSON)",
     "noValue": "—"
+  },
+  "companies": {
+    "title": "Firmen",
+    "description": "{count, plural, =0 {Keine Firmen} =1 {# Firma} other {# Firmen}}",
+    "newCompany": "Neue Firma",
+    "searchPlaceholder": "Firmen durchsuchen…",
+    "nameLabel": "Firmenname",
+    "industryLabel": "Branche",
+    "sizeLabel": "Größe",
+    "sizePlaceholder": "11-50",
+    "phoneLabel": "Telefon",
+    "websiteLabel": "Website",
+    "cancel": "Abbrechen",
+    "create": "Firma erstellen",
+    "creating": "Wird erstellt…",
+    "noCompanies": "Noch keine Firmen",
+    "noCompaniesDescription": "Fügen Sie Ihre erste Firma hinzu, oder erstellen Sie eine bei der Lead-Umwandlung.",
+    "columnCompany": "Firma",
+    "columnIndustry": "Branche",
+    "columnContacts": "Kontakte",
+    "columnDeals": "Abschlüsse",
+    "noValue": "—",
+    "backToCompanies": "Zurück zu den Firmen",
+    "detailsTitle": "Firmeninformationen",
+    "sizeRow": "Größe",
+    "phoneRow": "Telefon",
+    "websiteRow": "Website",
+    "edit": "Bearbeiten",
+    "editTitle": "Firma bearbeiten",
+    "save": "Änderungen speichern",
+    "saving": "Wird gespeichert…",
+    "contactsTitle": "Kontakte ({count})",
+    "noContacts": "Noch keine Kontakte.",
+    "dealsTitle": "Abschlüsse ({count})",
+    "noDeals": "Noch keine Abschlüsse.",
+    "timelineTitle": "Zeitleiste",
+    "timelineHint": "Enthält Aktivitäten aller Kontakte dieser Firma."
   }
 }

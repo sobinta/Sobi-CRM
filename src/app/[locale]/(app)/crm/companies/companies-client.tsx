@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
+  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -15,10 +17,55 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { createCompanyAction } from "../actions";
+import { createCompanyAction, updateCompanyAction } from "../actions";
 import { BusinessCustomFields } from "@/components/patterns/business-custom-fields";
 
+export interface CompanyFormValues {
+  id?: string;
+  name?: string;
+  industry?: string | null;
+  size?: string | null;
+  phone?: string | null;
+  website?: string | null;
+}
+
+/** Shared create/edit form body for a Company. */
+function CompanyFormFields({ defaults }: { defaults?: CompanyFormValues }) {
+  const t = useTranslations("companies");
+  return (
+    <>
+      <div>
+        <Label htmlFor="name" required>
+          {t("nameLabel")}
+        </Label>
+        <Input id="name" name="name" required autoFocus defaultValue={defaults?.name ?? ""} />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label htmlFor="industry">{t("industryLabel")}</Label>
+          <Input id="industry" name="industry" defaultValue={defaults?.industry ?? ""} />
+        </div>
+        <div>
+          <Label htmlFor="size">{t("sizeLabel")}</Label>
+          <Input id="size" name="size" placeholder={t("sizePlaceholder")} defaultValue={defaults?.size ?? ""} />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label htmlFor="phone">{t("phoneLabel")}</Label>
+          <Input id="phone" name="phone" dir="ltr" defaultValue={defaults?.phone ?? ""} />
+        </div>
+        <div>
+          <Label htmlFor="website">{t("websiteLabel")}</Label>
+          <Input id="website" name="website" dir="ltr" defaultValue={defaults?.website ?? ""} />
+        </div>
+      </div>
+    </>
+  );
+}
+
 export function CompaniesToolbar() {
+  const t = useTranslations("companies");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -45,47 +92,84 @@ export function CompaniesToolbar() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button variant="primary" onClick={() => setOpen(true)}>
-        <Plus className="h-4 w-4" /> شرکت جدید
-      </Button>
+      <DialogTrigger asChild>
+        <Button variant="primary">
+          <Plus className="h-4 w-4" /> {t("newCompany")}
+        </Button>
+      </DialogTrigger>
       <DialogContent>
         <form onSubmit={onCreate}>
           <DialogHeader>
-            <DialogTitle>شرکت جدید</DialogTitle>
+            <DialogTitle>{t("newCompany")}</DialogTitle>
           </DialogHeader>
           <DialogBody className="space-y-3">
-            <div>
-              <Label htmlFor="name" required>نام شرکت</Label>
-              <Input id="name" name="name" required autoFocus />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="industry">صنعت</Label>
-                <Input id="industry" name="industry" />
-              </div>
-              <div>
-                <Label htmlFor="size">اندازه</Label>
-                <Input id="size" name="size" placeholder="۱۱–۵۰" />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="phone">تلفن</Label>
-                <Input id="phone" name="phone" dir="ltr" />
-              </div>
-              <div>
-                <Label htmlFor="website">وب‌سایت</Label>
-                <Input id="website" name="website" dir="ltr" />
-              </div>
-            </div>
+            <CompanyFormFields />
             <BusinessCustomFields entityKey="company" onChange={setCustomFields} />
           </DialogBody>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="ghost" type="button">انصراف</Button>
+              <Button variant="ghost" type="button">
+                {t("cancel")}
+              </Button>
             </DialogClose>
             <Button variant="primary" type="submit" disabled={pending}>
-              {pending ? "در حال ثبت…" : "ثبت شرکت"}
+              {pending ? t("creating") : t("create")}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** Edit-in-place dialog for the company detail page. */
+export function EditCompanyDialog({ company }: { company: Required<CompanyFormValues> }) {
+  const t = useTranslations("companies");
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [pending, startTransition] = useTransition();
+
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    startTransition(async () => {
+      const res = await updateCompanyAction(company.id, {
+        name: form.get("name"),
+        industry: form.get("industry"),
+        website: form.get("website"),
+        phone: form.get("phone"),
+        size: form.get("size"),
+      });
+      if (res.ok) {
+        setOpen(false);
+        router.refresh();
+      }
+    });
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm">
+          {t("edit")}
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <form onSubmit={onSubmit}>
+          <DialogHeader>
+            <DialogTitle>{t("editTitle")}</DialogTitle>
+          </DialogHeader>
+          <DialogBody className="space-y-3">
+            <CompanyFormFields defaults={company} />
+          </DialogBody>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="ghost" type="button">
+                {t("cancel")}
+              </Button>
+            </DialogClose>
+            <Button variant="primary" type="submit" disabled={pending}>
+              {pending ? t("saving") : t("save")}
             </Button>
           </DialogFooter>
         </form>
@@ -95,6 +179,7 @@ export function CompaniesToolbar() {
 }
 
 export function CompaniesSearch({ initial }: { initial: string }) {
+  const t = useTranslations("companies");
   const router = useRouter();
   const [q, setQ] = useState(initial);
   return (
@@ -106,7 +191,12 @@ export function CompaniesSearch({ initial }: { initial: string }) {
       className="relative max-w-xs"
     >
       <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
-      <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جستجوی شرکت…" className="ps-9" />
+      <Input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder={t("searchPlaceholder")}
+        className="ps-9"
+      />
     </form>
   );
 }
