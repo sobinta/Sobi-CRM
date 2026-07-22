@@ -158,6 +158,7 @@ function TasksWidget({ data }: { data: WidgetData }) {
 
 function FeedWidget({ data }: { data: WidgetData }) {
   const t = useTranslations("dashboard");
+  const tFeed = useTranslations("activityFeed");
   const locale = useLocale();
   return (
     <WidgetFrame title={t("widgets.feed")} icon={Activity}>
@@ -165,14 +166,19 @@ function FeedWidget({ data }: { data: WidgetData }) {
         {data.feed.length === 0 && (
           <li className="text-sm text-ink-faint">{t("widgetEmptyActivity")}</li>
         )}
-        {data.feed.map((f) => (
-          <li key={f.id} className="text-sm">
-            <span className="text-ink">{t("widgetActivityActor")} {f.label}</span>
-            <time className="ms-1.5 text-xs text-ink-faint">
-              {new Date(f.occurredAt).toLocaleDateString(locale)}
-            </time>
-          </li>
-        ))}
+        {data.feed.map((f) => {
+          const label = f.labelKey
+            ? tFeed(`events.${f.labelKey}`)
+            : tFeed("genericEvent", { type: f.type.replace(/[._]/g, " ") });
+          return (
+            <li key={f.id} className="text-sm">
+              <span className="text-ink">{f.actorName ?? t("widgetActivityActor")} {label}</span>
+              <time className="ms-1.5 text-xs text-ink-faint">
+                {new Date(f.occurredAt).toLocaleDateString(locale)}
+              </time>
+            </li>
+          );
+        })}
       </ul>
     </WidgetFrame>
   );

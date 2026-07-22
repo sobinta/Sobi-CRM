@@ -201,6 +201,13 @@ one-click **"Continue with demo workspace"** button (see
 - **Activities & Notes** — a per-record timeline (calls, emails, meetings,
   notes, stage changes, files, system events) merged from the `Activity` and
   `Note` tables, automatically fed by anything event-emitting.
+- **Global Activity Feed** (`/crm/activity`) — every meaningful platform event
+  in one chronological, filterable stream: entity-type and date-range filters,
+  each entry showing the real actor's name and linking straight through to the
+  record it happened on, with fully localized labels for all ~45 event kinds
+  (en/de/fa). A "Log activity" action lets a user record a call, meeting,
+  email, or note against any contact/company/deal/lead found via a type-ahead
+  picker — the same entry also appears on that record's own timeline.
 - **Tags & Relationships** — a generic `Relationship` model plus a
   standalone **Relationship Graph** (React Flow) visualizing connections
   between any two records.

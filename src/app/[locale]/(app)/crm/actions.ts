@@ -12,6 +12,7 @@ import { createDeal, moveDealToStage } from "@/engines/crm/deal-service";
 import { createCompany, updateCompany } from "@/engines/crm/company-service";
 import { convertLead, createManualLead, updateLead } from "@/engines/crm/lead-service";
 import { addNote, addActivity } from "@/engines/timeline/timeline";
+import { publish } from "@/core/event-bus/bus";
 import { search } from "@/engines/search/search-service";
 import { saveDashboard } from "@/engines/dashboards/dashboard-service";
 import type { LayoutItem } from "@/components/patterns/widgets/widget-types";
@@ -103,25 +104,39 @@ export async function addNoteAction(
 const activitySchema = z.object({
   entityType: z.string().min(1),
   entityId: z.string().min(1),
-  kind: z.enum(["call", "meeting"]),
+  kind: z.enum(["call", "meeting", "email", "note"]),
   title: z.string().trim().min(1),
   body: z.string().trim().optional(),
+  occurredAt: z.string().trim().optional(),
 });
 
-/** Manually log a call/meeting on a record's timeline (a reminder-style note with a type). */
+/**
+ * Manually log a call/meeting/email/note on a record's timeline (a
+ * reminder-style entry with a type). Also publishes an "activity.logged"
+ * event so it surfaces on the global Activity Feed, not just the record's
+ * own timeline.
+ */
 export async function addActivityAction(input: unknown) {
   const parsed = activitySchema.safeParse(input);
   if (!parsed.success) return { ok: false as const };
-  await withActionContext(() =>
-    addActivity({
+  await withActionContext(async () => {
+    await addActivity({
       entityType: parsed.data.entityType,
       entityId: parsed.data.entityId,
       kind: parsed.data.kind,
       title: parsed.data.title,
       body: parsed.data.body,
-    }),
-  );
+      occurredAt: parsed.data.occurredAt ? new Date(parsed.data.occurredAt) : undefined,
+    });
+    await publish({
+      type: "activity.logged",
+      entityType: parsed.data.entityType,
+      entityId: parsed.data.entityId,
+      payload: { kind: parsed.data.kind, title: parsed.data.title },
+    });
+  });
   revalidatePath("/[locale]/(app)/crm", "layout");
+  revalidatePath("/[locale]/(app)/crm/activity", "page");
   return { ok: true as const };
 }
 

@@ -56,7 +56,9 @@ export type EventType =
   | "campaign.email_sent"
   // ai
   | "ai.action_proposed"
-  | "ai.action_approved";
+  | "ai.action_approved"
+  // manual timeline entries (calls, meetings, emails, notes logged by a user)
+  | "activity.logged";
 
 export interface PlatformEvent<P = Record<string, unknown>> {
   id: string;

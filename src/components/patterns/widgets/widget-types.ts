@@ -6,7 +6,7 @@ export interface WidgetData {
   pipeline: PipelineBreakdown[];
   trend: ActivityPoint[];
   tasks: Array<{ id: string; title: string; priority: string; dueAt: string | null }>;
-  feed: Array<{ id: string; label: string; type: string; occurredAt: string }>;
+  feed: Array<{ id: string; labelKey: string; type: string; actorName: string | null; occurredAt: string }>;
 }
 
 export type WidgetType =

@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { addActivityAction } from "@/app/[locale]/(app)/crm/actions";
 import { createTaskAction } from "@/app/[locale]/(app)/ops/actions";
+import { useDemoMode } from "@/components/layout/session-context";
 import { cn } from "@/lib/utils";
 
 /**
@@ -39,14 +40,23 @@ export function AddActivityDialog({
   triggerVariant?: "primary" | "secondary" | "ghost";
 }) {
   const t = useTranslations("activityDialog");
+  const tShell = useTranslations("shell");
+  const demoMode = useDemoMode();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<"activity" | "task">("activity");
   const [pending, startTransition] = useTransition();
+  const [simulated, setSimulated] = useState(false);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
+    if (demoMode) {
+      setOpen(false);
+      setSimulated(true);
+      e.currentTarget.reset();
+      return;
+    }
     startTransition(async () => {
       const res =
         tab === "activity"
@@ -56,6 +66,7 @@ export function AddActivityDialog({
               kind: form.get("kind"),
               title: form.get("title"),
               body: form.get("body"),
+              occurredAt: form.get("occurredAt") || undefined,
             })
           : await createTaskAction({
               title: form.get("title"),
@@ -72,6 +83,7 @@ export function AddActivityDialog({
   }
 
   return (
+    <div className="inline-flex flex-col items-end gap-1.5">
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={triggerVariant} size="sm">
@@ -102,6 +114,8 @@ export function AddActivityDialog({
                   <NativeSelect id="kind" name="kind" defaultValue="call">
                     <option value="call">{t("kindCall")}</option>
                     <option value="meeting">{t("kindMeeting")}</option>
+                    <option value="email">{t("kindEmail")}</option>
+                    <option value="note">{t("kindNote")}</option>
                   </NativeSelect>
                 </div>
                 <div>
@@ -119,6 +133,10 @@ export function AddActivityDialog({
                 <div>
                   <Label htmlFor="body">{t("bodyLabel")}</Label>
                   <Textarea id="body" name="body" rows={3} />
+                </div>
+                <div>
+                  <Label htmlFor="occurredAt">{t("whenLabel")}</Label>
+                  <Input id="occurredAt" name="occurredAt" type="date" dir="ltr" />
                 </div>
               </>
             ) : (
@@ -166,6 +184,12 @@ export function AddActivityDialog({
         </form>
       </DialogContent>
     </Dialog>
+      {simulated && (
+        <p role="status" className="text-xs font-medium text-brand">
+          {tShell("demoSimulation")}
+        </p>
+      )}
+    </div>
   );
 }
 

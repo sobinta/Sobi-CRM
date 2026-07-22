@@ -36,7 +36,7 @@ export default async function CustomizeDashboardPage() {
       pipeline,
       trend,
       tasks: tasks.slice(0, 8).map((task) => ({ id: task.id, title: task.title, priority: task.priority, dueAt: task.dueAt?.toISOString() ?? null })),
-      feed: feed.items.map((item) => ({ id: item.id, label: item.label, type: item.type, occurredAt: item.occurredAt.toISOString() })),
+      feed: feed.items.map((item) => ({ id: item.id, labelKey: item.labelKey, type: item.type, actorName: item.actorName, occurredAt: item.occurredAt.toISOString() })),
     };
     return { data, layout: dashboard.layout };
   });
