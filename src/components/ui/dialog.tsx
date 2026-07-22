@@ -18,7 +18,7 @@ export const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed start-1/2 top-1/2 z-[901] w-full max-w-md -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2",
+        "fixed start-1/2 top-1/2 z-[901] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2",
         "max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain rounded-xl border border-line bg-surface-overlay shadow-overlay",
         "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 duration-(--motion-base) motion-reduce:animate-none",
         className,

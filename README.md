@@ -170,8 +170,12 @@ one-click **"Continue with demo workspace"** button (see
 - **Contacts & Companies** — full CRUD, company find-or-create with
   LIKE-injection-safe matching, contact↔company relationships, tags, notes.
 - **Leads** — website-form and chatbot intake into one shared queue, each
-  lead carrying `source`, `conversationId` (linking a chatbot transcript),
-  and free-form `customFields`.
+  lead carrying `source`, `industry` (field of work), `conversationId`
+  (linking a chatbot transcript), and free-form `customFields`. A card-based
+  list with status filters, search, and CSV export; a manual "New lead" entry
+  point alongside the public website form; and a full detail page (`/crm/leads/[id]`)
+  with an editable details card, AI scoring, an AI content suggestion, and the
+  richer conversion dialog below.
 - **Deals & Pipeline** — a generic staged-record engine (Kanban board,
   native drag-and-drop) reused by deals and five industry-module pipelines;
   configurable stages with `isWon`/`isLost` flags driving deal status
@@ -189,7 +193,11 @@ one-click **"Continue with demo workspace"** button (see
 - **Deliberate conversion flow** (`convertLead`) — turns a raw Lead into a
   Contact, find-or-creates its Company, optionally creates a Deal, and files
   the lead's original message as the first timeline note. Idempotent: a
-  re-conversion returns the existing contact instead of duplicating it.
+  re-conversion returns the existing contact instead of duplicating it. The
+  conversion dialog captures richer fields than the raw lead carries — first/last
+  name, job title, corrected email/phone/company, an industry, a service
+  interest for individual (non-business) leads, and an extra note — without
+  ever rewriting the lead itself.
 - **AI lead scoring** — a 0–100 score with a Persian/English/German
   rationale string. Falls back to a transparent, explainable **heuristic**
   (completeness of email/phone/company/source/message) when no AI provider
@@ -454,9 +462,21 @@ scaffolds in module activation.
   visible on desktop, collapsible between icon-only and a labeled expanded
   state (remembered across sessions) — becomes a slide-in drawer on mobile
   (opened from a Topbar hamburger) with the exact same collapse/expand
-  control. The per-workspace sub-navigation (Dashboard, Contacts, …) runs as
-  a horizontal, scrollable tab strip above the page content on every screen
-  size, and every data table scrolls horizontally instead of clipping.
+  control, and every data table scrolls horizontally instead of clipping.
+- **Accordion sidebar navigation** — each workspace's sub-pages (Contacts,
+  Companies, Leads, Deals, …) nest directly inside the rail as an expandable
+  section instead of a separate top strip; the active section auto-opens. The
+  8 industry business modules are gathered under one collapsible **Templates**
+  group, reflecting the industry-templates direction (see
+  [Industry Templates](#low-code-studio)) rather than cluttering the primary
+  navigation.
+- **Per-feature help** — a "?" button next to almost every page's title opens
+  a short explainer (how the feature works, why it's useful) localized to the
+  active workspace language; see `helpTopics` in the i18n messages and
+  `src/components/patterns/feature-help.tsx`.
+- Every dialog keeps a comfortable side gutter on narrow screens (`calc(100%-2rem)`
+  instead of edge-to-edge `100%`) — a small, systemic fix that benefits every
+  modal in the app on mobile.
 
 ### Branding & internationalization
 

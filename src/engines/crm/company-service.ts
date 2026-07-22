@@ -92,7 +92,10 @@ export async function updateCompany(id: string, input: Partial<CompanyInput>) {
 }
 
 /** Find a company by exact (case-insensitive) name, else create it. */
-export async function findOrCreateCompany(name: string): Promise<string> {
+export async function findOrCreateCompany(
+  name: string,
+  opts?: { industry?: string | null },
+): Promise<string> {
   authorize("crm.company.create");
   const ctx = requireContext();
   const trimmed = name.trim();
@@ -102,7 +105,13 @@ export async function findOrCreateCompany(name: string): Promise<string> {
   });
   if (existing) return existing.id;
   const created = await db.company.create({
-    data: { tenantId: ctx.tenantId, name: trimmed, ownerId: ctx.membershipId, createdById: ctx.membershipId },
+    data: {
+      tenantId: ctx.tenantId,
+      name: trimmed,
+      industry: opts?.industry || undefined,
+      ownerId: ctx.membershipId,
+      createdById: ctx.membershipId,
+    },
   });
   return created.id;
 }

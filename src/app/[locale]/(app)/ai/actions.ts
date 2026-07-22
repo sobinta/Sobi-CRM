@@ -47,6 +47,7 @@ export async function draftEmailAction(contactId: string, intent: string) {
 export async function scoreLeadAction(leadId: string) {
   const res = await withActionContext(() => scoreLead(leadId));
   revalidatePath("/[locale]/(app)/crm/leads", "page");
+  revalidatePath("/[locale]/(app)/crm/leads/[id]", "page");
   return res ?? { score: 0, rationale: "" };
 }
 

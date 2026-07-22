@@ -75,6 +75,8 @@ model Lead {
   title       String
   contactId   String?
   companyName String?
+  /// Field of work / industry the lead operates in (distinct from companyName).
+  industry    String?
   email       String?
   phone       String?
   /// new | working | qualified | unqualified | converted

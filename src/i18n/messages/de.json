@@ -77,7 +77,6 @@
     "forms": "Formular-Editor",
     "entities": "Entitäten-Editor",
     "workflows": "Workflows",
-    "automations": "Automatisierungen",
     "rules": "Geschäftsregeln",
     "templates": "Vorlagen",
     "policies": "Policen",
@@ -107,7 +106,8 @@
     "menu": "Menü",
     "mobileNav": "Primär",
     "closeMenu": "Menü schließen",
-    "backToSite": "Zurück zur Hauptseite", "templatesGroup": "Vorlagen",
+    "backToSite": "Zurück zur Hauptseite",
+    "templatesGroup": "Vorlagen",
     "demoStatus": "Demo-Modus — frei erkunden; Teständerungen bleiben in diesem Browser und werden nie gespeichert.",
     "demoSimulation": "Demo-Vorschau lokal aktualisiert. Zum Zurücksetzen Seite neu laden."
   },
@@ -140,7 +140,12 @@
     "reportsDescription": "Verlässliche Ansichten zu Vertrieb, Pipeline, Kunden und Betrieb.",
     "visualInsights": "Visuelle Einblicke",
     "exportCsv": "CSV exportieren",
-    "reportNames": { "deals": "Geschäfte", "pipeline": "Pipeline", "tasks": "Aufgaben", "contacts": "Kontakte" },
+    "reportNames": {
+      "deals": "Geschäfte",
+      "pipeline": "Pipeline",
+      "tasks": "Aufgaben",
+      "contacts": "Kontakte"
+    },
     "noDataTitle": "Keine Daten für diesen Bericht",
     "noDataBody": "Fügen Sie Geschäftsdaten hinzu, damit sie hier erscheinen.",
     "activityTitle": "Aktivitätsverlauf",
@@ -205,11 +210,20 @@
     "attentionRestricted": "Für Ihren Zugriff sind keine Signale verfügbar.",
     "attentionClear": "Aktuell erledigt",
     "attentionOpen": "Zugehörige Arbeitsliste öffnen",
-    "attention": { "overdueTasks": "Überfällige Aufgaben", "staleDeals": "Geschäfte nach erwartetem Abschluss", "unassignedLeads": "Nicht zugewiesene aktive Leads" },
+    "attention": {
+      "overdueTasks": "Überfällige Aufgaben",
+      "staleDeals": "Geschäfte nach erwartetem Abschluss",
+      "unassignedLeads": "Nicht zugewiesene aktive Leads"
+    },
     "leadSources": "Lead-Quellenmix",
     "leadSourcesDescription": "Wo aktive Nachfrage in das CRM gelangt.",
     "leadSourcesEmpty": "Lead-Quellen erscheinen nach den ersten Leads.",
-    "sources": { "website": "Website", "chatbot": "Chatbot", "manual": "Manuell", "unknown": "Unbekannt" },
+    "sources": {
+      "website": "Website",
+      "chatbot": "Chatbot",
+      "manual": "Manuell",
+      "unknown": "Unbekannt"
+    },
     "teamWorkload": "Team-Auslastung",
     "teamWorkloadDescription": "Offene Aufgaben im aktiven Team.",
     "teamWorkloadEmpty": "Keine zugewiesenen offenen Aufgaben verfügbar.",
@@ -228,8 +242,20 @@
     "savedForDemo": "In diesem Browser gespeichert",
     "editDashboard": "Layout bearbeiten",
     "removeWidget": "Widget entfernen",
-    "widgets": { "kpi": "KPI-Karte", "pipeline": "Pipeline-Aufteilung", "trend": "Aktivitätstrend", "tasks": "Meine Aufgaben", "feed": "Aktivitätsverlauf" },
-    "widgetKpis": { "contacts": "Kontakte", "openDeals": "Offene Geschäfte", "wonValue": "Gewonnener Umsatz", "openTasks": "Offene Aufgaben", "conversion": "Lead-Konversion" },
+    "widgets": {
+      "kpi": "KPI-Karte",
+      "pipeline": "Pipeline-Aufteilung",
+      "trend": "Aktivitätstrend",
+      "tasks": "Meine Aufgaben",
+      "feed": "Aktivitätsverlauf"
+    },
+    "widgetKpis": {
+      "contacts": "Kontakte",
+      "openDeals": "Offene Geschäfte",
+      "wonValue": "Gewonnener Umsatz",
+      "openTasks": "Offene Aufgaben",
+      "conversion": "Lead-Konversion"
+    },
     "widgetEmptyTasks": "Keine offenen Aufgaben.",
     "widgetEmptyActivity": "Keine aktuellen Aktivitäten.",
     "widgetActivityActor": "Arbeitsbereich",
@@ -333,10 +359,18 @@
       "headline2": "wenn er die Nachverfolgung übersteht.",
       "subhead": "Nachrichten gehen in Postfächern unter. Follow-ups werden vergessen. Verträge liegen in irgendjemandes E-Mail. SOBI CRM gibt jedem Lead einen verlässlichen Weg zum Abschluss.",
       "points": [
-        { "title": "Leads erkalten in gemeinsamen Postfächern" },
-        { "title": "Follow-ups gehen zwischen Personen verloren" },
-        { "title": "Verträge liegen in E-Mails, nicht im System" },
-        { "title": "Niemand sieht, was gerade wirklich abschlussreif ist" }
+        {
+          "title": "Leads erkalten in gemeinsamen Postfächern"
+        },
+        {
+          "title": "Follow-ups gehen zwischen Personen verloren"
+        },
+        {
+          "title": "Verträge liegen in E-Mails, nicht im System"
+        },
+        {
+          "title": "Niemand sieht, was gerade wirklich abschlussreif ist"
+        }
       ],
       "flowRawLabel": "ROHER LEAD",
       "flowRaw": "„Wir betreiben 40 Lkw und brauchen bessere Dispositionsübersicht…“",
@@ -349,10 +383,22 @@
       "eyebrow": "EIN DURCHDACHTER WORKFLOW",
       "headline": "Vier Schritte von der ersten Nachricht zum unterschriebenen Deal.",
       "items": [
-        { "title": "Erfassen", "desc": "Website-Formular und Chatbot-Anfragen landen in einer gemeinsamen Lead-Warteschlange." },
-        { "title": "Konvertieren", "desc": "Eine bewusste Konvertierung macht aus einem Lead einen Kontakt, ein Unternehmen und einen Deal." },
-        { "title": "Abschließen", "desc": "KI entwirft den Vertrag; Kunden prüfen, drucken und akzeptieren online." },
-        { "title": "Wachsen", "desc": "KI-personalisierte Kampagnen und Reporting halten die Pipeline in Bewegung." }
+        {
+          "title": "Erfassen",
+          "desc": "Website-Formular und Chatbot-Anfragen landen in einer gemeinsamen Lead-Warteschlange."
+        },
+        {
+          "title": "Konvertieren",
+          "desc": "Eine bewusste Konvertierung macht aus einem Lead einen Kontakt, ein Unternehmen und einen Deal."
+        },
+        {
+          "title": "Abschließen",
+          "desc": "KI entwirft den Vertrag; Kunden prüfen, drucken und akzeptieren online."
+        },
+        {
+          "title": "Wachsen",
+          "desc": "KI-personalisierte Kampagnen und Reporting halten die Pipeline in Bewegung."
+        }
       ]
     },
     "analytics": {
@@ -365,13 +411,62 @@
       "eyebrow": "GEBAUT FÜR IHRE BRANCHE",
       "headline": "Ein CRM-Kern, angepasst an Ihre Branche.",
       "tabs": [
-        { "key": "insurance", "label": "Versicherung", "headline": "Policen, Verlängerungen und Schäden in einer Pipeline.", "body": "Versicherer und Produkte neben jeder Police, mit Erinnerungen vor Ablauf.", "quote": "Wir verpassen keine Verlängerungsfristen mehr, weil die Erinnerung direkt an der Police hängt.", "author": "Fiktive Demo-Person" },
-        { "key": "realEstate", "label": "Immobilien", "headline": "Kunden zu Immobilien zuordnen, nicht nur zu Kontakten.", "body": "Besichtigungen, Angebote und Verträge bleiben an Kunde und Objekt verknüpft.", "quote": "Jedes Angebot hat die komplette Besichtigungshistorie dabei.", "author": "Fiktive Demo-Person" },
-        { "key": "immigration", "label": "Einwanderung", "headline": "Fälle, Fristen und Unterlagen gemeinsam verfolgt.", "body": "Jeder Fall führt Visumsart, Behördeneinreichungen und Dokumenten-Checkliste an einem Ort.", "quote": "Fristen standen früher in irgendjemandes Kalender. Jetzt stehen sie am Fall selbst.", "author": "Fiktive Demo-Person" },
-        { "key": "barber", "label": "Friseursalon", "headline": "Termine und Laufkundschaft in einem gemeinsamen Buch.", "body": "Personal, Stühle und Besuchshistorie in einer Buchungsansicht.", "quote": "Laufkundschaft und Termine teilen sich endlich einen Kalender.", "author": "Fiktive Demo-Person" },
-        { "key": "salon", "label": "Kosmetikstudio", "headline": "Behandlungsserien und Einwilligung, richtig gehandhabt.", "body": "Vorher/Nachher-Fotos und unterschriebene Einwilligungen liegen im Kundenprofil.", "quote": "Einwilligungsformulare waren Papier in einer Schublade. Jetzt sind sie im Kundenprofil.", "author": "Fiktive Demo-Person" },
-        { "key": "restaurant", "label": "Restaurant", "headline": "Reservierungen, Allergien und Catering-Leads zusammen.", "body": "Gästeprofile führen Allergiehinweise und Historie; Catering-Leads laufen durch dieselbe Pipeline.", "quote": "Der Empfang weiß endlich, was die Küche wissen muss.", "author": "Fiktive Demo-Person" },
-        { "key": "agency", "label": "Vertrieb & Agentur", "headline": "Kampagnen und Ziele neben der Pipeline.", "body": "Angebote, Performance und personalisierte Kampagnen teilen dieselben Kontakt- und Deal-Daten.", "quote": "Unsere Kampagnen-Follow-ups wissen endlich, welche Deals wirklich offen sind.", "author": "Fiktive Demo-Person" }
+        {
+          "key": "insurance",
+          "label": "Versicherung",
+          "headline": "Policen, Verlängerungen und Schäden in einer Pipeline.",
+          "body": "Versicherer und Produkte neben jeder Police, mit Erinnerungen vor Ablauf.",
+          "quote": "Wir verpassen keine Verlängerungsfristen mehr, weil die Erinnerung direkt an der Police hängt.",
+          "author": "Fiktive Demo-Person"
+        },
+        {
+          "key": "realEstate",
+          "label": "Immobilien",
+          "headline": "Kunden zu Immobilien zuordnen, nicht nur zu Kontakten.",
+          "body": "Besichtigungen, Angebote und Verträge bleiben an Kunde und Objekt verknüpft.",
+          "quote": "Jedes Angebot hat die komplette Besichtigungshistorie dabei.",
+          "author": "Fiktive Demo-Person"
+        },
+        {
+          "key": "immigration",
+          "label": "Einwanderung",
+          "headline": "Fälle, Fristen und Unterlagen gemeinsam verfolgt.",
+          "body": "Jeder Fall führt Visumsart, Behördeneinreichungen und Dokumenten-Checkliste an einem Ort.",
+          "quote": "Fristen standen früher in irgendjemandes Kalender. Jetzt stehen sie am Fall selbst.",
+          "author": "Fiktive Demo-Person"
+        },
+        {
+          "key": "barber",
+          "label": "Friseursalon",
+          "headline": "Termine und Laufkundschaft in einem gemeinsamen Buch.",
+          "body": "Personal, Stühle und Besuchshistorie in einer Buchungsansicht.",
+          "quote": "Laufkundschaft und Termine teilen sich endlich einen Kalender.",
+          "author": "Fiktive Demo-Person"
+        },
+        {
+          "key": "salon",
+          "label": "Kosmetikstudio",
+          "headline": "Behandlungsserien und Einwilligung, richtig gehandhabt.",
+          "body": "Vorher/Nachher-Fotos und unterschriebene Einwilligungen liegen im Kundenprofil.",
+          "quote": "Einwilligungsformulare waren Papier in einer Schublade. Jetzt sind sie im Kundenprofil.",
+          "author": "Fiktive Demo-Person"
+        },
+        {
+          "key": "restaurant",
+          "label": "Restaurant",
+          "headline": "Reservierungen, Allergien und Catering-Leads zusammen.",
+          "body": "Gästeprofile führen Allergiehinweise und Historie; Catering-Leads laufen durch dieselbe Pipeline.",
+          "quote": "Der Empfang weiß endlich, was die Küche wissen muss.",
+          "author": "Fiktive Demo-Person"
+        },
+        {
+          "key": "agency",
+          "label": "Vertrieb & Agentur",
+          "headline": "Kampagnen und Ziele neben der Pipeline.",
+          "body": "Angebote, Performance und personalisierte Kampagnen teilen dieselben Kontakt- und Deal-Daten.",
+          "quote": "Unsere Kampagnen-Follow-ups wissen endlich, welche Deals wirklich offen sind.",
+          "author": "Fiktive Demo-Person"
+        }
       ]
     },
     "pricing": {
@@ -384,21 +479,86 @@
       "priceNote": "/ Nutzer / Monat",
       "billedAnnually": "jährlich abgerechnet",
       "tiers": [
-        { "name": "Kostenlos", "desc": "Zum Testen strukturierter Lead-Nachverfolgung.", "priceMonthly": "0 €", "priceAnnual": "0 €", "cta": "Kostenlos starten", "features": ["5 Leads / Monat", "Basis-Konvertierung", "Lead-Bewertung", "7 Tage Verlauf"] },
-        { "name": "Pro", "desc": "Für Teams, die den vollen Vertriebszyklus fahren.", "priceMonthly": "19 €", "priceAnnual": "15 €", "cta": "Pro starten", "features": ["Unbegrenzte Leads", "KI-Bewertung & Inhaltsvorschläge", "Verträge & Online-Annahme", "E-Mail-Export"] },
-        { "name": "Team", "desc": "Für Teams mit gemeinsamer Verantwortung.", "priceMonthly": "34 €", "priceAnnual": "27 €", "cta": "Team starten", "recommended": true, "features": ["Alles aus Pro", "Team-Arbeitsbereich", "Rollenverwaltung", "Kampagnen"] },
-        { "name": "Enterprise", "desc": "Für regulierte, vernetzte Organisationen.", "priceMonthly": "Individuell", "priceAnnual": "Individuell", "custom": true, "cta": "Vertrieb kontaktieren", "features": ["Alles aus Team", "SSO-fähige Architektur", "Audit-Protokolle", "Individuelle Aufbewahrung"] }
+        {
+          "name": "Kostenlos",
+          "desc": "Zum Testen strukturierter Lead-Nachverfolgung.",
+          "priceMonthly": "0 €",
+          "priceAnnual": "0 €",
+          "cta": "Kostenlos starten",
+          "features": [
+            "5 Leads / Monat",
+            "Basis-Konvertierung",
+            "Lead-Bewertung",
+            "7 Tage Verlauf"
+          ]
+        },
+        {
+          "name": "Pro",
+          "desc": "Für Teams, die den vollen Vertriebszyklus fahren.",
+          "priceMonthly": "19 €",
+          "priceAnnual": "15 €",
+          "cta": "Pro starten",
+          "features": [
+            "Unbegrenzte Leads",
+            "KI-Bewertung & Inhaltsvorschläge",
+            "Verträge & Online-Annahme",
+            "E-Mail-Export"
+          ]
+        },
+        {
+          "name": "Team",
+          "desc": "Für Teams mit gemeinsamer Verantwortung.",
+          "priceMonthly": "34 €",
+          "priceAnnual": "27 €",
+          "cta": "Team starten",
+          "recommended": true,
+          "features": [
+            "Alles aus Pro",
+            "Team-Arbeitsbereich",
+            "Rollenverwaltung",
+            "Kampagnen"
+          ]
+        },
+        {
+          "name": "Enterprise",
+          "desc": "Für regulierte, vernetzte Organisationen.",
+          "priceMonthly": "Individuell",
+          "priceAnnual": "Individuell",
+          "custom": true,
+          "cta": "Vertrieb kontaktieren",
+          "features": [
+            "Alles aus Team",
+            "SSO-fähige Architektur",
+            "Audit-Protokolle",
+            "Individuelle Aufbewahrung"
+          ]
+        }
       ]
     },
     "faq": {
       "eyebrow": "FRAGEN & ANTWORTEN",
       "headline": "Was Teams vor dem Start fragen.",
       "items": [
-        { "q": "Brauche ich einen KI-API-Schlüssel?", "a": "Nein. Jede KI-Funktion hat einen soliden Fallback ohne Schlüssel — Lead-Bewertung, Inhaltsvorschläge und Entwürfe funktionieren trotzdem; ein echter Anbieter verbessert nur die Qualität." },
-        { "q": "Ist meine Daten von anderen Mandanten isoliert?", "a": "Ja. Die Mandantentrennung wird auf Datenebene erzwungen, nicht nur pro Bildschirm — ein Arbeitsbereich kann strukturell nicht auf die Daten eines anderen zugreifen." },
-        { "q": "Kann ich nur die Module aktivieren, die ich brauche?", "a": "Ja. Versicherung, Immobilien, Einwanderung und die Buchungsmodule sind jeweils pro Arbeitsbereich zubuchbar." },
-        { "q": "Was passiert mit Demo-Daten?", "a": "Der Arbeitsbereich startet mit realistischen fiktiven Daten. Ausgewählte Aktionen lassen sich im Browser testen, aber nichts wird in der Datenbank gespeichert oder an externe Dienste gesendet." },
-        { "q": "Wurde die Vertragsvorlage juristisch geprüft?", "a": "Es ist ein generierter Ausgangspunkt, keine Rechtsberatung — lassen Sie jeden Vertrag von Ihrem eigenen Anwalt prüfen, bevor Sie ihn an einen echten Kunden senden." }
+        {
+          "q": "Brauche ich einen KI-API-Schlüssel?",
+          "a": "Nein. Jede KI-Funktion hat einen soliden Fallback ohne Schlüssel — Lead-Bewertung, Inhaltsvorschläge und Entwürfe funktionieren trotzdem; ein echter Anbieter verbessert nur die Qualität."
+        },
+        {
+          "q": "Ist meine Daten von anderen Mandanten isoliert?",
+          "a": "Ja. Die Mandantentrennung wird auf Datenebene erzwungen, nicht nur pro Bildschirm — ein Arbeitsbereich kann strukturell nicht auf die Daten eines anderen zugreifen."
+        },
+        {
+          "q": "Kann ich nur die Module aktivieren, die ich brauche?",
+          "a": "Ja. Versicherung, Immobilien, Einwanderung und die Buchungsmodule sind jeweils pro Arbeitsbereich zubuchbar."
+        },
+        {
+          "q": "Was passiert mit Demo-Daten?",
+          "a": "Der Arbeitsbereich startet mit realistischen fiktiven Daten. Ausgewählte Aktionen lassen sich im Browser testen, aber nichts wird in der Datenbank gespeichert oder an externe Dienste gesendet."
+        },
+        {
+          "q": "Wurde die Vertragsvorlage juristisch geprüft?",
+          "a": "Es ist ein generierter Ausgangspunkt, keine Rechtsberatung — lassen Sie jeden Vertrag von Ihrem eigenen Anwalt prüfen, bevor Sie ihn an einen echten Kunden senden."
+        }
       ]
     },
     "cta": {
@@ -411,10 +571,38 @@
     "footer": {
       "tagline": "Jeder Lead, bis zum Abschluss begleitet.",
       "columns": [
-        { "title": "Produkt", "links": ["Funktionen", "Preise", "Module"] },
-        { "title": "Branchen", "links": ["Versicherung", "Immobilien", "Einwanderung", "Dienstleister"] },
-        { "title": "Unternehmen", "links": ["Über uns", "Kontakt"] },
-        { "title": "Rechtliches", "links": ["Datenschutz", "AGB", "Sicherheit"] }
+        {
+          "title": "Produkt",
+          "links": [
+            "Funktionen",
+            "Preise",
+            "Module"
+          ]
+        },
+        {
+          "title": "Branchen",
+          "links": [
+            "Versicherung",
+            "Immobilien",
+            "Einwanderung",
+            "Dienstleister"
+          ]
+        },
+        {
+          "title": "Unternehmen",
+          "links": [
+            "Über uns",
+            "Kontakt"
+          ]
+        },
+        {
+          "title": "Rechtliches",
+          "links": [
+            "Datenschutz",
+            "AGB",
+            "Sicherheit"
+          ]
+        }
       ],
       "copyright": "© 2026 SOBI CRM. Produktdemonstration."
     }
@@ -462,30 +650,230 @@
     "preview": "Vorschau"
   },
   "businessForms": {
-    "contacts": "Kontakte", "contactCount": "{count, plural, =0 {Keine Kontakte} =1 {# Kontakt} other {# Kontakte}}", "searchContacts": "Kontakte suchen…", "newContact": "Neuer Kontakt", "firstName": "Vorname", "lastName": "Nachname", "email": "E-Mail", "phone": "Telefon", "jobTitle": "Position", "lifecycle": "Lebenszyklus", "name": "Name", "company": "Unternehmen", "cancel": "Abbrechen", "creating": "Wird erstellt…", "createContact": "Kontakt erstellen", "validationError": "Bitte prüfen Sie die Pflichtfelder.", "noContacts": "Noch keine Kontakte", "noContactsDescription": "Fügen Sie den ersten Kontakt hinzu, um Beziehungen aufzubauen.", "pageOf": "Seite {page} von {total}", "previous": "Zurück", "next": "Weiter",
-    "lifecycleValues": { "lead": "Lead", "prospect": "Interessent", "customer": "Kunde", "inactive": "Inaktiv" }
+    "contacts": "Kontakte",
+    "contactCount": "{count, plural, =0 {Keine Kontakte} =1 {# Kontakt} other {# Kontakte}}",
+    "searchContacts": "Kontakte suchen…",
+    "newContact": "Neuer Kontakt",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "jobTitle": "Position",
+    "lifecycle": "Lebenszyklus",
+    "name": "Name",
+    "company": "Unternehmen",
+    "cancel": "Abbrechen",
+    "creating": "Wird erstellt…",
+    "createContact": "Kontakt erstellen",
+    "validationError": "Bitte prüfen Sie die Pflichtfelder.",
+    "noContacts": "Noch keine Kontakte",
+    "noContactsDescription": "Fügen Sie den ersten Kontakt hinzu, um Beziehungen aufzubauen.",
+    "pageOf": "Seite {page} von {total}",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "lifecycleValues": {
+      "lead": "Lead",
+      "prospect": "Interessent",
+      "customer": "Kunde",
+      "inactive": "Inaktiv"
+    }
   },
   "formBuilder": {
-    "eyebrow": "Studio · Geschäftsformulare", "title": "Universeller Formulareditor", "description": "Mandantenspezifische Felder erstellen, Bereiche anordnen, Sprachen prüfen und sicher veröffentlichen, ohne Systemfelder zu verändern.", "entities": "Geschäftsobjekte", "canvas": "Formularfläche", "editing": "{entity} bearbeiten", "versionHint": "Entwürfe wirken sich erst nach der Veröffentlichung auf Benutzer aus.", "demoNotice": "Demo-Modus: Änderungen bleiben nur in diesem Browser und erzeugen keine Metadaten oder Versionen.", "history": "Verlauf", "saveDraft": "Entwurf speichern", "publish": "Veröffentlichen", "publishing": "Veröffentlichung…", "sectionTitle": "Bereichstitel", "moveUp": "Nach oben", "moveDown": "Nach unten", "deleteSection": "Bereich löschen", "emptySection": "Feld für diesen Bereich erstellen oder hinzufügen", "configure": "Feld konfigurieren", "removeFromForm": "Aus Formular entfernen", "required": "Pflichtfeld", "fullWidth": "Volle Breite", "archiveField": "Feld archivieren und vorhandene Werte behalten", "addExisting": "Vorhandenes Feld hinzufügen", "createField": "Feld erstellen", "newSection": "Neuer Bereich", "addSection": "Bereich hinzufügen", "livePreview": "Live-Vorschau", "previewLanguage": "Vorschausprache", "newFieldTitle": "Geschäftsfeld erstellen", "fieldKey": "Stabiler Feldschlüssel", "fieldKeyHint": "Lateinische Kleinbuchstaben, Zahlen und Unterstriche. Später nicht änderbar.", "fieldType": "Feldtyp", "labelFa": "Persische Bezeichnung", "labelEn": "Englische Bezeichnung", "labelDe": "Deutsche Bezeichnung", "placeholder": "Platzhalter / Beispiel", "helpText": "Hilfetext", "options": "Auswahlwerte", "optionsHint": "Ein Wert pro Zeile", "min": "Minimum / Mindestlänge", "max": "Maximum / Maximallänge", "searchable": "In Suche aufnehmen", "cancel": "Abbrechen", "historyTitle": "Versionsverlauf", "noVersions": "Noch keine Version gespeichert.", "unnamedVersion": "Formularversion", "archiveVersion": "Entwurf archivieren", "rollback": "Wiederherstellen", "close": "Schließen",
+    "eyebrow": "Studio · Geschäftsformulare",
+    "title": "Universeller Formulareditor",
+    "description": "Mandantenspezifische Felder erstellen, Bereiche anordnen, Sprachen prüfen und sicher veröffentlichen, ohne Systemfelder zu verändern.",
+    "entities": "Geschäftsobjekte",
+    "canvas": "Formularfläche",
+    "editing": "{entity} bearbeiten",
+    "versionHint": "Entwürfe wirken sich erst nach der Veröffentlichung auf Benutzer aus.",
+    "demoNotice": "Demo-Modus: Änderungen bleiben nur in diesem Browser und erzeugen keine Metadaten oder Versionen.",
+    "history": "Verlauf",
+    "saveDraft": "Entwurf speichern",
+    "publish": "Veröffentlichen",
+    "publishing": "Veröffentlichung…",
+    "sectionTitle": "Bereichstitel",
+    "moveUp": "Nach oben",
+    "moveDown": "Nach unten",
+    "deleteSection": "Bereich löschen",
+    "emptySection": "Feld für diesen Bereich erstellen oder hinzufügen",
+    "configure": "Feld konfigurieren",
+    "removeFromForm": "Aus Formular entfernen",
+    "required": "Pflichtfeld",
+    "fullWidth": "Volle Breite",
+    "archiveField": "Feld archivieren und vorhandene Werte behalten",
+    "addExisting": "Vorhandenes Feld hinzufügen",
+    "createField": "Feld erstellen",
+    "newSection": "Neuer Bereich",
+    "addSection": "Bereich hinzufügen",
+    "livePreview": "Live-Vorschau",
+    "previewLanguage": "Vorschausprache",
+    "newFieldTitle": "Geschäftsfeld erstellen",
+    "fieldKey": "Stabiler Feldschlüssel",
+    "fieldKeyHint": "Lateinische Kleinbuchstaben, Zahlen und Unterstriche. Später nicht änderbar.",
+    "fieldType": "Feldtyp",
+    "labelFa": "Persische Bezeichnung",
+    "labelEn": "Englische Bezeichnung",
+    "labelDe": "Deutsche Bezeichnung",
+    "placeholder": "Platzhalter / Beispiel",
+    "helpText": "Hilfetext",
+    "options": "Auswahlwerte",
+    "optionsHint": "Ein Wert pro Zeile",
+    "min": "Minimum / Mindestlänge",
+    "max": "Maximum / Maximallänge",
+    "searchable": "In Suche aufnehmen",
+    "cancel": "Abbrechen",
+    "historyTitle": "Versionsverlauf",
+    "noVersions": "Noch keine Version gespeichert.",
+    "unnamedVersion": "Formularversion",
+    "archiveVersion": "Entwurf archivieren",
+    "rollback": "Wiederherstellen",
+    "close": "Schließen",
     "customizeForm": "Formular anpassen",
-    "conditionalVisibility": "Bedingte Sichtbarkeit", "showWhenField": "Anzeigen, wenn Feld", "alwaysVisible": "Immer sichtbar", "equalsValue": "Wert ist gleich", "calculatedField": "Berechneter Wert", "calculateFrom": "Berechnen aus Feld", "notCalculated": "Nicht berechnet", "operator": "Operator", "constant": "Konstante",
-    "feedback": { "draft": "Entwurf gespeichert", "published": "Veröffentlicht", "error": "Speichern fehlgeschlagen" }, "statuses": { "draft": "Entwurf", "published": "Veröffentlicht", "archived": "Archiviert" },
-    "types": { "text": "Kurztext", "textarea": "Langtext", "number": "Zahl", "currency": "Währung", "boolean": "Ja / Nein", "date": "Datum", "datetime": "Datum und Uhrzeit", "select": "Einfachauswahl", "multiselect": "Mehrfachauswahl", "email": "E-Mail", "phone": "Telefon", "url": "URL", "relation": "Verknüpfter Datensatz", "user": "Teammitglied" },
-    "entitiesMap": { "contact": "Kontakte", "company": "Unternehmen", "lead": "Leads", "deal": "Abschlüsse", "task": "Aufgaben", "event": "Termine", "campaign": "Kampagnen", "contract": "Verträge", "policy": "Policen" }
+    "conditionalVisibility": "Bedingte Sichtbarkeit",
+    "showWhenField": "Anzeigen, wenn Feld",
+    "alwaysVisible": "Immer sichtbar",
+    "equalsValue": "Wert ist gleich",
+    "calculatedField": "Berechneter Wert",
+    "calculateFrom": "Berechnen aus Feld",
+    "notCalculated": "Nicht berechnet",
+    "operator": "Operator",
+    "constant": "Konstante",
+    "feedback": {
+      "draft": "Entwurf gespeichert",
+      "published": "Veröffentlicht",
+      "error": "Speichern fehlgeschlagen"
+    },
+    "statuses": {
+      "draft": "Entwurf",
+      "published": "Veröffentlicht",
+      "archived": "Archiviert"
+    },
+    "types": {
+      "text": "Kurztext",
+      "textarea": "Langtext",
+      "number": "Zahl",
+      "currency": "Währung",
+      "boolean": "Ja / Nein",
+      "date": "Datum",
+      "datetime": "Datum und Uhrzeit",
+      "select": "Einfachauswahl",
+      "multiselect": "Mehrfachauswahl",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "url": "URL",
+      "relation": "Verknüpfter Datensatz",
+      "user": "Teammitglied"
+    },
+    "entitiesMap": {
+      "contact": "Kontakte",
+      "company": "Unternehmen",
+      "lead": "Leads",
+      "deal": "Abschlüsse",
+      "task": "Aufgaben",
+      "event": "Termine",
+      "campaign": "Kampagnen",
+      "contract": "Verträge",
+      "policy": "Policen"
+    }
   },
   "calendar": {
-    "eyebrow": "Gemeinsame Planung", "title": "Kalender", "description": "Termine, Aufgaben, Abschlüsse, Kampagnen, Policen und Verträge in einem zweisprachigen Kalender.",
-    "searchAndFilter": "Suchen und filtern", "newEvent": "Neuer Termin", "demoNotice": "Demo-Modus: Termine und Erinnerungen können getestet werden, Änderungen bleiben aber nur in diesem Browser.",
-    "textSearch": "Textsuche", "searchPlaceholder": "Titel, Person, Kampagne…", "from": "Von", "to": "Bis", "reminders": "Erinnerungen", "any": "Alle", "withReminder": "Mit Erinnerung", "withoutReminder": "Ohne Erinnerung", "sources": "Quellen", "searching": "Suche…", "search": "Suchen", "searchResults": "{count, plural, =0 {Keine Ergebnisse} one {# Ergebnis} other {# Ergebnisse}}", "closeResults": "Ergebnisse schließen",
-    "previousMonth": "Vorheriger Monat", "nextMonth": "Nächster Monat", "today": "Heute", "month": "Monat", "year": "Jahr", "jalali": "Jalali", "gregorian": "Gregorianisch", "partialSources": "Einige Quellen sind nicht verfügbar: {sources}", "truncated": "Es werden nur die ersten 200 Treffer angezeigt.",
-    "weekdays": { "sat": "Sa", "sun": "So", "mon": "Mo", "tue": "Di", "wed": "Mi", "thu": "Do", "fri": "Fr" },
-    "jalaliMonths": { "1": "Farvardin", "2": "Ordibehesht", "3": "Khordad", "4": "Tir", "5": "Mordad", "6": "Shahrivar", "7": "Mehr", "8": "Aban", "9": "Azar", "10": "Dey", "11": "Bahman", "12": "Esfand" },
-    "sourcesMap": { "event": "Termine", "task": "Aufgaben", "deal": "Abschlüsse", "campaign": "Kampagnen", "policy": "Policen", "contract": "Verträge" },
-    "addOnDate": "Termin am {date} hinzufügen", "more": "+{count} weitere", "close": "Schließen", "openRecord": "Datensatz öffnen", "editEvent": "Termin bearbeiten", "eventTitle": "Titel", "eventType": "Typ", "color": "Farbe", "date": "Datum", "allDay": "Ganztägig", "start": "Beginn", "end": "Ende", "location": "Ort", "eventDescription": "Beschreibung",
-    "types": { "appointment": "Termin", "meeting": "Besprechung", "deadline": "Frist", "followup": "Nachfassen" },
-    "tones": { "brand": "CRM-Grün", "accent": "Akzent", "info": "Blau", "positive": "Positiv", "warning": "Warnung", "danger": "Dringend" },
-    "reminderOptions": { "0": "Bei Beginn", "15": "15 Minuten vorher", "60": "1 Stunde vorher", "1440": "1 Tag vorher" },
-    "deleteEvent": "Termin löschen", "cancel": "Abbrechen", "saving": "Speichern…", "saveEvent": "Termin speichern"
+    "eyebrow": "Gemeinsame Planung",
+    "title": "Kalender",
+    "description": "Termine, Aufgaben, Abschlüsse, Kampagnen, Policen und Verträge in einem zweisprachigen Kalender.",
+    "searchAndFilter": "Suchen und filtern",
+    "newEvent": "Neuer Termin",
+    "demoNotice": "Demo-Modus: Termine und Erinnerungen können getestet werden, Änderungen bleiben aber nur in diesem Browser.",
+    "textSearch": "Textsuche",
+    "searchPlaceholder": "Titel, Person, Kampagne…",
+    "from": "Von",
+    "to": "Bis",
+    "reminders": "Erinnerungen",
+    "any": "Alle",
+    "withReminder": "Mit Erinnerung",
+    "withoutReminder": "Ohne Erinnerung",
+    "sources": "Quellen",
+    "searching": "Suche…",
+    "search": "Suchen",
+    "searchResults": "{count, plural, =0 {Keine Ergebnisse} one {# Ergebnis} other {# Ergebnisse}}",
+    "closeResults": "Ergebnisse schließen",
+    "previousMonth": "Vorheriger Monat",
+    "nextMonth": "Nächster Monat",
+    "today": "Heute",
+    "month": "Monat",
+    "year": "Jahr",
+    "jalali": "Jalali",
+    "gregorian": "Gregorianisch",
+    "partialSources": "Einige Quellen sind nicht verfügbar: {sources}",
+    "truncated": "Es werden nur die ersten 200 Treffer angezeigt.",
+    "weekdays": {
+      "sat": "Sa",
+      "sun": "So",
+      "mon": "Mo",
+      "tue": "Di",
+      "wed": "Mi",
+      "thu": "Do",
+      "fri": "Fr"
+    },
+    "jalaliMonths": {
+      "1": "Farvardin",
+      "2": "Ordibehesht",
+      "3": "Khordad",
+      "4": "Tir",
+      "5": "Mordad",
+      "6": "Shahrivar",
+      "7": "Mehr",
+      "8": "Aban",
+      "9": "Azar",
+      "10": "Dey",
+      "11": "Bahman",
+      "12": "Esfand"
+    },
+    "sourcesMap": {
+      "event": "Termine",
+      "task": "Aufgaben",
+      "deal": "Abschlüsse",
+      "campaign": "Kampagnen",
+      "policy": "Policen",
+      "contract": "Verträge"
+    },
+    "addOnDate": "Termin am {date} hinzufügen",
+    "more": "+{count} weitere",
+    "close": "Schließen",
+    "openRecord": "Datensatz öffnen",
+    "editEvent": "Termin bearbeiten",
+    "eventTitle": "Titel",
+    "eventType": "Typ",
+    "color": "Farbe",
+    "date": "Datum",
+    "allDay": "Ganztägig",
+    "start": "Beginn",
+    "end": "Ende",
+    "location": "Ort",
+    "eventDescription": "Beschreibung",
+    "types": {
+      "appointment": "Termin",
+      "meeting": "Besprechung",
+      "deadline": "Frist",
+      "followup": "Nachfassen"
+    },
+    "tones": {
+      "brand": "CRM-Grün",
+      "accent": "Akzent",
+      "info": "Blau",
+      "positive": "Positiv",
+      "warning": "Warnung",
+      "danger": "Dringend"
+    },
+    "reminderOptions": {
+      "0": "Bei Beginn",
+      "15": "15 Minuten vorher",
+      "60": "1 Stunde vorher",
+      "1440": "1 Tag vorher"
+    },
+    "deleteEvent": "Termin löschen",
+    "cancel": "Abbrechen",
+    "saving": "Speichern…",
+    "saveEvent": "Termin speichern"
   },
   "onboardingTour": {
     "progress": "Schritt {current} von {total}",
@@ -494,14 +882,38 @@
     "next": "Weiter",
     "finish": "Fertig",
     "steps": {
-      "dashboard": { "title": "Ihre CRM-Kommandozentrale", "description": "Hier sehen Sie Pipeline, Wiedervorlagen, Aktivitäten und Punkte mit Handlungsbedarf auf einen Blick." },
-      "rail": { "title": "Zwischen Sobinta-Produkten wechseln", "description": "Die Produktleiste verbindet CRM, Vorgänge, Finanzen, KI und Studio in einem konsistenten Arbeitsbereich." },
-      "navigation": { "title": "Im aktuellen Produkt arbeiten", "description": "Diese Zeile passt sich dem gewählten Produkt an und hält die täglichen Werkzeuge griffbereit." },
-      "search": { "title": "Alles schnell finden", "description": "Suchen Sie überall nach Datensätzen und Aktionen. Mit Strg K öffnen Sie die Suche direkt." },
-      "calendar": { "title": "Arbeit in einem Kalender planen", "description": "Unter Vorgänge finden Sie den gemeinsamen gregorianischen und persischen Kalender mit Erinnerungen." },
-      "forms": { "title": "Geschäftsformulare anpassen", "description": "Im Studio werden wiederverwendbare Felder und Formulare an Ihre Abläufe angepasst." },
-      "support": { "title": "Hilfe ist immer erreichbar", "description": "Hier können Sie diese Tour erneut starten. Tickets und tarifabhängiger Live-Support folgen ebenfalls hier." },
-      "profile": { "title": "Profil und Abonnement", "description": "Prüfen Sie Profil und Tarif und wechseln Sie bei wachsendem Bedarf in einen höheren Plan." }
+      "dashboard": {
+        "title": "Ihre CRM-Kommandozentrale",
+        "description": "Hier sehen Sie Pipeline, Wiedervorlagen, Aktivitäten und Punkte mit Handlungsbedarf auf einen Blick."
+      },
+      "rail": {
+        "title": "Zwischen Sobinta-Produkten wechseln",
+        "description": "Die Produktleiste verbindet CRM, Vorgänge, Finanzen, KI und Studio in einem konsistenten Arbeitsbereich."
+      },
+      "navigation": {
+        "title": "Im aktuellen Produkt arbeiten",
+        "description": "Diese Zeile passt sich dem gewählten Produkt an und hält die täglichen Werkzeuge griffbereit."
+      },
+      "search": {
+        "title": "Alles schnell finden",
+        "description": "Suchen Sie überall nach Datensätzen und Aktionen. Mit Strg K öffnen Sie die Suche direkt."
+      },
+      "calendar": {
+        "title": "Arbeit in einem Kalender planen",
+        "description": "Unter Vorgänge finden Sie den gemeinsamen gregorianischen und persischen Kalender mit Erinnerungen."
+      },
+      "forms": {
+        "title": "Geschäftsformulare anpassen",
+        "description": "Im Studio werden wiederverwendbare Felder und Formulare an Ihre Abläufe angepasst."
+      },
+      "support": {
+        "title": "Hilfe ist immer erreichbar",
+        "description": "Hier können Sie diese Tour erneut starten. Tickets und tarifabhängiger Live-Support folgen ebenfalls hier."
+      },
+      "profile": {
+        "title": "Profil und Abonnement",
+        "description": "Prüfen Sie Profil und Tarif und wechseln Sie bei wachsendem Bedarf in einen höheren Plan."
+      }
     }
   },
   "help": {
@@ -510,10 +922,81 @@
     "openSupport": "Support-Center öffnen"
   },
   "support": {
-    "title": "Support-Center", "description": "Tickets und planabhängige Live-Hilfe in einem sicheren Verlauf.", "newTicket": "Neue Anfrage", "myTickets": "Meine Anfragen", "empty": "Noch keine Support-Anfragen.", "ticket": "Ticket", "live": "Live-Chat", "messages": "Nachrichten", "newRequest": "Wie können wir helfen?", "newRequestHint": "Geben Sie genug Kontext an, damit das Sobinta-Team schnell antworten kann.", "liveUpgrade": "Live-Chat ist in ausgewählten professionellen Plänen verfügbar. Tickets gibt es in jedem Plan.", "subject": "Betreff", "category": "Kategorie", "general": "Allgemein", "technical": "Technisch", "billing": "Abrechnung", "feature": "Funktionswunsch", "message": "Nachricht", "cancel": "Abbrechen", "startChat": "Chat starten", "sendTicket": "Ticket senden", "status": "Status", "connected": "Live-Kanal aktiv", "replyPlaceholder": "Antwort schreiben…", "send": "Senden", "selectTitle": "Unterhaltung auswählen", "selectHint": "Öffnen Sie eine Anfrage oder kontaktieren Sie den Sobinta-Support.", "demoSaved": "Demo lokal aktualisiert; nichts wurde gespeichert.", "failed": "Anfrage konnte nicht gesendet werden. Ihr Text bleibt erhalten; bitte erneut versuchen.", "status_open": "Offen", "status_in_progress": "In Bearbeitung", "status_waiting_on_customer": "Wartet auf Kunden", "status_resolved": "Gelöst", "status_closed": "Geschlossen"
+    "title": "Support-Center",
+    "description": "Tickets und planabhängige Live-Hilfe in einem sicheren Verlauf.",
+    "newTicket": "Neue Anfrage",
+    "myTickets": "Meine Anfragen",
+    "empty": "Noch keine Support-Anfragen.",
+    "ticket": "Ticket",
+    "live": "Live-Chat",
+    "messages": "Nachrichten",
+    "newRequest": "Wie können wir helfen?",
+    "newRequestHint": "Geben Sie genug Kontext an, damit das Sobinta-Team schnell antworten kann.",
+    "liveUpgrade": "Live-Chat ist in ausgewählten professionellen Plänen verfügbar. Tickets gibt es in jedem Plan.",
+    "subject": "Betreff",
+    "category": "Kategorie",
+    "general": "Allgemein",
+    "technical": "Technisch",
+    "billing": "Abrechnung",
+    "feature": "Funktionswunsch",
+    "message": "Nachricht",
+    "cancel": "Abbrechen",
+    "startChat": "Chat starten",
+    "sendTicket": "Ticket senden",
+    "status": "Status",
+    "connected": "Live-Kanal aktiv",
+    "replyPlaceholder": "Antwort schreiben…",
+    "send": "Senden",
+    "selectTitle": "Unterhaltung auswählen",
+    "selectHint": "Öffnen Sie eine Anfrage oder kontaktieren Sie den Sobinta-Support.",
+    "demoSaved": "Demo lokal aktualisiert; nichts wurde gespeichert.",
+    "failed": "Anfrage konnte nicht gesendet werden. Ihr Text bleibt erhalten; bitte erneut versuchen.",
+    "status_open": "Offen",
+    "status_in_progress": "In Bearbeitung",
+    "status_waiting_on_customer": "Wartet auf Kunden",
+    "status_resolved": "Gelöst",
+    "status_closed": "Geschlossen"
   },
   "supportAdmin": {
-    "title": "Plattform-Support", "description": "Tickets und Live-Chats aller Sobinta-Arbeitsbereiche sicher verwalten.", "statusFilter": "Nach Status filtern", "allStatuses": "Alle Status", "priorityFilter": "Nach Priorität filtern", "allPriorities": "Alle Prioritäten", "priority_low": "Niedrig", "priority_normal": "Normal", "priority_high": "Hoch", "priority_urgent": "Dringend", "assigneeFilter": "Nach Zuständigkeit filtern", "allAssignees": "Alle Zuständigen", "assignedToMe": "Mir zugewiesen", "withoutAssignee": "Nicht zugewiesen", "tenantFilter": "Nach Arbeitsbereich filtern", "allTenants": "Alle Arbeitsbereiche", "ageFilter": "Mindestwartezeit", "anyAge": "Beliebige Wartezeit", "older4": "Älter als 4 Stunden", "older12": "Älter als 12 Stunden", "older24": "Älter als 24 Stunden", "older72": "Älter als 3 Tage", "applyFilters": "Filter anwenden", "queue": "Anfragen", "removeAssignment": "Zuweisung entfernen", "assignToMe": "Mir zuweisen", "changeStatus": "Status ändern", "replyPlaceholder": "Antwort des Supports…", "sendReply": "Antwort senden", "selectRequest": "Anfrage auswählen", "statusUpdated": "Ticketstatus aktualisiert.", "updateFailed": "Aktualisierung fehlgeschlagen. Erneut versuchen.", "assigned": "Ticket wurde Ihnen zugewiesen.", "unassigned": "Zuweisung entfernt.", "assignFailed": "Zuweisung fehlgeschlagen. Erneut versuchen.", "sendFailed": "Senden fehlgeschlagen; Ihre Antwort bleibt erhalten.", "replySent": "Antwort und sichere Kundenbenachrichtigung wurden erstellt.", "operator": "Support", "customer": "Kunde"
+    "title": "Plattform-Support",
+    "description": "Tickets und Live-Chats aller Sobinta-Arbeitsbereiche sicher verwalten.",
+    "statusFilter": "Nach Status filtern",
+    "allStatuses": "Alle Status",
+    "priorityFilter": "Nach Priorität filtern",
+    "allPriorities": "Alle Prioritäten",
+    "priority_low": "Niedrig",
+    "priority_normal": "Normal",
+    "priority_high": "Hoch",
+    "priority_urgent": "Dringend",
+    "assigneeFilter": "Nach Zuständigkeit filtern",
+    "allAssignees": "Alle Zuständigen",
+    "assignedToMe": "Mir zugewiesen",
+    "withoutAssignee": "Nicht zugewiesen",
+    "tenantFilter": "Nach Arbeitsbereich filtern",
+    "allTenants": "Alle Arbeitsbereiche",
+    "ageFilter": "Mindestwartezeit",
+    "anyAge": "Beliebige Wartezeit",
+    "older4": "Älter als 4 Stunden",
+    "older12": "Älter als 12 Stunden",
+    "older24": "Älter als 24 Stunden",
+    "older72": "Älter als 3 Tage",
+    "applyFilters": "Filter anwenden",
+    "queue": "Anfragen",
+    "removeAssignment": "Zuweisung entfernen",
+    "assignToMe": "Mir zuweisen",
+    "changeStatus": "Status ändern",
+    "replyPlaceholder": "Antwort des Supports…",
+    "sendReply": "Antwort senden",
+    "selectRequest": "Anfrage auswählen",
+    "statusUpdated": "Ticketstatus aktualisiert.",
+    "updateFailed": "Aktualisierung fehlgeschlagen. Erneut versuchen.",
+    "assigned": "Ticket wurde Ihnen zugewiesen.",
+    "unassigned": "Zuweisung entfernt.",
+    "assignFailed": "Zuweisung fehlgeschlagen. Erneut versuchen.",
+    "sendFailed": "Senden fehlgeschlagen; Ihre Antwort bleibt erhalten.",
+    "replySent": "Antwort und sichere Kundenbenachrichtigung wurden erstellt.",
+    "operator": "Support",
+    "customer": "Kunde"
   },
   "imports": {
     "title": "Datenimporte",
@@ -639,5 +1122,90 @@
     "applied": "Angewendet",
     "entities": "{count} Entitäten",
     "view": "Entitäten ansehen"
+  },
+  "helpTopics": {
+    "leads": {
+      "title": "Über Leads",
+      "body": "Ein Lead ist eine unbearbeitete, nicht qualifizierte Anfrage — er kommt automatisch über Ihr öffentliches Website-Formular herein, oder Sie fügen ihn manuell hinzu. Leads werden nie bearbeitet, um besser auszusehen; sie bleiben genau so, wie sie eingegangen sind, damit Sie immer den ursprünglichen Kontext sehen.\n\nAuf dieser Seite können Sie:\n- Einen Lead öffnen, um alle Details zu sehen: Kontaktdaten, Eingangsdatum, Tätigkeitsfeld und aktuellen Status.\n- Ihn mit KI bewerten — ein Fit-Score von 0-100 plus eine kurze Begründung, basierend auf der Vollständigkeit der Angaben und der Geschäftsphase.\n- Einen KI-Content-Vorschlag erhalten — einen passenden Artikel und eine versandfertige Follow-up-Nachricht.\n- Ihn in einen Kontakt umwandeln (und, falls ein Firmenname vorliegt, in ein Unternehmen) — optional gleichzeitig mit einem Deal.\n\nWarum das wichtig ist: Die Umwandlung ist ein bewusster, einseitiger Schritt. Der Lead selbst wird nie gelöscht oder überschrieben, sodass Sie immer eine lückenlose Nachverfolgung vom Erstkontakt bis zum Kunden haben."
+    }
+  },
+  "leads": {
+    "title": "Leads",
+    "description": "{count} offene Leads",
+    "newLead": "Neuer Lead",
+    "search": "Leads durchsuchen…",
+    "status": {
+      "new": "Neu",
+      "working": "In Bearbeitung",
+      "qualified": "Qualifiziert",
+      "unqualified": "Nicht qualifiziert",
+      "converted": "Umgewandelt"
+    },
+    "all": "Alle",
+    "sources": {
+      "website": "Website",
+      "manual": "Manuell erfasst",
+      "chatbot": "Chatbot",
+      "telegram": "Telegram",
+      "chatbox": "Webchat",
+      "unknown": "Unbekannt"
+    },
+    "score": "Score",
+    "scoreCta": "KI-Bewertung",
+    "scoring": "Wird bewertet…",
+    "suggestCta": "Inhalt vorschlagen",
+    "suggesting": "Wird ermittelt…",
+    "noSuggestion": "Kein passender Artikel",
+    "viewContact": "Kontakt ansehen",
+    "convert": "In Kontakt umwandeln",
+    "emptyTitle": "Noch keine Leads",
+    "emptyDescription": "Leads kommen automatisch über Ihr öffentliches Website-Formular herein, oder Sie fügen einen manuell hinzu.",
+    "submitted": "Eingegangen",
+    "industry": "Tätigkeitsfeld",
+    "noValue": "—",
+    "newLeadTitle": "Neuer Lead",
+    "newLeadDescription": "Erfassen Sie eine eingehende Anfrage manuell — der andere Lead-Kanal neben dem öffentlichen Website-Formular.",
+    "titleLabel": "Titel",
+    "titlePlaceholder": "z. B. Beratungsanfrage",
+    "companyLabel": "Firmenname (optional)",
+    "industryLabel": "Tätigkeitsfeld (optional)",
+    "emailLabel": "E-Mail",
+    "phoneLabel": "Telefon",
+    "messageLabel": "Nachricht / Anliegen",
+    "valueLabel": "Geschätzter Wert",
+    "create": "Lead erstellen",
+    "creating": "Wird erstellt…",
+    "cancel": "Abbrechen",
+    "convertTitle": "Lead in Kontakt umwandeln",
+    "convertIntro": "Wandelt diesen Lead in einen Kontakt um (und in ein Unternehmen, falls ein Firmenname angegeben ist). Der Lead selbst bleibt unverändert.",
+    "firstNameLabel": "Vorname",
+    "lastNameLabel": "Nachname",
+    "jobTitleLabel": "Position (optional)",
+    "serviceInterestLabel": "Gewünschte Leistung (optional)",
+    "notesLabel": "Zusätzliche Notiz (optional)",
+    "notesPlaceholder": "Alles Weitere, das erwähnenswert ist…",
+    "createDealLabel": "Zusätzlich einen Deal erstellen",
+    "dealAmountLabel": "Geschätzter Deal-Betrag",
+    "convertSubmit": "Umwandeln",
+    "converting": "Wird umgewandelt…",
+    "backToLeads": "Zurück zu den Leads",
+    "scoreCardTitle": "KI-Bewertung",
+    "scoreEmpty": "Noch nicht bewertet.",
+    "rescoreCta": "Neu bewerten",
+    "suggestCardTitle": "Content-Vorschlag",
+    "suggestEmpty": "Lassen Sie sich einen KI-Artikel zur Nachverfolgung vorschlagen.",
+    "suggestFor": "Basierend auf dem Artikel",
+    "copyMessage": "Nachricht kopieren",
+    "copied": "Kopiert",
+    "editLead": "Bearbeiten",
+    "editLeadTitle": "Lead-Details bearbeiten",
+    "save": "Änderungen speichern",
+    "saving": "Wird gespeichert…",
+    "convertedBanner": "Dieser Lead wurde bereits umgewandelt.",
+    "detailsCardTitle": "Details",
+    "statusLabel": "Status",
+    "estimatedValueLabel": "Geschätzter Wert",
+    "messagePreviewTitle": "Ursprüngliche Nachricht",
+    "sourceLabel": "Quelle"
   }
 }

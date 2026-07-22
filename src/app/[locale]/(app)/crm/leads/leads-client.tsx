@@ -1,14 +1,27 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "@/i18n/navigation";
-import { UserPlus, ArrowLeftRight, Eye, Sparkles, Copy, Check, MessageSquareText } from "lucide-react";
+import { useMemo, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
+import { useRouter, Link } from "@/i18n/navigation";
+import {
+  UserPlus,
+  Eye,
+  Sparkles,
+  Copy,
+  Check,
+  MessageSquareText,
+  Download,
+  Search,
+  Mail,
+  Phone,
+  Briefcase,
+  CalendarClock,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Chip, type ChipProps } from "@/components/ui/chip";
+import { Chip } from "@/components/ui/chip";
+import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/patterns/empty-state";
 import {
   Dialog,
@@ -19,49 +32,32 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { convertLeadAction } from "../actions";
 import { scoreLeadAction, suggestContentForLeadAction } from "@/app/[locale]/(app)/ai/actions";
+import { LEAD_STATUSES, LEAD_STATUS_TONE, leadScoreTone } from "@/engines/crm/lead-format";
+import { downloadCsv } from "@/lib/csv-export";
+import { ConvertLeadDialog } from "./convert-lead-dialog";
+import { NewLeadDialog } from "./new-lead-dialog";
 
 export interface LeadRow {
   id: string;
   title: string;
   companyName: string | null;
+  industry: string | null;
   email: string | null;
+  phone: string | null;
   status: string;
   source: string | null;
   score: number;
   scoreRationale: string | null;
+  estimatedValue: number | null;
+  message: string | null;
+  createdAt: string;
   contactId: string | null;
 }
 
-const statusTone: Record<string, ChipProps["tone"]> = {
-  new: "info",
-  working: "warning",
-  qualified: "positive",
-  unqualified: "neutral",
-  converted: "brand",
-};
-
-const statusLabel: Record<string, string> = {
-  new: "جدید",
-  working: "در حال بررسی",
-  qualified: "واجد شرایط",
-  unqualified: "رد شده",
-  converted: "تبدیل‌شده",
-};
-
-function scoreTone(score: number): ChipProps["tone"] {
-  if (score >= 70) return "positive";
-  if (score >= 40) return "warning";
-  if (score > 0) return "danger";
-  return "neutral";
-}
-
 export function LeadsClient({ leads }: { leads: LeadRow[] }) {
+  const t = useTranslations("leads");
   const router = useRouter();
-  const [converting, setConverting] = useState<LeadRow | null>(null);
-  const [withDeal, setWithDeal] = useState(true);
-  const [amount, setAmount] = useState("");
   const [pending, startTransition] = useTransition();
   const [scoringId, setScoringId] = useState<string | null>(null);
   const [suggestingId, setSuggestingId] = useState<string | null>(null);
@@ -72,6 +68,29 @@ export function LeadsClient({ leads }: { leads: LeadRow[] }) {
   } | null>(null);
   const [noSuggestionFor, setNoSuggestionFor] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [search, setSearch] = useState("");
+
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { all: leads.length };
+    for (const status of LEAD_STATUSES) c[status] = 0;
+    for (const l of leads) c[l.status] = (c[l.status] ?? 0) + 1;
+    return c;
+  }, [leads]);
+
+  const visibleLeads = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return leads.filter((l) => {
+      if (statusFilter !== "all" && l.status !== statusFilter) return false;
+      if (!q) return true;
+      return (
+        l.title.toLowerCase().includes(q) ||
+        (l.companyName ?? "").toLowerCase().includes(q) ||
+        (l.email ?? "").toLowerCase().includes(q) ||
+        (l.phone ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [leads, statusFilter, search]);
 
   function scoreLead(id: string) {
     setScoringId(id);
@@ -105,58 +124,96 @@ export function LeadsClient({ leads }: { leads: LeadRow[] }) {
     });
   }
 
-  function doConvert() {
-    if (!converting) return;
-    startTransition(async () => {
-      const res = await convertLeadAction(converting.id, {
-        createDeal: withDeal,
-        dealAmount: amount ? Number(amount) : undefined,
-      });
-      setConverting(null);
-      if (res.ok) router.push(`/crm/contacts/${res.contactId}`);
-      else router.refresh();
-    });
-  }
-
-  if (leads.length === 0) {
-    return (
-      <div className="px-6 py-4">
-        <EmptyState
-          icon={UserPlus}
-          title="هنوز لیدی ثبت نشده"
-          description="لیدها از فرم مشاوره‌ی سایت و چت‌بات به اینجا می‌آیند."
-        />
-      </div>
+  function exportCsv() {
+    downloadCsv(
+      "leads.csv",
+      [
+        { key: "title", label: t("titleLabel") },
+        { key: "companyName", label: t("companyLabel") },
+        { key: "industry", label: t("industry") },
+        { key: "email", label: t("emailLabel") },
+        { key: "phone", label: t("phoneLabel") },
+        { key: "source", label: t("sourceLabel") },
+        { key: "score", label: t("score") },
+        { key: "status", label: t("statusLabel") },
+        { key: "createdAt", label: t("submitted") },
+      ],
+      visibleLeads.map((l) => ({
+        title: l.title,
+        companyName: l.companyName ?? "",
+        industry: l.industry ?? "",
+        email: l.email ?? "",
+        phone: l.phone ?? "",
+        source: l.source ?? "",
+        score: l.score,
+        status: t(`status.${l.status}` as never),
+        createdAt: new Date(l.createdAt).toLocaleDateString(),
+      })),
     );
   }
 
   return (
-    <div className="px-6 py-4">
-      <div className="overflow-x-auto rounded-xl border border-line">
-        <table className="w-full text-sm">
-          <thead className="bg-surface-sunken text-xs text-ink-faint">
-            <tr>
-              <th className="px-4 py-2.5 text-start font-medium">لید</th>
-              <th className="px-4 py-2.5 text-start font-medium">کسب‌وکار</th>
-              <th className="px-4 py-2.5 text-start font-medium">منبع</th>
-              <th className="px-4 py-2.5 text-start font-medium">امتیاز</th>
-              <th className="px-4 py-2.5 text-start font-medium">وضعیت</th>
-              <th className="px-4 py-2.5 text-end font-medium"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-line">
-            {leads.map((l) => (
-              <tr key={l.id} className="bg-surface-raised">
-                <td className="px-4 py-3 font-medium text-ink">{l.title}</td>
-                <td className="px-4 py-3 text-ink-muted">{l.companyName ?? "—"}</td>
-                <td className="px-4 py-3 text-ink-muted">
-                  {l.source === "website" ? "وب‌سایت" : l.source === "chatbot" ? "چت‌بات" : l.source ?? "—"}
-                </td>
-                <td className="px-4 py-3">
+    <div className="px-4 py-4 sm:px-6">
+      {/* Filters */}
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap gap-1.5">
+          <FilterChip
+            active={statusFilter === "all"}
+            onClick={() => setStatusFilter("all")}
+            label={`${t("all")} (${counts.all})`}
+          />
+          {LEAD_STATUSES.map((status) => (
+            <FilterChip
+              key={status}
+              active={statusFilter === status}
+              onClick={() => setStatusFilter(status)}
+              label={`${t(`status.${status}`)} (${counts[status] ?? 0})`}
+            />
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 sm:w-56 sm:flex-none">
+            <Search className="pointer-events-none absolute start-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-faint" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t("search")}
+              className="ps-8"
+            />
+          </div>
+          <Button variant="secondary" size="sm" onClick={exportCsv}>
+            <Download className="h-3.5 w-3.5" /> CSV
+          </Button>
+          <NewLeadDialog />
+        </div>
+      </div>
+
+      {visibleLeads.length === 0 ? (
+        <EmptyState
+          icon={UserPlus}
+          title={t("emptyTitle")}
+          description={t("emptyDescription")}
+        />
+      ) : (
+        <div className="space-y-3">
+          {visibleLeads.map((l) => (
+            <Card key={l.id}>
+              <CardContent className="space-y-3">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <Link href={`/crm/leads/${l.id}`} className="min-w-0 flex-1 outline-none focus-visible:underline">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="truncate text-sm font-semibold text-ink hover:underline">
+                        {l.title}
+                      </h3>
+                      <Chip tone={LEAD_STATUS_TONE[l.status] ?? "neutral"}>
+                        {t(`status.${l.status}` as never)}
+                      </Chip>
+                    </div>
+                  </Link>
                   {l.score > 0 ? (
-                    <span className="flex items-center gap-1.5" title={l.scoreRationale ?? ""}>
-                      <Chip tone={scoreTone(l.score)}>{l.score}</Chip>
-                    </span>
+                    <Chip tone={leadScoreTone(l.score)} title={l.scoreRationale ?? ""}>
+                      {t("score")}: {l.score}
+                    </Chip>
                   ) : (
                     <Button
                       variant="ghost"
@@ -165,113 +222,139 @@ export function LeadsClient({ leads }: { leads: LeadRow[] }) {
                       disabled={pending && scoringId === l.id}
                     >
                       <Sparkles className="h-3.5 w-3.5" />
-                      {scoringId === l.id ? "…" : "امتیاز AI"}
+                      {scoringId === l.id ? "…" : t("scoreCta")}
                     </Button>
                   )}
-                </td>
-                <td className="px-4 py-3">
-                  <Chip tone={statusTone[l.status] ?? "neutral"}>
-                    {statusLabel[l.status] ?? l.status}
+                </div>
+
+                <div className="grid gap-1.5 text-xs text-ink-muted sm:grid-cols-2">
+                  {(l.companyName || l.industry) && (
+                    <span className="flex items-center gap-1.5">
+                      <Briefcase className="h-3.5 w-3.5 shrink-0 text-ink-faint" />
+                      {[l.companyName, l.industry].filter(Boolean).join(" · ")}
+                    </span>
+                  )}
+                  {l.email && (
+                    <span className="flex items-center gap-1.5" dir="ltr">
+                      <Mail className="h-3.5 w-3.5 shrink-0 text-ink-faint" />
+                      {l.email}
+                    </span>
+                  )}
+                  {l.phone && (
+                    <span className="flex items-center gap-1.5" dir="ltr">
+                      <Phone className="h-3.5 w-3.5 shrink-0 text-ink-faint" />
+                      {l.phone}
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1.5">
+                    <CalendarClock className="h-3.5 w-3.5 shrink-0 text-ink-faint" />
+                    {t("submitted")}: {new Date(l.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Chip tone="neutral" dot={false}>
+                    {t(`sources.${l.source ?? "unknown"}` as never)}
                   </Chip>
-                </td>
-                <td className="px-4 py-3 text-end">
-                  <div className="flex items-center justify-end gap-1.5">
+                </div>
+
+                {l.message && (
+                  <p className="line-clamp-2 rounded-md bg-surface-sunken px-3 py-2 text-xs text-ink-muted">
+                    {l.message}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => suggestContent(l)}
+                    disabled={pending && suggestingId === l.id}
+                    title={t("suggestCta")}
+                  >
+                    <MessageSquareText className="h-3.5 w-3.5" />
+                    {suggestingId === l.id
+                      ? t("suggesting")
+                      : noSuggestionFor === l.id
+                        ? t("noSuggestion")
+                        : t("suggestCta")}
+                  </Button>
+                  {l.status === "converted" && l.contactId ? (
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => suggestContent(l)}
-                      disabled={pending && suggestingId === l.id}
-                      title="پیشنهاد محتوای پیگیری بر اساس پایگاه دانش"
+                      onClick={() => router.push(`/crm/contacts/${l.contactId}`)}
                     >
-                      <MessageSquareText className="h-3.5 w-3.5" />
-                      {suggestingId === l.id
-                        ? "…"
-                        : noSuggestionFor === l.id
-                          ? "مقاله‌ای یافت نشد"
-                          : "پیشنهاد محتوا"}
+                      <Eye className="h-3.5 w-3.5" /> {t("viewContact")}
                     </Button>
-                    {l.status === "converted" && l.contactId ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => router.push(`/crm/contacts/${l.contactId}`)}
-                      >
-                        <Eye className="h-3.5 w-3.5" /> مشاهده‌ی مخاطب
-                      </Button>
-                    ) : (
-                      <Button variant="secondary" size="sm" onClick={() => setConverting(l)}>
-                        <ArrowLeftRight className="h-3.5 w-3.5" /> تبدیل به مخاطب
-                      </Button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <Dialog open={!!converting} onOpenChange={(o) => !o && setConverting(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>تبدیل لید به مخاطب</DialogTitle>
-          </DialogHeader>
-          <DialogBody className="space-y-4">
-            <p className="text-sm text-ink-muted">
-              «{converting?.title}» به یک مخاطب (و در صورت وجود، شرکت) ارتقا می‌یابد. لید اصلی دست‌نخورده می‌ماند.
-            </p>
-            <label className="flex items-center justify-between text-sm">
-              <span className="text-ink">ساخت معامله همراه با تبدیل</span>
-              <Switch checked={withDeal} onCheckedChange={setWithDeal} />
-            </label>
-            {withDeal && (
-              <div>
-                <Label htmlFor="amt">مبلغ تخمینی (تومان)</Label>
-                <Input
-                  id="amt"
-                  type="number"
-                  min={0}
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0"
-                  dir="ltr"
-                />
-              </div>
-            )}
-          </DialogBody>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="ghost" type="button">انصراف</Button>
-            </DialogClose>
-            <Button variant="primary" onClick={doConvert} disabled={pending}>
-              {pending ? "در حال تبدیل…" : "تبدیل"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+                  ) : (
+                    <ConvertLeadDialog
+                      lead={{
+                        id: l.id,
+                        title: l.title,
+                        companyName: l.companyName,
+                        industry: l.industry,
+                        email: l.email,
+                        phone: l.phone,
+                        estimatedValue: l.estimatedValue,
+                      }}
+                    />
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <Dialog open={!!suggestion} onOpenChange={(o) => !o && setSuggestion(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>پیشنهاد محتوای پیگیری</DialogTitle>
+            <DialogTitle>{t("suggestCardTitle")}</DialogTitle>
           </DialogHeader>
           <DialogBody className="space-y-3">
             <p className="text-sm text-ink-muted">
-              برای «{suggestion?.lead.title}» — بر اساس مقاله‌ی «{suggestion?.articleTitle}»
+              {t("suggestFor")} «{suggestion?.articleTitle}»
             </p>
             <Textarea value={suggestion?.message ?? ""} readOnly rows={6} className="text-sm" />
           </DialogBody>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="ghost" type="button">بستن</Button>
+              <Button variant="ghost" type="button">
+                {t("cancel")}
+              </Button>
             </DialogClose>
             <Button variant="primary" onClick={copySuggestion}>
               {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-              {copied ? "کپی شد" : "کپی پیام"}
+              {copied ? t("copied") : t("copyMessage")}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function FilterChip({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={
+        active
+          ? "rounded-full bg-brand px-3 py-1 text-xs font-medium text-ink-on-brand"
+          : "rounded-full bg-surface-sunken px-3 py-1 text-xs font-medium text-ink-muted hover:bg-surface-raised hover:text-ink"
+      }
+    >
+      {label}
+    </button>
   );
 }

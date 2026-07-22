@@ -77,7 +77,6 @@
     "forms": "Form builder",
     "entities": "Entity builder",
     "workflows": "Workflows",
-    "automations": "Automations",
     "rules": "Business rules",
     "templates": "Templates",
     "policies": "Policies",
@@ -107,7 +106,8 @@
     "menu": "Menu",
     "mobileNav": "Primary",
     "closeMenu": "Close menu",
-    "backToSite": "Back to main site", "templatesGroup": "Templates",
+    "backToSite": "Back to main site",
+    "templatesGroup": "Templates",
     "demoStatus": "Demo mode — explore freely; test changes stay in this browser and are never saved.",
     "demoSimulation": "Demo preview updated locally. Reload the page to reset it."
   },
@@ -140,7 +140,12 @@
     "reportsDescription": "Trusted views across sales, pipeline, customers, and operations.",
     "visualInsights": "Visual insights",
     "exportCsv": "Export CSV",
-    "reportNames": { "deals": "Deals", "pipeline": "Pipeline", "tasks": "Tasks", "contacts": "Contacts" },
+    "reportNames": {
+      "deals": "Deals",
+      "pipeline": "Pipeline",
+      "tasks": "Tasks",
+      "contacts": "Contacts"
+    },
     "noDataTitle": "No data for this report",
     "noDataBody": "Add business records to see them reflected here.",
     "activityTitle": "Activity feed",
@@ -205,11 +210,20 @@
     "attentionRestricted": "No attention signals are available with your access.",
     "attentionClear": "Clear right now",
     "attentionOpen": "Open the related worklist",
-    "attention": { "overdueTasks": "Overdue tasks", "staleDeals": "Deals past expected close", "unassignedLeads": "Unassigned active leads" },
+    "attention": {
+      "overdueTasks": "Overdue tasks",
+      "staleDeals": "Deals past expected close",
+      "unassignedLeads": "Unassigned active leads"
+    },
     "leadSources": "Lead acquisition mix",
     "leadSourcesDescription": "Where active demand is entering the CRM.",
     "leadSourcesEmpty": "Lead source data will appear after the first leads arrive.",
-    "sources": { "website": "Website", "chatbot": "Chatbot", "manual": "Manual", "unknown": "Unknown" },
+    "sources": {
+      "website": "Website",
+      "chatbot": "Chatbot",
+      "manual": "Manual",
+      "unknown": "Unknown"
+    },
     "teamWorkload": "Team workload",
     "teamWorkloadDescription": "Open work assigned across the active team.",
     "teamWorkloadEmpty": "No assigned open tasks are available.",
@@ -228,8 +242,20 @@
     "savedForDemo": "Saved in this browser",
     "editDashboard": "Edit layout",
     "removeWidget": "Remove widget",
-    "widgets": { "kpi": "KPI card", "pipeline": "Pipeline breakdown", "trend": "Activity trend", "tasks": "My tasks", "feed": "Activity feed" },
-    "widgetKpis": { "contacts": "Contacts", "openDeals": "Open deals", "wonValue": "Won revenue", "openTasks": "Open tasks", "conversion": "Lead conversion" },
+    "widgets": {
+      "kpi": "KPI card",
+      "pipeline": "Pipeline breakdown",
+      "trend": "Activity trend",
+      "tasks": "My tasks",
+      "feed": "Activity feed"
+    },
+    "widgetKpis": {
+      "contacts": "Contacts",
+      "openDeals": "Open deals",
+      "wonValue": "Won revenue",
+      "openTasks": "Open tasks",
+      "conversion": "Lead conversion"
+    },
     "widgetEmptyTasks": "No open tasks.",
     "widgetEmptyActivity": "No recent activity.",
     "widgetActivityActor": "Workspace",
@@ -333,10 +359,18 @@
       "headline2": "if it survives the follow-up.",
       "subhead": "Messages get lost in inboxes. Follow-ups get forgotten. Contracts live in someone's email. SOBI CRM gives every lead a durable path to close.",
       "points": [
-        { "title": "Leads go cold in shared inboxes" },
-        { "title": "Follow-ups get forgotten between people" },
-        { "title": "Contracts live in someone's email, not a system" },
-        { "title": "No one can see what's actually about to close" }
+        {
+          "title": "Leads go cold in shared inboxes"
+        },
+        {
+          "title": "Follow-ups get forgotten between people"
+        },
+        {
+          "title": "Contracts live in someone's email, not a system"
+        },
+        {
+          "title": "No one can see what's actually about to close"
+        }
       ],
       "flowRawLabel": "RAW LEAD",
       "flowRaw": "\"We run 40 trucks and need better dispatch visibility…\"",
@@ -349,10 +383,22 @@
       "eyebrow": "A DELIBERATE WORKFLOW",
       "headline": "Four steps from first message to signed deal.",
       "items": [
-        { "title": "Capture", "desc": "Website form and chatbot intake land in one shared leads queue." },
-        { "title": "Convert", "desc": "A deliberate conversion turns a lead into a Contact, Company, and Deal." },
-        { "title": "Close", "desc": "AI drafts the contract; clients review, print, and accept online." },
-        { "title": "Grow", "desc": "AI-personalized campaigns and reporting keep the pipeline moving." }
+        {
+          "title": "Capture",
+          "desc": "Website form and chatbot intake land in one shared leads queue."
+        },
+        {
+          "title": "Convert",
+          "desc": "A deliberate conversion turns a lead into a Contact, Company, and Deal."
+        },
+        {
+          "title": "Close",
+          "desc": "AI drafts the contract; clients review, print, and accept online."
+        },
+        {
+          "title": "Grow",
+          "desc": "AI-personalized campaigns and reporting keep the pipeline moving."
+        }
       ]
     },
     "analytics": {
@@ -365,13 +411,62 @@
       "eyebrow": "BUILT FOR HOW YOUR BUSINESS WORKS",
       "headline": "One CRM core, adapted to your industry.",
       "tabs": [
-        { "key": "insurance", "label": "Insurance", "headline": "Policies, renewals, and claims in one pipeline.", "body": "Track carriers and products alongside every policy, with renewal reminders before they lapse.", "quote": "We stopped missing renewal windows because the reminder lives next to the policy, not in a spreadsheet.", "author": "Fictional demo persona" },
-        { "key": "realEstate", "label": "Real Estate", "headline": "Match clients to properties, not just contacts.", "body": "Viewings, offers, and contracts stay attached to both the client and the property.", "quote": "Every offer has the full viewing history attached — no more piecing it together from email.", "author": "Fictional demo persona" },
-        { "key": "immigration", "label": "Immigration", "headline": "Cases, deadlines, and required documents tracked together.", "body": "Each case carries its visa type, authority submissions, and document checklist in one place.", "quote": "Deadlines used to live in someone's calendar. Now they live on the case itself.", "author": "Fictional demo persona" },
-        { "key": "barber", "label": "Barber Shop", "headline": "Appointments and walk-ins, one shared book.", "body": "Staff, chairs, and visit history in a single booking view.", "quote": "Walk-ins and bookings finally share one calendar instead of two systems.", "author": "Fictional demo persona" },
-        { "key": "salon", "label": "Beauty Salon", "headline": "Treatment series and consent, handled properly.", "body": "Before/after photos and signed consent forms travel with the client record.", "quote": "Consent forms used to be paper in a drawer. Now they're on the client's profile.", "author": "Fictional demo persona" },
-        { "key": "restaurant", "label": "Restaurant", "headline": "Reservations, allergies, and catering leads together.", "body": "Guest profiles carry allergy notes and history; catering leads flow through the same pipeline.", "quote": "The host stand finally knows what the kitchen needs to know.", "author": "Fictional demo persona" },
-        { "key": "agency", "label": "Sales & Agency", "headline": "Campaigns and targets alongside the pipeline.", "body": "Proposals, performance, and personalized campaigns share the same contact and deal data.", "quote": "Our campaign follow-ups finally know which deals are actually open.", "author": "Fictional demo persona" }
+        {
+          "key": "insurance",
+          "label": "Insurance",
+          "headline": "Policies, renewals, and claims in one pipeline.",
+          "body": "Track carriers and products alongside every policy, with renewal reminders before they lapse.",
+          "quote": "We stopped missing renewal windows because the reminder lives next to the policy, not in a spreadsheet.",
+          "author": "Fictional demo persona"
+        },
+        {
+          "key": "realEstate",
+          "label": "Real Estate",
+          "headline": "Match clients to properties, not just contacts.",
+          "body": "Viewings, offers, and contracts stay attached to both the client and the property.",
+          "quote": "Every offer has the full viewing history attached — no more piecing it together from email.",
+          "author": "Fictional demo persona"
+        },
+        {
+          "key": "immigration",
+          "label": "Immigration",
+          "headline": "Cases, deadlines, and required documents tracked together.",
+          "body": "Each case carries its visa type, authority submissions, and document checklist in one place.",
+          "quote": "Deadlines used to live in someone's calendar. Now they live on the case itself.",
+          "author": "Fictional demo persona"
+        },
+        {
+          "key": "barber",
+          "label": "Barber Shop",
+          "headline": "Appointments and walk-ins, one shared book.",
+          "body": "Staff, chairs, and visit history in a single booking view.",
+          "quote": "Walk-ins and bookings finally share one calendar instead of two systems.",
+          "author": "Fictional demo persona"
+        },
+        {
+          "key": "salon",
+          "label": "Beauty Salon",
+          "headline": "Treatment series and consent, handled properly.",
+          "body": "Before/after photos and signed consent forms travel with the client record.",
+          "quote": "Consent forms used to be paper in a drawer. Now they're on the client's profile.",
+          "author": "Fictional demo persona"
+        },
+        {
+          "key": "restaurant",
+          "label": "Restaurant",
+          "headline": "Reservations, allergies, and catering leads together.",
+          "body": "Guest profiles carry allergy notes and history; catering leads flow through the same pipeline.",
+          "quote": "The host stand finally knows what the kitchen needs to know.",
+          "author": "Fictional demo persona"
+        },
+        {
+          "key": "agency",
+          "label": "Sales & Agency",
+          "headline": "Campaigns and targets alongside the pipeline.",
+          "body": "Proposals, performance, and personalized campaigns share the same contact and deal data.",
+          "quote": "Our campaign follow-ups finally know which deals are actually open.",
+          "author": "Fictional demo persona"
+        }
       ]
     },
     "pricing": {
@@ -384,21 +479,86 @@
       "priceNote": "/ user / mo",
       "billedAnnually": "billed annually",
       "tiers": [
-        { "name": "Free", "desc": "For trying structured lead follow-up.", "priceMonthly": "$0", "priceAnnual": "$0", "cta": "Start free", "features": ["5 leads / month", "Basic conversion", "Lead scoring", "7-day history"] },
-        { "name": "Pro", "desc": "For teams that run the full sales cycle.", "priceMonthly": "$19", "priceAnnual": "$15", "cta": "Start Pro", "features": ["Unlimited leads", "AI scoring & content suggestions", "Contracts & online acceptance", "Email export"] },
-        { "name": "Team", "desc": "For teams that need shared accountability.", "priceMonthly": "$34", "priceAnnual": "$27", "cta": "Start Team", "recommended": true, "features": ["Everything in Pro", "Team workspace", "Role management", "Campaigns"] },
-        { "name": "Enterprise", "desc": "For governed, connected organizations.", "priceMonthly": "Custom", "priceAnnual": "Custom", "custom": true, "cta": "Contact sales", "features": ["Everything in Team", "SSO-ready architecture", "Audit logs", "Custom retention"] }
+        {
+          "name": "Free",
+          "desc": "For trying structured lead follow-up.",
+          "priceMonthly": "$0",
+          "priceAnnual": "$0",
+          "cta": "Start free",
+          "features": [
+            "5 leads / month",
+            "Basic conversion",
+            "Lead scoring",
+            "7-day history"
+          ]
+        },
+        {
+          "name": "Pro",
+          "desc": "For teams that run the full sales cycle.",
+          "priceMonthly": "$19",
+          "priceAnnual": "$15",
+          "cta": "Start Pro",
+          "features": [
+            "Unlimited leads",
+            "AI scoring & content suggestions",
+            "Contracts & online acceptance",
+            "Email export"
+          ]
+        },
+        {
+          "name": "Team",
+          "desc": "For teams that need shared accountability.",
+          "priceMonthly": "$34",
+          "priceAnnual": "$27",
+          "cta": "Start Team",
+          "recommended": true,
+          "features": [
+            "Everything in Pro",
+            "Team workspace",
+            "Role management",
+            "Campaigns"
+          ]
+        },
+        {
+          "name": "Enterprise",
+          "desc": "For governed, connected organizations.",
+          "priceMonthly": "Custom",
+          "priceAnnual": "Custom",
+          "custom": true,
+          "cta": "Contact sales",
+          "features": [
+            "Everything in Team",
+            "SSO-ready architecture",
+            "Audit logs",
+            "Custom retention"
+          ]
+        }
       ]
     },
     "faq": {
       "eyebrow": "QUESTIONS, ANSWERED",
       "headline": "What teams ask before they start.",
       "items": [
-        { "q": "Do I need an AI API key?", "a": "No. Every AI feature has a graceful, keyless fallback — lead scoring, content suggestions, and drafts still work; connecting a real provider just improves quality." },
-        { "q": "Is my data isolated from other tenants?", "a": "Yes. Tenant isolation is enforced at the data layer, not just per-screen — it's structurally impossible for one workspace to read another's records." },
-        { "q": "Can I activate only the modules I need?", "a": "Yes. Insurance, Real Estate, Immigration, and the service-booking modules are each opt-in per workspace." },
-        { "q": "What happens to demo data?", "a": "The workspace starts with realistic fictional data. You can test selected actions in your browser, but nothing is saved to the database or sent to external services." },
-        { "q": "Is the contract template legally reviewed?", "a": "It's a generated starting point, not legal advice — review any contract with your own counsel before sending it to a real client." }
+        {
+          "q": "Do I need an AI API key?",
+          "a": "No. Every AI feature has a graceful, keyless fallback — lead scoring, content suggestions, and drafts still work; connecting a real provider just improves quality."
+        },
+        {
+          "q": "Is my data isolated from other tenants?",
+          "a": "Yes. Tenant isolation is enforced at the data layer, not just per-screen — it's structurally impossible for one workspace to read another's records."
+        },
+        {
+          "q": "Can I activate only the modules I need?",
+          "a": "Yes. Insurance, Real Estate, Immigration, and the service-booking modules are each opt-in per workspace."
+        },
+        {
+          "q": "What happens to demo data?",
+          "a": "The workspace starts with realistic fictional data. You can test selected actions in your browser, but nothing is saved to the database or sent to external services."
+        },
+        {
+          "q": "Is the contract template legally reviewed?",
+          "a": "It's a generated starting point, not legal advice — review any contract with your own counsel before sending it to a real client."
+        }
       ]
     },
     "cta": {
@@ -411,10 +571,38 @@
     "footer": {
       "tagline": "Every lead, carried to a close.",
       "columns": [
-        { "title": "Product", "links": ["Features", "Pricing", "Modules"] },
-        { "title": "Solutions", "links": ["Insurance", "Real Estate", "Immigration", "Service businesses"] },
-        { "title": "Company", "links": ["About", "Contact"] },
-        { "title": "Legal", "links": ["Privacy", "Terms", "Security"] }
+        {
+          "title": "Product",
+          "links": [
+            "Features",
+            "Pricing",
+            "Modules"
+          ]
+        },
+        {
+          "title": "Solutions",
+          "links": [
+            "Insurance",
+            "Real Estate",
+            "Immigration",
+            "Service businesses"
+          ]
+        },
+        {
+          "title": "Company",
+          "links": [
+            "About",
+            "Contact"
+          ]
+        },
+        {
+          "title": "Legal",
+          "links": [
+            "Privacy",
+            "Terms",
+            "Security"
+          ]
+        }
       ],
       "copyright": "© 2026 SOBI CRM. Product demonstration."
     }
@@ -462,31 +650,230 @@
     "preview": "Preview"
   },
   "businessForms": {
-    "contacts": "Contacts", "contactCount": "{count, plural, =0 {No contacts} =1 {# contact} other {# contacts}}", "searchContacts": "Search contacts…", "newContact": "New contact", "firstName": "First name", "lastName": "Last name", "email": "Email", "phone": "Phone", "jobTitle": "Job title", "lifecycle": "Lifecycle", "name": "Name", "company": "Company", "cancel": "Cancel", "creating": "Creating…", "createContact": "Create contact", "validationError": "Please check the required fields.", "noContacts": "No contacts yet", "noContactsDescription": "Add your first contact to start building relationships.", "pageOf": "Page {page} of {total}", "previous": "Previous", "next": "Next",
-    "lifecycleValues": { "lead": "Lead", "prospect": "Prospect", "customer": "Customer", "inactive": "Inactive" }
+    "contacts": "Contacts",
+    "contactCount": "{count, plural, =0 {No contacts} =1 {# contact} other {# contacts}}",
+    "searchContacts": "Search contacts…",
+    "newContact": "New contact",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "phone": "Phone",
+    "jobTitle": "Job title",
+    "lifecycle": "Lifecycle",
+    "name": "Name",
+    "company": "Company",
+    "cancel": "Cancel",
+    "creating": "Creating…",
+    "createContact": "Create contact",
+    "validationError": "Please check the required fields.",
+    "noContacts": "No contacts yet",
+    "noContactsDescription": "Add your first contact to start building relationships.",
+    "pageOf": "Page {page} of {total}",
+    "previous": "Previous",
+    "next": "Next",
+    "lifecycleValues": {
+      "lead": "Lead",
+      "prospect": "Prospect",
+      "customer": "Customer",
+      "inactive": "Inactive"
+    }
   },
   "formBuilder": {
-    "eyebrow": "Studio · business forms", "title": "Universal form builder", "description": "Create tenant-specific fields, arrange sections, preview every locale, and publish safely without changing system fields.", "entities": "Business entities", "canvas": "Form canvas", "editing": "Editing {entity}", "versionHint": "Draft changes do not affect users until publication.", "demoNotice": "Demo mode: builder changes stay only in this browser and never create metadata or versions.", "history": "History", "saveDraft": "Save draft", "publish": "Publish", "publishing": "Publishing…", "sectionTitle": "Section title", "moveUp": "Move up", "moveDown": "Move down", "deleteSection": "Delete section", "emptySection": "Create or add a field to this section", "configure": "Configure field", "removeFromForm": "Remove from this form", "required": "Required", "fullWidth": "Full width", "archiveField": "Archive field and preserve existing values", "addExisting": "Add an existing field", "createField": "Create field", "newSection": "New section", "addSection": "Add section", "livePreview": "Live preview", "previewLanguage": "Preview language", "newFieldTitle": "Create a business field", "fieldKey": "Stable field key", "fieldKeyHint": "Lowercase Latin letters, numbers, and underscores. It cannot be changed later.", "fieldType": "Field type", "labelFa": "Persian label", "labelEn": "English label", "labelDe": "German label", "placeholder": "Placeholder / example", "helpText": "Help text", "options": "Choices", "optionsHint": "One choice per line", "min": "Minimum / min length", "max": "Maximum / max length", "searchable": "Include in search", "cancel": "Cancel", "historyTitle": "Form version history", "noVersions": "No saved versions yet.", "unnamedVersion": "Form version", "archiveVersion": "Archive draft", "rollback": "Restore", "close": "Close",
+    "eyebrow": "Studio · business forms",
+    "title": "Universal form builder",
+    "description": "Create tenant-specific fields, arrange sections, preview every locale, and publish safely without changing system fields.",
+    "entities": "Business entities",
+    "canvas": "Form canvas",
+    "editing": "Editing {entity}",
+    "versionHint": "Draft changes do not affect users until publication.",
+    "demoNotice": "Demo mode: builder changes stay only in this browser and never create metadata or versions.",
+    "history": "History",
+    "saveDraft": "Save draft",
+    "publish": "Publish",
+    "publishing": "Publishing…",
+    "sectionTitle": "Section title",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "deleteSection": "Delete section",
+    "emptySection": "Create or add a field to this section",
+    "configure": "Configure field",
+    "removeFromForm": "Remove from this form",
+    "required": "Required",
+    "fullWidth": "Full width",
+    "archiveField": "Archive field and preserve existing values",
+    "addExisting": "Add an existing field",
+    "createField": "Create field",
+    "newSection": "New section",
+    "addSection": "Add section",
+    "livePreview": "Live preview",
+    "previewLanguage": "Preview language",
+    "newFieldTitle": "Create a business field",
+    "fieldKey": "Stable field key",
+    "fieldKeyHint": "Lowercase Latin letters, numbers, and underscores. It cannot be changed later.",
+    "fieldType": "Field type",
+    "labelFa": "Persian label",
+    "labelEn": "English label",
+    "labelDe": "German label",
+    "placeholder": "Placeholder / example",
+    "helpText": "Help text",
+    "options": "Choices",
+    "optionsHint": "One choice per line",
+    "min": "Minimum / min length",
+    "max": "Maximum / max length",
+    "searchable": "Include in search",
+    "cancel": "Cancel",
+    "historyTitle": "Form version history",
+    "noVersions": "No saved versions yet.",
+    "unnamedVersion": "Form version",
+    "archiveVersion": "Archive draft",
+    "rollback": "Restore",
+    "close": "Close",
     "customizeForm": "Customize form",
-    "conditionalVisibility": "Conditional visibility", "showWhenField": "Show when field", "alwaysVisible": "Always visible", "equalsValue": "Equals value", "calculatedField": "Calculated value", "calculateFrom": "Calculate from field", "notCalculated": "Not calculated", "operator": "Operator", "constant": "Constant",
-    "feedback": { "draft": "Draft saved", "published": "Published", "error": "Could not save" },
-    "statuses": { "draft": "Draft", "published": "Published", "archived": "Archived" },
-    "types": { "text": "Short text", "textarea": "Long text", "number": "Number", "currency": "Currency", "boolean": "Yes / no", "date": "Date", "datetime": "Date and time", "select": "Single choice", "multiselect": "Multiple choice", "email": "Email", "phone": "Phone", "url": "URL", "relation": "Related record", "user": "Team member" },
-    "entitiesMap": { "contact": "Contacts", "company": "Companies", "lead": "Leads", "deal": "Deals", "task": "Tasks", "event": "Events", "campaign": "Campaigns", "contract": "Contracts", "policy": "Policies" }
+    "conditionalVisibility": "Conditional visibility",
+    "showWhenField": "Show when field",
+    "alwaysVisible": "Always visible",
+    "equalsValue": "Equals value",
+    "calculatedField": "Calculated value",
+    "calculateFrom": "Calculate from field",
+    "notCalculated": "Not calculated",
+    "operator": "Operator",
+    "constant": "Constant",
+    "feedback": {
+      "draft": "Draft saved",
+      "published": "Published",
+      "error": "Could not save"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "types": {
+      "text": "Short text",
+      "textarea": "Long text",
+      "number": "Number",
+      "currency": "Currency",
+      "boolean": "Yes / no",
+      "date": "Date",
+      "datetime": "Date and time",
+      "select": "Single choice",
+      "multiselect": "Multiple choice",
+      "email": "Email",
+      "phone": "Phone",
+      "url": "URL",
+      "relation": "Related record",
+      "user": "Team member"
+    },
+    "entitiesMap": {
+      "contact": "Contacts",
+      "company": "Companies",
+      "lead": "Leads",
+      "deal": "Deals",
+      "task": "Tasks",
+      "event": "Events",
+      "campaign": "Campaigns",
+      "contract": "Contracts",
+      "policy": "Policies"
+    }
   },
   "calendar": {
-    "eyebrow": "Unified schedule", "title": "Calendar", "description": "See meetings, tasks, deals, campaigns, policies, and contracts in one bilingual calendar.",
-    "searchAndFilter": "Search and filter", "newEvent": "New event", "demoNotice": "Demo mode: you can try events and reminders, but changes stay only in this browser.",
-    "textSearch": "Search text", "searchPlaceholder": "Title, person, campaign…", "from": "From", "to": "To", "reminders": "Reminders", "any": "Any", "withReminder": "With reminder", "withoutReminder": "Without reminder", "sources": "Sources", "searching": "Searching…", "search": "Search", "searchResults": "{count, plural, =0 {No results} one {# result} other {# results}}", "closeResults": "Close results",
-    "previousMonth": "Previous month", "nextMonth": "Next month", "today": "Today", "month": "Month", "year": "Year", "jalali": "Jalali", "gregorian": "Gregorian", "partialSources": "Some sources are unavailable: {sources}", "truncated": "Only the first 200 matching items are shown.",
-    "weekdays": { "sat": "Sat", "sun": "Sun", "mon": "Mon", "tue": "Tue", "wed": "Wed", "thu": "Thu", "fri": "Fri" },
-    "jalaliMonths": { "1": "Farvardin", "2": "Ordibehesht", "3": "Khordad", "4": "Tir", "5": "Mordad", "6": "Shahrivar", "7": "Mehr", "8": "Aban", "9": "Azar", "10": "Dey", "11": "Bahman", "12": "Esfand" },
-    "sourcesMap": { "event": "Events", "task": "Tasks", "deal": "Deals", "campaign": "Campaigns", "policy": "Policies", "contract": "Contracts" },
-    "addOnDate": "Add an event on {date}", "more": "+{count} more", "close": "Close", "openRecord": "Open record", "editEvent": "Edit event", "eventTitle": "Title", "eventType": "Type", "color": "Color", "date": "Date", "allDay": "All day", "start": "Start", "end": "End", "location": "Location", "eventDescription": "Description",
-    "types": { "appointment": "Appointment", "meeting": "Meeting", "deadline": "Deadline", "followup": "Follow-up" },
-    "tones": { "brand": "CRM green", "accent": "Accent", "info": "Blue", "positive": "Positive", "warning": "Warning", "danger": "Urgent" },
-    "reminderOptions": { "0": "At start", "15": "15 minutes before", "60": "1 hour before", "1440": "1 day before" },
-    "deleteEvent": "Delete event", "cancel": "Cancel", "saving": "Saving…", "saveEvent": "Save event"
+    "eyebrow": "Unified schedule",
+    "title": "Calendar",
+    "description": "See meetings, tasks, deals, campaigns, policies, and contracts in one bilingual calendar.",
+    "searchAndFilter": "Search and filter",
+    "newEvent": "New event",
+    "demoNotice": "Demo mode: you can try events and reminders, but changes stay only in this browser.",
+    "textSearch": "Search text",
+    "searchPlaceholder": "Title, person, campaign…",
+    "from": "From",
+    "to": "To",
+    "reminders": "Reminders",
+    "any": "Any",
+    "withReminder": "With reminder",
+    "withoutReminder": "Without reminder",
+    "sources": "Sources",
+    "searching": "Searching…",
+    "search": "Search",
+    "searchResults": "{count, plural, =0 {No results} one {# result} other {# results}}",
+    "closeResults": "Close results",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "Today",
+    "month": "Month",
+    "year": "Year",
+    "jalali": "Jalali",
+    "gregorian": "Gregorian",
+    "partialSources": "Some sources are unavailable: {sources}",
+    "truncated": "Only the first 200 matching items are shown.",
+    "weekdays": {
+      "sat": "Sat",
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri"
+    },
+    "jalaliMonths": {
+      "1": "Farvardin",
+      "2": "Ordibehesht",
+      "3": "Khordad",
+      "4": "Tir",
+      "5": "Mordad",
+      "6": "Shahrivar",
+      "7": "Mehr",
+      "8": "Aban",
+      "9": "Azar",
+      "10": "Dey",
+      "11": "Bahman",
+      "12": "Esfand"
+    },
+    "sourcesMap": {
+      "event": "Events",
+      "task": "Tasks",
+      "deal": "Deals",
+      "campaign": "Campaigns",
+      "policy": "Policies",
+      "contract": "Contracts"
+    },
+    "addOnDate": "Add an event on {date}",
+    "more": "+{count} more",
+    "close": "Close",
+    "openRecord": "Open record",
+    "editEvent": "Edit event",
+    "eventTitle": "Title",
+    "eventType": "Type",
+    "color": "Color",
+    "date": "Date",
+    "allDay": "All day",
+    "start": "Start",
+    "end": "End",
+    "location": "Location",
+    "eventDescription": "Description",
+    "types": {
+      "appointment": "Appointment",
+      "meeting": "Meeting",
+      "deadline": "Deadline",
+      "followup": "Follow-up"
+    },
+    "tones": {
+      "brand": "CRM green",
+      "accent": "Accent",
+      "info": "Blue",
+      "positive": "Positive",
+      "warning": "Warning",
+      "danger": "Urgent"
+    },
+    "reminderOptions": {
+      "0": "At start",
+      "15": "15 minutes before",
+      "60": "1 hour before",
+      "1440": "1 day before"
+    },
+    "deleteEvent": "Delete event",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "saveEvent": "Save event"
   },
   "onboardingTour": {
     "progress": "Step {current} of {total}",
@@ -495,14 +882,38 @@
     "next": "Next",
     "finish": "Finish",
     "steps": {
-      "dashboard": { "title": "Your CRM command center", "description": "Start here for the health of your pipeline, follow-ups, activity, and items that need attention." },
-      "rail": { "title": "Move between Sobinta products", "description": "The product rail keeps CRM, operations, finance, AI, and Studio within one consistent workspace." },
-      "navigation": { "title": "Work within the current product", "description": "This row changes with the selected product and keeps its daily tools close at hand." },
-      "search": { "title": "Find anything quickly", "description": "Search records and actions from anywhere. You can also open it with Ctrl K." },
-      "calendar": { "title": "Plan work on one calendar", "description": "Open Operations for the shared Gregorian and Jalali calendar, reminders, and scheduled CRM work." },
-      "forms": { "title": "Adapt business forms", "description": "Studio is where reusable business fields and forms can be tailored to each workflow." },
-      "support": { "title": "Help is always within reach", "description": "Replay this tour here. Tickets and plan-enabled live support will also live in this utility." },
-      "profile": { "title": "Your profile and subscription", "description": "Review your profile and current plan here, then upgrade when your team needs more capacity." }
+      "dashboard": {
+        "title": "Your CRM command center",
+        "description": "Start here for the health of your pipeline, follow-ups, activity, and items that need attention."
+      },
+      "rail": {
+        "title": "Move between Sobinta products",
+        "description": "The product rail keeps CRM, operations, finance, AI, and Studio within one consistent workspace."
+      },
+      "navigation": {
+        "title": "Work within the current product",
+        "description": "This row changes with the selected product and keeps its daily tools close at hand."
+      },
+      "search": {
+        "title": "Find anything quickly",
+        "description": "Search records and actions from anywhere. You can also open it with Ctrl K."
+      },
+      "calendar": {
+        "title": "Plan work on one calendar",
+        "description": "Open Operations for the shared Gregorian and Jalali calendar, reminders, and scheduled CRM work."
+      },
+      "forms": {
+        "title": "Adapt business forms",
+        "description": "Studio is where reusable business fields and forms can be tailored to each workflow."
+      },
+      "support": {
+        "title": "Help is always within reach",
+        "description": "Replay this tour here. Tickets and plan-enabled live support will also live in this utility."
+      },
+      "profile": {
+        "title": "Your profile and subscription",
+        "description": "Review your profile and current plan here, then upgrade when your team needs more capacity."
+      }
     }
   },
   "help": {
@@ -511,10 +922,81 @@
     "openSupport": "Open support center"
   },
   "support": {
-    "title": "Support center", "description": "Tickets and plan-enabled live help, in one secure conversation history.", "newTicket": "New request", "myTickets": "My requests", "empty": "No support requests yet.", "ticket": "Ticket", "live": "Live chat", "messages": "messages", "newRequest": "How can we help?", "newRequestHint": "Share enough context to help the Sobinta team respond quickly.", "liveUpgrade": "Live chat is available on eligible professional plans. Tickets remain available on every plan.", "subject": "Subject", "category": "Category", "general": "General", "technical": "Technical", "billing": "Billing", "feature": "Feature request", "message": "Message", "cancel": "Cancel", "startChat": "Start chat", "sendTicket": "Send ticket", "status": "Status", "connected": "Live channel active", "replyPlaceholder": "Write a reply…", "send": "Send", "selectTitle": "Choose a conversation", "selectHint": "Open an existing request or start a new one to contact Sobinta support.", "demoSaved": "Demo simulation updated locally; nothing was saved.", "failed": "The request could not be sent. Your text is preserved; please retry.", "status_open": "Open", "status_in_progress": "In progress", "status_waiting_on_customer": "Waiting on customer", "status_resolved": "Resolved", "status_closed": "Closed"
+    "title": "Support center",
+    "description": "Tickets and plan-enabled live help, in one secure conversation history.",
+    "newTicket": "New request",
+    "myTickets": "My requests",
+    "empty": "No support requests yet.",
+    "ticket": "Ticket",
+    "live": "Live chat",
+    "messages": "messages",
+    "newRequest": "How can we help?",
+    "newRequestHint": "Share enough context to help the Sobinta team respond quickly.",
+    "liveUpgrade": "Live chat is available on eligible professional plans. Tickets remain available on every plan.",
+    "subject": "Subject",
+    "category": "Category",
+    "general": "General",
+    "technical": "Technical",
+    "billing": "Billing",
+    "feature": "Feature request",
+    "message": "Message",
+    "cancel": "Cancel",
+    "startChat": "Start chat",
+    "sendTicket": "Send ticket",
+    "status": "Status",
+    "connected": "Live channel active",
+    "replyPlaceholder": "Write a reply…",
+    "send": "Send",
+    "selectTitle": "Choose a conversation",
+    "selectHint": "Open an existing request or start a new one to contact Sobinta support.",
+    "demoSaved": "Demo simulation updated locally; nothing was saved.",
+    "failed": "The request could not be sent. Your text is preserved; please retry.",
+    "status_open": "Open",
+    "status_in_progress": "In progress",
+    "status_waiting_on_customer": "Waiting on customer",
+    "status_resolved": "Resolved",
+    "status_closed": "Closed"
   },
   "supportAdmin": {
-    "title": "Platform support inbox", "description": "Securely manage tickets and live chats across Sobinta workspaces.", "statusFilter": "Filter by status", "allStatuses": "All statuses", "priorityFilter": "Filter by priority", "allPriorities": "All priorities", "priority_low": "Low", "priority_normal": "Normal", "priority_high": "High", "priority_urgent": "Urgent", "assigneeFilter": "Filter by assignee", "allAssignees": "All assignees", "assignedToMe": "Assigned to me", "withoutAssignee": "Unassigned", "tenantFilter": "Filter by workspace", "allTenants": "All workspaces", "ageFilter": "Minimum waiting age", "anyAge": "Any waiting age", "older4": "Older than 4 hours", "older12": "Older than 12 hours", "older24": "Older than 24 hours", "older72": "Older than 3 days", "applyFilters": "Apply filters", "queue": "Request queue", "removeAssignment": "Remove assignment", "assignToMe": "Assign to me", "changeStatus": "Change status", "replyPlaceholder": "Operator reply…", "sendReply": "Send reply", "selectRequest": "Select a request", "statusUpdated": "Ticket status updated.", "updateFailed": "Update failed. Please retry.", "assigned": "Ticket assigned to you.", "unassigned": "Assignment removed.", "assignFailed": "Assignment failed. Please retry.", "sendFailed": "Send failed; your reply was preserved.", "replySent": "Reply sent and a safe customer notification was created.", "operator": "Operator", "customer": "Customer"
+    "title": "Platform support inbox",
+    "description": "Securely manage tickets and live chats across Sobinta workspaces.",
+    "statusFilter": "Filter by status",
+    "allStatuses": "All statuses",
+    "priorityFilter": "Filter by priority",
+    "allPriorities": "All priorities",
+    "priority_low": "Low",
+    "priority_normal": "Normal",
+    "priority_high": "High",
+    "priority_urgent": "Urgent",
+    "assigneeFilter": "Filter by assignee",
+    "allAssignees": "All assignees",
+    "assignedToMe": "Assigned to me",
+    "withoutAssignee": "Unassigned",
+    "tenantFilter": "Filter by workspace",
+    "allTenants": "All workspaces",
+    "ageFilter": "Minimum waiting age",
+    "anyAge": "Any waiting age",
+    "older4": "Older than 4 hours",
+    "older12": "Older than 12 hours",
+    "older24": "Older than 24 hours",
+    "older72": "Older than 3 days",
+    "applyFilters": "Apply filters",
+    "queue": "Request queue",
+    "removeAssignment": "Remove assignment",
+    "assignToMe": "Assign to me",
+    "changeStatus": "Change status",
+    "replyPlaceholder": "Operator reply…",
+    "sendReply": "Send reply",
+    "selectRequest": "Select a request",
+    "statusUpdated": "Ticket status updated.",
+    "updateFailed": "Update failed. Please retry.",
+    "assigned": "Ticket assigned to you.",
+    "unassigned": "Assignment removed.",
+    "assignFailed": "Assignment failed. Please retry.",
+    "sendFailed": "Send failed; your reply was preserved.",
+    "replySent": "Reply sent and a safe customer notification was created.",
+    "operator": "Operator",
+    "customer": "Customer"
   },
   "imports": {
     "title": "Data imports",
@@ -640,5 +1122,90 @@
     "applied": "Applied",
     "entities": "{count} entities",
     "view": "View entities"
+  },
+  "helpTopics": {
+    "leads": {
+      "title": "About Leads",
+      "body": "A lead is a raw, unqualified inquiry — it arrives automatically from your public website form, or you can add one manually. Leads are never edited to look presentable; they stay exactly as received so you always see the original context.\n\nFrom this page you can:\n- Open a lead to see its full details: contact info, submission date, field of work, and current status.\n- Score it with AI — get a 0-100 fit score plus a short rationale based on how complete the information is and what stage of business it represents.\n- Get an AI content suggestion — a relevant article and a ready-to-send follow-up message.\n- Convert it into a Contact (and, if there's a business name, a Company) - optionally creating a Deal at the same time.\n\nWhy this matters: converting is a deliberate, one-way step. The lead itself is never deleted or overwritten, so you always have a clean trail from first contact to customer."
+    }
+  },
+  "leads": {
+    "title": "Leads",
+    "description": "{count} open leads",
+    "newLead": "New lead",
+    "search": "Search leads…",
+    "status": {
+      "new": "New",
+      "working": "Working",
+      "qualified": "Qualified",
+      "unqualified": "Unqualified",
+      "converted": "Converted"
+    },
+    "all": "All",
+    "sources": {
+      "website": "Website",
+      "manual": "Manual entry",
+      "chatbot": "Chatbot",
+      "telegram": "Telegram",
+      "chatbox": "Web chat",
+      "unknown": "Unknown"
+    },
+    "score": "Score",
+    "scoreCta": "AI score",
+    "scoring": "Scoring…",
+    "suggestCta": "Suggest content",
+    "suggesting": "Thinking…",
+    "noSuggestion": "No matching article",
+    "viewContact": "View contact",
+    "convert": "Convert to contact",
+    "emptyTitle": "No leads yet",
+    "emptyDescription": "Leads arrive automatically from your public website form, or you can add one manually.",
+    "submitted": "Submitted",
+    "industry": "Field of work",
+    "noValue": "—",
+    "newLeadTitle": "New lead",
+    "newLeadDescription": "Manually record an inbound inquiry — the other lead channel besides the public website form.",
+    "titleLabel": "Title",
+    "titlePlaceholder": "e.g. Consultation request",
+    "companyLabel": "Business name (optional)",
+    "industryLabel": "Field of work (optional)",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "messageLabel": "Message / challenge",
+    "valueLabel": "Estimated value",
+    "create": "Create lead",
+    "creating": "Creating…",
+    "cancel": "Cancel",
+    "convertTitle": "Convert lead to contact",
+    "convertIntro": "Promotes this lead into a Contact (and a Company, if a business name is set). The lead itself stays untouched.",
+    "firstNameLabel": "First name",
+    "lastNameLabel": "Last name",
+    "jobTitleLabel": "Job title (optional)",
+    "serviceInterestLabel": "Service they're interested in (optional)",
+    "notesLabel": "Additional note (optional)",
+    "notesPlaceholder": "Anything else worth remembering…",
+    "createDealLabel": "Also create a deal",
+    "dealAmountLabel": "Estimated deal amount",
+    "convertSubmit": "Convert",
+    "converting": "Converting…",
+    "backToLeads": "Back to leads",
+    "scoreCardTitle": "AI score",
+    "scoreEmpty": "Not scored yet.",
+    "rescoreCta": "Re-score",
+    "suggestCardTitle": "Content suggestion",
+    "suggestEmpty": "Get an AI-suggested follow-up article for this lead.",
+    "suggestFor": "Based on the article",
+    "copyMessage": "Copy message",
+    "copied": "Copied",
+    "editLead": "Edit",
+    "editLeadTitle": "Edit lead details",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "convertedBanner": "This lead has already been converted.",
+    "detailsCardTitle": "Details",
+    "statusLabel": "Status",
+    "estimatedValueLabel": "Estimated value",
+    "messagePreviewTitle": "Original message",
+    "sourceLabel": "Source"
   }
 }

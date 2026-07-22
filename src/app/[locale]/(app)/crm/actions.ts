@@ -10,7 +10,7 @@ import {
 } from "@/engines/crm/contact-service";
 import { createDeal, moveDealToStage } from "@/engines/crm/deal-service";
 import { createCompany } from "@/engines/crm/company-service";
-import { convertLead } from "@/engines/crm/lead-service";
+import { convertLead, createManualLead, updateLead } from "@/engines/crm/lead-service";
 import { addNote } from "@/engines/timeline/timeline";
 import { search } from "@/engines/search/search-service";
 import { saveDashboard } from "@/engines/dashboards/dashboard-service";
@@ -126,15 +126,64 @@ export async function createCompanyAction(input: unknown) {
   return { ok: true as const, id: company.id };
 }
 
-export async function convertLeadAction(
-  leadId: string,
-  opts: { createDeal: boolean; dealAmount?: number },
-) {
-  const res = await withActionContext(() =>
-    convertLead({ leadId, createDeal: opts.createDeal, dealAmount: opts.dealAmount }),
-  );
+const convertLeadSchema = z.object({
+  leadId: z.string().min(1),
+  createDeal: z.boolean().optional(),
+  dealAmount: z.coerce.number().min(0).optional(),
+  firstName: z.string().trim().optional(),
+  lastName: z.string().trim().optional(),
+  email: z.string().trim().optional(),
+  phone: z.string().trim().optional(),
+  jobTitle: z.string().trim().optional(),
+  companyName: z.string().trim().optional(),
+  industry: z.string().trim().optional(),
+  serviceInterest: z.string().trim().optional(),
+  notes: z.string().trim().optional(),
+});
+
+export async function convertLeadAction(input: unknown) {
+  const parsed = convertLeadSchema.safeParse(input);
+  if (!parsed.success) return { ok: false as const };
+  const res = await withActionContext(() => convertLead(parsed.data));
   revalidatePath("/[locale]/(app)/crm/leads", "page");
+  revalidatePath("/[locale]/(app)/crm/leads/[id]", "page");
   return res
     ? { ok: true as const, contactId: res.contactId }
     : { ok: false as const };
+}
+
+const manualLeadSchema = z.object({
+  title: z.string().trim().min(1),
+  companyName: z.string().trim().optional(),
+  industry: z.string().trim().optional(),
+  email: z.string().trim().optional(),
+  phone: z.string().trim().optional(),
+  message: z.string().trim().optional(),
+  estimatedValue: z.coerce.number().min(0).optional(),
+});
+
+export async function createManualLeadAction(input: unknown) {
+  const parsed = manualLeadSchema.safeParse(input);
+  if (!parsed.success) return { ok: false as const };
+  const lead = await withActionContext(() => createManualLead(parsed.data));
+  revalidatePath("/[locale]/(app)/crm/leads", "page");
+  return { ok: true as const, id: lead.id };
+}
+
+const updateLeadSchema = z.object({
+  title: z.string().trim().min(1).optional(),
+  companyName: z.string().trim().optional(),
+  industry: z.string().trim().optional(),
+  email: z.string().trim().optional(),
+  phone: z.string().trim().optional(),
+  estimatedValue: z.coerce.number().min(0).optional(),
+});
+
+export async function updateLeadAction(id: string, input: unknown) {
+  const parsed = updateLeadSchema.safeParse(input);
+  if (!parsed.success) return { ok: false as const };
+  await withActionContext(() => updateLead(id, parsed.data));
+  revalidatePath("/[locale]/(app)/crm/leads", "page");
+  revalidatePath("/[locale]/(app)/crm/leads/[id]", "page");
+  return { ok: true as const };
 }
