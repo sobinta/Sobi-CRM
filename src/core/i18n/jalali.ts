@@ -44,3 +44,15 @@ export function formatJalali(date: Date): string {
   const dd = String(j.day).padStart(2, "0");
   return toPersianDigits(`${j.year}/${mm}/${dd}`);
 }
+
+/** "۲۰۲۶/۰۷/۲۳" style formatted Gregorian date string (Persian digits, for tenants that prefer the Gregorian calendar on documents). */
+export function formatGregorianForContract(date: Date): string {
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return toPersianDigits(`${date.getFullYear()}/${mm}/${dd}`);
+}
+
+/** Format a date per the tenant's configured contract calendar preference. */
+export function formatContractDate(date: Date, calendarMode: string): string {
+  return calendarMode === "gregorian" ? formatGregorianForContract(date) : formatJalali(date);
+}

@@ -262,17 +262,36 @@ Action Center → Human Approval → AI Audit`.
 
 ### Contracts
 
-- **Auto-numbered** contracts (`CTR-<Jalali year>-<sequence>`) generated
-  from a Deal/Contact/Company, using a 10-article Persian consulting
-  contract template with a 40/30/30 payment schedule and real substituted
-  values.
+- **Auto-numbered** contracts (`CTR-<Jalali year>-<sequence>`) generated from
+  a Deal/Contact/Company, tied to the specific contact's name in the
+  contracts list. **Four selectable text templates** (Consulting services,
+  Software development, Monthly retainer, One-time project), each a full
+  Persian-language legal document with real substituted values.
+- **Letterhead & digital-signature designer** (in-module, tenant-wide):
+  company name/logo/address/footer, a signatory name + title, and an
+  admin-configurable **Jalali/Gregorian** date calendar for documents.
+- **Digital signature required before sharing** — a contract must be
+  digitally signed (`applySignature`) before it can be sent; `sendContract`
+  refuses to issue a share link otherwise. The signature block (signatory
+  name/title, signed date, and a locally-generated QR code — never sent to a
+  third-party QR service, since it encodes the unguessable share token)
+  renders at the end of every signed document, both on the public page and
+  the downloadable PDF.
+- **Pre-contract export** — a watermarked ("PRE-CONTRACT" + letterhead)
+  PDF preview for informal client review from the draft stage, generated
+  via `/crm/contracts/[id]/print?mode=pre`; it never includes the digital
+  signature. The final signed PDF (`?mode=final`) is available once signed.
+  Both routes reuse the browser's native print-to-PDF (no server-rendering
+  dependency) with a dedicated print stylesheet.
 - **Public share page** — an unguessable `shareToken` link where the client
-  reviews, prints (dedicated print stylesheet), and **accepts online**; view
-  tracking (`sent → viewed`) and acceptance (`viewed → accepted`) are
-  awaited server-side (not fire-and-forget) so serverless response-cutoff
-  can't lose the write.
-- **Status lifecycle**: draft → sent → viewed → accepted / canceled, with
-  edit-locking once accepted.
+  reviews the letterhead-branded document, sees the signature+QR block, and
+  **accepts online** by entering their own name plus the contract number
+  shown on the page (a lightweight cross-check); a QR scan opens the very
+  same page. View tracking (`sent → viewed`) and acceptance
+  (`viewed → accepted`) are awaited server-side (not fire-and-forget) so
+  serverless response-cutoff can't lose the write.
+- **Status lifecycle**: draft → digitally signed → sent → viewed → accepted /
+  canceled, with edit-locking once accepted.
 - **AI rewrite** of the contract body and **AI follow-up** message
   generation.
 - Public-context event publishing (`contract.created|sent|viewed|accepted`)

@@ -11,7 +11,8 @@ import { publish } from "@/core/event-bus/bus";
 import { record } from "@/core/audit/audit";
 import { addActivity } from "@/engines/timeline/timeline";
 import { toJalali } from "@/core/i18n/jalali";
-import { buildContractTemplate } from "./template";
+import { buildContractTemplate, isContractTemplateKey, type ContractTemplateKey } from "./template";
+import { getContractLetterhead, letterheadIsSignatureReady } from "./letterhead";
 import { getProvider } from "@/engines/ai/provider";
 import { assertTenantReferences } from "@/core/tenancy/relations";
 import { TenantMismatchError } from "@/core/tenancy/errors";
@@ -44,6 +45,7 @@ export interface CreateContractInput {
   dealId?: string | null;
   contactId?: string | null;
   companyId?: string | null;
+  templateKey?: string;
   subject: string;
   amount: number;
   currency?: string;
@@ -79,11 +81,15 @@ export async function createContract(input: CreateContractInput) {
     companyName = company.name;
   }
 
+  const letterhead = await getContractLetterhead();
+  const templateKey: ContractTemplateKey = isContractTemplateKey(input.templateKey ?? "")
+    ? (input.templateKey as ContractTemplateKey)
+    : "consulting";
   const contractNo = await nextContractNumber();
   const startDate = input.startDate ?? new Date();
-  const bodyMd = buildContractTemplate({
+  const bodyMd = buildContractTemplate(templateKey, {
     contractNo,
-    providerName: "SOBI CRM مشاور",
+    providerName: letterhead.companyName,
     clientName,
     companyName,
     subject: input.subject,
@@ -91,6 +97,7 @@ export async function createContract(input: CreateContractInput) {
     currency: input.currency ?? "تومان",
     startDate,
     durationLabel: input.durationLabel ?? "۳ ماه",
+    calendarMode: letterhead.calendarMode,
   });
 
   const contract = await db.contract.create({
@@ -101,11 +108,13 @@ export async function createContract(input: CreateContractInput) {
       dealId: input.dealId,
       contactId: input.contactId,
       companyId: input.companyId,
+      templateKey,
       bodyMd,
       amount: new Prisma.Decimal(input.amount),
       currency: input.currency ?? "تومان",
       startDate,
       durationLabel: input.durationLabel ?? "۳ ماه",
+      calendarMode: letterhead.calendarMode,
       status: "draft",
       shareToken: crypto.randomBytes(24).toString("base64url"),
       createdById: ctx.membershipId,
@@ -151,9 +160,58 @@ export async function updateContractBody(id: string, bodyMd: string) {
   return updated;
 }
 
-export async function sendContract(id: string) {
+export type SignContractResult =
+  | { ok: true }
+  | { ok: false; reason: "locked" | "no_signatory" };
+
+/**
+ * Apply the tenant's configured digital signature to a contract. Requires a
+ * signatory name to be configured in the letterhead settings first. Once
+ * applied, the signature block (name/title + QR code) renders at the end of
+ * the document — sendContract() then refuses to issue a share link until
+ * this has happened. Returns a structured result (not a thrown error) since
+ * both failure modes are expected, user-actionable states the UI must
+ * explain specifically, not a generic "operation failed".
+ */
+export async function applySignature(id: string): Promise<SignContractResult> {
   authorize("crm.contract.update");
-  const updated = await db.contract.update({
+  const ctx = requireContext();
+  const contract = await db.contract.findFirst({ where: { id } });
+  if (!contract) throw new TenantMismatchError();
+  if (contract.status === "accepted" || contract.status === "canceled") {
+    return { ok: false, reason: "locked" };
+  }
+  const letterhead = await getContractLetterhead();
+  if (!letterheadIsSignatureReady(letterhead)) {
+    return { ok: false, reason: "no_signatory" };
+  }
+
+  await db.contract.update({
+    where: { id },
+    data: { signedAt: new Date(), signedById: ctx.membershipId },
+  });
+  await Promise.all([
+    record({ category: "DATA", action: "contract.sign", entityType: "contract", entityId: id }),
+    addActivity({
+      entityType: "contract",
+      entityId: id,
+      kind: "system",
+      title: `قرارداد ${contract.contractNo} با امضای دیجیتال تأیید شد`,
+    }),
+  ]);
+  return { ok: true };
+}
+
+export type SendContractResult = { ok: true } | { ok: false; reason: "not_signed" };
+
+export async function sendContract(id: string): Promise<SendContractResult> {
+  authorize("crm.contract.update");
+  const contract = await db.contract.findFirst({ where: { id } });
+  if (!contract) throw new TenantMismatchError();
+  if (!contract.signedAt) {
+    return { ok: false, reason: "not_signed" };
+  }
+  await db.contract.update({
     where: { id },
     data: {
       status: "sent",
@@ -166,7 +224,7 @@ export async function sendContract(id: string) {
     publish({ type: "contract.sent", entityType: "contract", entityId: id }),
     record({ category: "DATA", action: "contract.send", entityType: "contract", entityId: id }),
   ]);
-  return updated;
+  return { ok: true };
 }
 
 export async function cancelContract(id: string) {
@@ -217,10 +275,16 @@ export async function markContractViewed(shareToken: string): Promise<void> {
   });
 }
 
-/** Public — no auth. The client's online acceptance ("simple signature"). */
+/**
+ * Public — no auth. The client's final online acceptance: they input their
+ * own name plus the contract number shown on the page (a lightweight
+ * cross-check that they're confirming the right document), which constitutes
+ * acceptance of all contract terms.
+ */
 export async function acceptContractPublic(
   shareToken: string,
   acceptedByName: string,
+  contractNo: string,
 ): Promise<{ ok: boolean }> {
   const resolved = await resolvePublicContract(shareToken);
   if (!resolved) return { ok: false };
@@ -232,6 +296,9 @@ export async function acceptContractPublic(
       where: { id: resolved.id, shareToken },
     });
     if (!contract) return { ok: false };
+    if (contract.contractNo.trim().toLowerCase() !== contractNo.trim().toLowerCase()) {
+      return { ok: false };
+    }
     const accepted = await db.contract.updateMany({
       where: {
         id: contract.id,

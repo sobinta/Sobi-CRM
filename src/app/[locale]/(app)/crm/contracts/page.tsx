@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { listContracts } from "@/engines/contracts/contract-service";
 import { db } from "@/core/db";
@@ -6,13 +7,16 @@ import { PageHeader } from "@/components/patterns/page-header";
 import { ContractsClient, type ContractRow, type ContactOption } from "./contracts-client";
 
 export default async function ContractsPage() {
-  const data = await withPlatformContext(async () => {
-    const [contracts, contacts] = await Promise.all([
-      listContracts(),
-      db.contact.findMany({ select: { id: true, firstName: true, lastName: true }, take: 200 }),
-    ]);
-    return { contracts, contacts };
-  });
+  const [data, t] = await Promise.all([
+    withPlatformContext(async () => {
+      const [contracts, contacts] = await Promise.all([
+        listContracts(),
+        db.contact.findMany({ select: { id: true, firstName: true, lastName: true }, take: 200 }),
+      ]);
+      return { contracts, contacts };
+    }),
+    getTranslations("contracts"),
+  ]);
   if (!data) notFound();
 
   const rows: ContractRow[] = data.contracts.map((c) => ({
@@ -32,8 +36,9 @@ export default async function ContractsPage() {
   return (
     <div>
       <PageHeader
-        title="قراردادها"
-        description={`${rows.length} قرارداد`}
+        title={t("title")}
+        description={t("count", { count: rows.length })}
+        helpTopic="contracts"
       />
       <ContractsClient contracts={rows} contacts={contactOptions} />
     </div>

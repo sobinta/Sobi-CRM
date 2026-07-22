@@ -12,6 +12,8 @@ model Contract {
   dealId         String?
   contactId      String?
   companyId      String?
+  /// Which built-in contract-text template generated bodyMd (consulting | development | retainer | oneTime).
+  templateKey    String    @default("consulting")
   /// Markdown body (the rendered contract text).
   bodyMd         String
   amount         Decimal   @default(0) @db.Decimal(14, 2)
@@ -19,11 +21,17 @@ model Contract {
   startDate      DateTime?
   expiresAt      DateTime?
   durationLabel  String?
+  /// jalali | gregorian — which calendar dates in the document were rendered with.
+  calendarMode   String    @default("jalali")
   /// draft | sent | viewed | accepted | canceled
   status         String    @default("draft")
   /// Public, unguessable token for the share link.
   shareToken     String    @unique
   shareTokenExpiresAt DateTime?
+  /// Set once the tenant's digital signature has been applied. sendContract()
+  /// refuses to issue a share link until this is set.
+  signedAt       DateTime?
+  signedById     String?
   sentAt         DateTime?
   viewedAt       DateTime?
   acceptedAt     DateTime?

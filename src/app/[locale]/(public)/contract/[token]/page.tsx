@@ -1,11 +1,20 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import {
   getContractByToken,
   markContractViewed,
 } from "@/engines/contracts/contract-service";
+import { getContractLetterheadPublic } from "@/engines/contracts/letterhead";
+import { contractQrDataUrl } from "@/engines/contracts/qr";
 import { renderContractMarkdown } from "@/engines/contracts/render";
+import { formatContractDate } from "@/core/i18n/jalali";
 import { Logo } from "@/components/brand/logo";
 import { getSiteAssetsPublic } from "@/engines/platform-admin/branding-service";
+import {
+  ContractDocument,
+  ContractPrintStyles,
+  ContractSignatureBlock,
+} from "@/components/patterns/contract-document";
 import { AcceptForm } from "./accept-form";
 import { headers } from "next/headers";
 import { limit, rateLimitKey } from "@/core/security/rate-limit";
@@ -14,9 +23,9 @@ import { isContractShareToken } from "@/core/security/public-tokens";
 export default async function PublicContractPage({
   params,
 }: {
-  params: Promise<{ token: string }>;
+  params: Promise<{ token: string; locale: string }>;
 }) {
-  const { token } = await params;
+  const { token, locale } = await params;
   if (!isContractShareToken(token)) notFound();
   const requestHeaders = await headers();
   const address =
@@ -28,9 +37,10 @@ export default async function PublicContractPage({
     windowMs: 15 * 60_000,
   });
   if (!throttle.ok) notFound();
-  const [contract, assets] = await Promise.all([
+  const [contract, assets, t] = await Promise.all([
     getContractByToken(token),
     getSiteAssetsPublic(),
+    getTranslations("publicContract"),
   ]);
   if (!contract || contract.status === "draft") notFound();
 
@@ -39,29 +49,15 @@ export default async function PublicContractPage({
   // moment the response finishes streaming, before the DB write completes.
   await markContractViewed(token);
 
+  const letterhead = await getContractLetterheadPublic(contract.tenantId);
+  const proto = process.env.NODE_ENV === "production" ? "https" : "http";
+  const publicUrl = `${proto}://${requestHeaders.get("host") ?? ""}/${locale}/contract/${contract.shareToken}`;
+
   const html = renderContractMarkdown(contract.bodyMd);
 
   return (
     <div className="min-h-dvh bg-surface-sunken">
-      {/* Print styling: hide the action bar, use a clean white page. */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-            @media print {
-              .no-print { display: none !important; }
-              body { background: white !important; }
-            }
-            .contract-doc h1 { font-size: 1.375rem; font-weight: 700; margin: 1.25rem 0 0.75rem; }
-            .contract-doc h2 { font-size: 1.1rem; font-weight: 700; margin: 1.5rem 0 0.5rem; }
-            .contract-doc p { margin: 0.5rem 0; line-height: 1.9; }
-            .contract-doc hr { margin: 1.5rem 0; border-color: var(--line); }
-            .contract-doc blockquote { border-inline-start: 3px solid var(--brand); padding-inline-start: 0.75rem; color: var(--ink-muted); margin: 0.75rem 0; }
-            .contract-table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.875rem; }
-            .contract-table th, .contract-table td { border: 1px solid var(--line); padding: 0.5rem 0.75rem; text-align: start; }
-            .contract-table th { background: var(--surface-sunken); }
-          `,
-        }}
-      />
+      <ContractPrintStyles />
 
       {/* Brand header */}
       <header className="no-print bg-brand px-6 py-5">
@@ -75,19 +71,71 @@ export default async function PublicContractPage({
           <h1 className="text-lg font-semibold text-ink">قرارداد {contract.contractNo}</h1>
         </div>
 
-        <div className="mb-6 rounded-xl border border-line bg-surface-raised p-6 shadow-raised sm:p-10">
-          <div
-            className="contract-doc text-sm text-ink"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
+        <div className="mb-6">
+          <ContractDocument
+            bodyHtml={html}
+            headerTitle={`قرارداد ${contract.contractNo}`}
+            companyName={letterhead.companyName}
+            logoUrl={letterhead.logoUrl}
+            addressLine={letterhead.addressLine}
+            footerText={letterhead.footerText}
+          >
+            {contract.signedAt && letterhead.signatoryName && (
+              <ContractSignatureBlockAsync
+                publicUrl={publicUrl}
+                signatoryName={letterhead.signatoryName}
+                signatoryTitle={letterhead.signatoryTitle}
+                signedAt={contract.signedAt}
+                calendarMode={contract.calendarMode}
+                signedByLabel={t("signedBy")}
+                scanLabel={t("scanToVerify")}
+                linkLabel={t("orOpenLink")}
+              />
+            )}
+          </ContractDocument>
         </div>
 
         <AcceptForm
           token={contract.shareToken}
+          contractNo={contract.contractNo}
           alreadyAccepted={contract.status === "accepted"}
           acceptedByName={contract.acceptedByName}
         />
       </main>
     </div>
+  );
+}
+
+async function ContractSignatureBlockAsync({
+  publicUrl,
+  signatoryName,
+  signatoryTitle,
+  signedAt,
+  calendarMode,
+  signedByLabel,
+  scanLabel,
+  linkLabel,
+}: {
+  publicUrl: string;
+  signatoryName: string;
+  signatoryTitle: string | null;
+  signedAt: Date;
+  calendarMode: string;
+  signedByLabel: string;
+  scanLabel: string;
+  linkLabel: string;
+}) {
+  const qrDataUrl = await contractQrDataUrl(publicUrl);
+  return (
+    <ContractSignatureBlock
+      qrDataUrl={qrDataUrl}
+      signatoryName={signatoryName}
+      signatoryTitle={signatoryTitle}
+      signedAtLabel={formatContractDate(signedAt, calendarMode)}
+      verifyHref={publicUrl}
+      signedByLabel={signedByLabel}
+      scanLabel={scanLabel}
+      linkLabel={linkLabel}
+    />
   );
 }
