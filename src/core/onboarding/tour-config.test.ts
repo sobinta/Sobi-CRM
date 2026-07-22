@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  DASHBOARD_TOUR_VERSION,
   demoTourStorageKey,
   findAvailableStep,
   positionTourPanel,
@@ -16,7 +17,9 @@ describe("onboarding tour helpers", () => {
   it("requires the current completed or skipped version", () => {
     expect(tourIsDone(null)).toBe(false);
     expect(tourIsDone({ version: 0, completedAt: new Date(), skippedAt: null })).toBe(false);
-    expect(tourIsDone({ version: 1, completedAt: null, skippedAt: new Date() })).toBe(true);
+    expect(
+      tourIsDone({ version: DASHBOARD_TOUR_VERSION, completedAt: null, skippedAt: new Date() }),
+    ).toBe(true);
   });
 
   it("isolates demo progress by tenant and version", () => {

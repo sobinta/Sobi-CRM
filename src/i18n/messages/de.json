@@ -908,6 +908,14 @@
         "title": "Ihre CRM-Kommandozentrale",
         "description": "Hier sehen Sie Pipeline, Wiedervorlagen, Aktivitäten und Punkte mit Handlungsbedarf auf einen Blick."
       },
+      "dashboardPerformance": {
+        "title": "Wo sich gerade etwas bewegt",
+        "description": "Dieses Diagramm zeigt wichtige Aktivität der letzten zwei Wochen, damit Sie ruhige Phasen frühzeitig erkennen."
+      },
+      "managerAttention": {
+        "title": "Was jetzt Ihre Aufmerksamkeit braucht",
+        "description": "Überfällige Folgeaufgaben und ins Stocken geratene Vorgänge erscheinen hier automatisch, damit nichts durchrutscht."
+      },
       "rail": {
         "title": "Zwischen Sobinta-Produkten wechseln",
         "description": "Die Produktleiste verbindet CRM, Vorgänge, Finanzen, KI und Studio in einem konsistenten Arbeitsbereich."
@@ -916,17 +924,53 @@
         "title": "Im aktuellen Produkt arbeiten",
         "description": "Diese Zeile passt sich dem gewählten Produkt an und hält die täglichen Werkzeuge griffbereit."
       },
+      "navDeals": {
+        "title": "Deals durch Ihre Pipeline bewegen",
+        "description": "Verfolgen Sie jeden Deal von Neu bis Gewonnen oder Verloren, und verschieben Sie ihn per Drag & Drop oder direkter Auswahl zwischen den Phasen."
+      },
+      "navContracts": {
+        "title": "Verträge erstellen, signieren und versenden",
+        "description": "Erstellen Sie einen professionellen Vertrag aus einer Vorlage, versehen Sie ihn mit Ihrer digitalen Signatur und teilen Sie einen Link, den der Kunde online prüfen und annehmen kann."
+      },
+      "navCampaigns": {
+        "title": "Kontakte persönlich und im großen Maßstab erreichen",
+        "description": "Versenden Sie KI-personalisierte E-Mail-Kampagnen an ein ganzes Segment gleichzeitig — jede Nachricht auf die Historie der jeweiligen Person zugeschnitten."
+      },
+      "navReports": {
+        "title": "Das Geschäft auf einen Blick sehen",
+        "description": "Conversion-Trichter, Pipeline-Wert, Lead-Quellen und Umsatztrends — alles in einem visuellen Dashboard."
+      },
+      "navFeed": {
+        "title": "Jede wichtige Änderung, ein Feed",
+        "description": "Jede Aktualisierung von Kontakten, Deals, Aufgaben und Verträgen läuft in einem einzigen, filterbaren chronologischen Feed zusammen."
+      },
       "search": {
         "title": "Alles schnell finden",
         "description": "Suchen Sie überall nach Datensätzen und Aktionen. Mit Strg K öffnen Sie die Suche direkt."
       },
-      "calendar": {
-        "title": "Arbeit in einem Kalender planen",
-        "description": "Unter Vorgänge finden Sie den gemeinsamen gregorianischen und persischen Kalender mit Erinnerungen."
+      "operations": {
+        "title": "Aufgaben, Kalender und Dateien",
+        "description": "Operations bündelt die tägliche Teamarbeit — gemeinsame Aufgaben, einen Kalender und die Dateiablage — an einem Ort."
       },
-      "forms": {
-        "title": "Geschäftsformulare anpassen",
-        "description": "Im Studio werden wiederverwendbare Felder und Formulare an Ihre Abläufe angepasst."
+      "finance": {
+        "title": "Provisionen, Abrechnung und Umsatz",
+        "description": "Finance konsolidiert Abrechnungsstatus, Provisionen und Umsatz über alle Deals und Module hinweg."
+      },
+      "ai": {
+        "title": "Ihr KI-Assistent und seine Fähigkeiten",
+        "description": "Stellen Sie in einfacher Sprache Fragen zu Ihren CRM-Daten, und lassen Sie die KI Follow-ups entwerfen, Leads bewerten und Datensätze zusammenfassen."
+      },
+      "studio": {
+        "title": "Ohne Code entwickeln",
+        "description": "In Studio gestalten Sie Formulare, Entitäten, Workflows, Automatisierungen und Geschäftsregeln — ganz ohne Entwickler."
+      },
+      "templatesGroup": {
+        "title": "Branchenvorlagen aktivieren",
+        "description": "Aktivieren Sie vorgefertigte Module — Versicherung, Immobilien, Einwanderung und mehr —, jedes mit eigenem Workflow, Feldern und Dashboard."
+      },
+      "admin": {
+        "title": "Nutzer, Rollen und Systemzustand",
+        "description": "Verwalten Sie Zugriff und Berechtigungen Ihres Teams, konfigurieren Sie Integrationen, und behalten Sie den Systemzustand über Administration im Blick."
       },
       "support": {
         "title": "Hilfe ist immer erreichbar",

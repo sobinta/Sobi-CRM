@@ -1,18 +1,35 @@
 export const DASHBOARD_TOUR_KEY = "dashboard-introduction";
-export const DASHBOARD_TOUR_VERSION = 1;
+export const DASHBOARD_TOUR_VERSION = 2;
 
 export interface TourStepDefinition {
   id: string;
   target: string;
 }
 
+/**
+ * Every step's target must actually exist in the DOM for at least some users
+ * on the /crm dashboard, or findAvailableStep() silently skips it forever.
+ * Steps gated by role (e.g. "admin") are fine — they're simply skipped for
+ * users who can't see that workspace.
+ */
 export const DASHBOARD_TOUR_STEPS: TourStepDefinition[] = [
   { id: "dashboard", target: '[data-tour="dashboard-overview"]' },
+  { id: "dashboardPerformance", target: '[data-tour="dashboard-performance"]' },
+  { id: "managerAttention", target: '[data-tour="manager-attention"]' },
   { id: "rail", target: '[data-tour="module-rail"]' },
   { id: "navigation", target: '[data-tour="context-navigation"]' },
+  { id: "navDeals", target: '[data-tour="nav-crm-deals"]' },
+  { id: "navContracts", target: '[data-tour="nav-crm-contracts"]' },
+  { id: "navCampaigns", target: '[data-tour="nav-crm-campaigns"]' },
+  { id: "navReports", target: '[data-tour="nav-crm-reports"]' },
+  { id: "navFeed", target: '[data-tour="nav-crm-feed"]' },
   { id: "search", target: '[data-tour="global-search"]' },
-  { id: "calendar", target: '[data-tour="calendar-entry"]' },
-  { id: "forms", target: '[data-tour="form-entry"]' },
+  { id: "operations", target: '[data-tour="workspace-operations"]' },
+  { id: "finance", target: '[data-tour="workspace-finance"]' },
+  { id: "ai", target: '[data-tour="workspace-ai"]' },
+  { id: "studio", target: '[data-tour="workspace-studio"]' },
+  { id: "templatesGroup", target: '[data-tour="templates-group"]' },
+  { id: "admin", target: '[data-tour="workspace-admin"]' },
   { id: "support", target: '[data-tour="support-entry"]' },
   { id: "profile", target: '[data-tour="profile-entry"]' },
 ];

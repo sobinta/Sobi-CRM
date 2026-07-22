@@ -146,7 +146,7 @@ export function ModuleRail({ mobile = false }: { mobile?: boolean }) {
     const open = openKeys.has(ws.key);
     const headerActive = pathname === ws.href;
     return (
-      <div key={ws.key}>
+      <div key={ws.key} data-tour={`workspace-${ws.key}`}>
         <div className="flex items-center">
           <Link
             href={ws.href}
@@ -187,6 +187,7 @@ export function ModuleRail({ mobile = false }: { mobile?: boolean }) {
                   key={item.key}
                   href={item.href}
                   onClick={close}
+                  data-tour={`nav-${ws.key}-${item.key}`}
                   aria-current={itemActive ? "page" : undefined}
                   className={cn(
                     "flex min-h-8 items-center rounded-md px-2.5 text-[13px] outline-none",
@@ -253,6 +254,7 @@ export function ModuleRail({ mobile = false }: { mobile?: boolean }) {
                   type="button"
                   onClick={() => toggleSection(TEMPLATES_KEY)}
                   aria-expanded={templatesOpen}
+                  data-tour="templates-group"
                   className="flex min-h-10 w-full items-center gap-2.5 rounded-lg px-2.5 text-sm text-ink-on-rail/70 outline-none transition-colors hover:bg-white/8 hover:text-ink-on-rail focus-visible:outline-2 focus-visible:outline-focus-ring"
                 >
                   <LayoutGrid aria-hidden="true" className="h-4.5 w-4.5 shrink-0" />

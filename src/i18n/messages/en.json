@@ -908,6 +908,14 @@
         "title": "Your CRM command center",
         "description": "Start here for the health of your pipeline, follow-ups, activity, and items that need attention."
       },
+      "dashboardPerformance": {
+        "title": "See where momentum is building",
+        "description": "This chart tracks meaningful activity over the last two weeks, so you can spot slow periods early."
+      },
+      "managerAttention": {
+        "title": "What needs you right now",
+        "description": "Overdue follow-ups and stalled items surface here automatically, so nothing falls through the cracks."
+      },
       "rail": {
         "title": "Move between Sobinta products",
         "description": "The product rail keeps CRM, operations, finance, AI, and Studio within one consistent workspace."
@@ -916,17 +924,53 @@
         "title": "Work within the current product",
         "description": "This row changes with the selected product and keeps its daily tools close at hand."
       },
+      "navDeals": {
+        "title": "Move deals through your pipeline",
+        "description": "Track every deal from New through Won or Lost, and move it between stages by dragging or picking a stage directly."
+      },
+      "navContracts": {
+        "title": "Draft, sign, and send contracts",
+        "description": "Generate a professional contract from a template, apply your digital signature, and share a link the client can review and accept online."
+      },
+      "navCampaigns": {
+        "title": "Reach contacts personally, at scale",
+        "description": "Send AI-personalized email campaigns to a whole segment at once — each message tailored to that person's own history."
+      },
+      "navReports": {
+        "title": "See the business at a glance",
+        "description": "Conversion funnels, pipeline value, lead sources, and revenue trends, all in one visual dashboard."
+      },
+      "navFeed": {
+        "title": "Every meaningful change, one feed",
+        "description": "Every contact, deal, task, and contract update flows into a single chronological feed you can filter and search."
+      },
       "search": {
         "title": "Find anything quickly",
         "description": "Search records and actions from anywhere. You can also open it with Ctrl K."
       },
-      "calendar": {
-        "title": "Plan work on one calendar",
-        "description": "Open Operations for the shared Gregorian and Jalali calendar, reminders, and scheduled CRM work."
+      "operations": {
+        "title": "Tasks, calendar, and files",
+        "description": "Operations keeps your team's day-to-day work — shared tasks, a calendar, and document storage — in one place."
       },
-      "forms": {
-        "title": "Adapt business forms",
-        "description": "Studio is where reusable business fields and forms can be tailored to each workflow."
+      "finance": {
+        "title": "Commissions, billing, and revenue",
+        "description": "Finance rolls up billing status, commissions, and revenue across every deal and module."
+      },
+      "ai": {
+        "title": "Your AI assistant and skills",
+        "description": "Ask questions about your CRM data in plain language, and let AI draft follow-ups, score leads, and summarize records for you."
+      },
+      "studio": {
+        "title": "Build without code",
+        "description": "Studio is where you design forms, entities, workflows, automations, and business rules — no developer required."
+      },
+      "templatesGroup": {
+        "title": "Turn on industry templates",
+        "description": "Activate ready-made modules — Insurance, Real Estate, Immigration, and more — each with its own workflow, fields, and dashboard."
+      },
+      "admin": {
+        "title": "Users, roles, and system health",
+        "description": "Manage your team's access and permissions, configure integrations, and keep an eye on system health from Administration."
       },
       "support": {
         "title": "Help is always within reach",
