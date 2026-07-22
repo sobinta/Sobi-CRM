@@ -37,11 +37,12 @@ export default async function ContactsPage({
       <PageHeader
         title={t("contacts")}
         description={t("contactCount", { count: total })}
+        helpTopic="contacts"
       >
         <ContactsToolbar />
       </PageHeader>
 
-      <div className="px-6 py-4">
+      <div className="px-4 py-4 sm:px-6">
         {rows.length === 0 ? (
           <EmptyState
             icon={Users}
@@ -54,11 +55,14 @@ export default async function ContactsPage({
               <thead className="bg-surface-sunken text-xs text-ink-faint">
                 <tr>
                   <th className="px-4 py-2.5 text-start font-medium">{t("name")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("businessOrService")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("phone")}</th>
                   <th className="px-4 py-2.5 text-start font-medium">{t("email")}</th>
-                  <th className="px-4 py-2.5 text-start font-medium">{t("company")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("registered")}</th>
                   <th className="px-4 py-2.5 text-start font-medium">
                     {t("lifecycle")}
                   </th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("source")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -69,6 +73,9 @@ export default async function ContactsPage({
                     c.lifecycle,
                     locale,
                   );
+                  const custom = (c.customFields ?? {}) as { serviceInterest?: string };
+                  const businessOrService = c.company?.name ?? custom.serviceInterest ?? t("noValue");
+                  const sourceKey = c.source ?? "unknown";
                   return (
                     <tr
                       key={c.id}
@@ -79,20 +86,33 @@ export default async function ContactsPage({
                           href={`/crm/contacts/${c.id}`}
                           className="flex items-center gap-2.5 font-medium text-ink hover:text-brand"
                         >
-                          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-subtle text-[11px] font-semibold text-brand-subtle-ink">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-[11px] font-semibold text-brand-subtle-ink">
                             {(c.firstName[0] ?? "") + (c.lastName[0] ?? "")}
                           </span>
-                          {c.firstName} {c.lastName}
+                          <span className="whitespace-nowrap">
+                            {c.firstName} {c.lastName}
+                          </span>
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-ink-muted" dir="ltr">
-                        {c.email ?? "—"}
+                      <td className="px-4 py-3 whitespace-nowrap text-ink-muted">
+                        {businessOrService}
                       </td>
-                      <td className="px-4 py-3 text-ink-muted">
-                        {c.company?.name ?? "—"}
+                      <td className="px-4 py-3 whitespace-nowrap text-ink-muted" dir="ltr">
+                        {c.phone ?? t("noValue")}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-ink-muted" dir="ltr">
+                        {c.email ?? t("noValue")}
+                      </td>
+                      <td className="px-4 py-3 tabular whitespace-nowrap text-ink-muted">
+                        {new Date(c.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
                         <Chip tone={chip.tone}>{chip.label}</Chip>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <Chip tone="neutral" dot={false}>
+                          {t(`sources.${sourceKey}` as never)}
+                        </Chip>
                       </td>
                     </tr>
                   );

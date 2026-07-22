@@ -31,6 +31,8 @@ const taskSchema = z.object({
   priority: z.string().optional(),
   dueAt: z.string().optional(),
   recurrence: z.string().optional(),
+  entityType: z.string().optional(),
+  entityId: z.string().optional(),
   customFields: z.record(z.string(), z.unknown()).optional(),
 });
 
@@ -43,10 +45,13 @@ export async function createTaskAction(input: unknown) {
       priority: parsed.data.priority,
       dueAt: parsed.data.dueAt ? new Date(parsed.data.dueAt) : null,
       recurrence: parsed.data.recurrence || null,
+      entityType: parsed.data.entityType || null,
+      entityId: parsed.data.entityId || null,
       customFields: await validatePublishedCustomFields("task", parsed.data.customFields),
     }),
   );
   revalidatePath("/[locale]/(app)/ops/tasks", "page");
+  revalidatePath("/[locale]/(app)/crm", "layout");
   return { ok: true as const };
 }
 

@@ -676,7 +676,21 @@
       "prospect": "Prospect",
       "customer": "Customer",
       "inactive": "Inactive"
-    }
+    },
+    "registered": "Registered",
+    "source": "Source",
+    "businessOrService": "Business / Service",
+    "noValue": "—",
+    "sources": {
+      "website": "Website",
+      "manual": "Manual entry",
+      "chatbot": "Chatbot",
+      "telegram": "Telegram",
+      "chatbox": "Web chat",
+      "unknown": "Unknown"
+    },
+    "addActivity": "Add activity",
+    "addTask": "Add task"
   },
   "formBuilder": {
     "eyebrow": "Studio · business forms",
@@ -1127,6 +1141,10 @@
     "leads": {
       "title": "About Leads",
       "body": "A lead is a raw, unqualified inquiry — it arrives automatically from your public website form, or you can add one manually. Leads are never edited to look presentable; they stay exactly as received so you always see the original context.\n\nFrom this page you can:\n- Open a lead to see its full details: contact info, submission date, field of work, and current status.\n- Score it with AI — get a 0-100 fit score plus a short rationale based on how complete the information is and what stage of business it represents.\n- Get an AI content suggestion — a relevant article and a ready-to-send follow-up message.\n- Convert it into a Contact (and, if there's a business name, a Company) - optionally creating a Deal at the same time.\n\nWhy this matters: converting is a deliberate, one-way step. The lead itself is never deleted or overwritten, so you always have a clean trail from first contact to customer."
+    },
+    "contacts": {
+      "title": "About Contacts",
+      "body": "A contact is a real person you're in a relationship with — a customer, prospect, or anyone converted from a lead. This is the 360-degree view: everything about them in one place.\n\nFrom this page you can:\n- See a full timeline from the moment they first arrived as a lead through conversion and every activity since — calls, notes, tasks, and stage changes, oldest to newest.\n- Add an activity or a task by hand, e.g. a reminder for what to do next with this person.\n- Read their AI \"customer knowledge\" summary, generated from a linked chatbot conversation.\n- See which company they belong to (if any) and jump straight to it.\n\nThe list view shows where each contact came from (website, manual entry, chatbot, Telegram, web chat) and their lifecycle stage, so you can tell a brand-new prospect from an existing customer at a glance."
     }
   },
   "leads": {
@@ -1207,5 +1225,55 @@
     "estimatedValueLabel": "Estimated value",
     "messagePreviewTitle": "Original message",
     "sourceLabel": "Source"
+  },
+  "activityDialog": {
+    "addActivity": "Add activity",
+    "addTask": "Add task",
+    "tabActivity": "Activity",
+    "tabTask": "Task",
+    "kindLabel": "Type",
+    "kindCall": "Call",
+    "kindMeeting": "Meeting",
+    "titleLabel": "Title",
+    "titlePlaceholder": "e.g. Called about the proposal",
+    "bodyLabel": "Notes (optional)",
+    "dueLabel": "Due date (optional)",
+    "priorityLabel": "Priority",
+    "priorityLow": "Low",
+    "priorityNormal": "Normal",
+    "priorityHigh": "High",
+    "priorityUrgent": "Urgent",
+    "taskTitlePlaceholder": "e.g. Follow up next week",
+    "cancel": "Cancel",
+    "create": "Add",
+    "creating": "Adding…"
+  },
+  "contactDetail": {
+    "backToContacts": "Back to contacts",
+    "detailsTitle": "Details",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "jobTitleLabel": "Job title",
+    "companyLabel": "Company",
+    "serviceInterestLabel": "Service interest",
+    "sourceLabel": "Source",
+    "registeredLabel": "Registered",
+    "lifecycleLabel": "Lifecycle",
+    "aiKnowledgeTitle": "Customer knowledge (AI)",
+    "aiKnowledgeEmpty": "No summary yet. Use the AI assistant below.",
+    "aiAssistantTitle": "AI assistant",
+    "summarize": "Summary",
+    "nextStep": "Suggest next step",
+    "summarizeConvo": "Summarize conversation",
+    "processing": "Working…",
+    "nextStepNote": "Suggestion: \"{suggestion}\" — sent to the AI Action Center for approval.",
+    "convoSummaryUpdated": "Conversation summary updated in the Customer knowledge card.",
+    "convoNotFound": "No conversation found for this contact.",
+    "addNoteTitle": "Add note",
+    "timelineTitle": "Timeline",
+    "privacyTitle": "Privacy (GDPR)",
+    "privacyDescription": "Export or erase all personal data held about this contact.",
+    "exportData": "Export data (JSON)",
+    "noValue": "—"
   }
 }

@@ -68,6 +68,13 @@ export async function createManualLead(input: ManualLeadInput) {
   await Promise.all([
     publish({ type: "lead.created", entityType: "lead", entityId: lead.id, payload: { source: "manual" } }),
     record({ category: "DATA", action: "lead.create", entityType: "lead", entityId: lead.id }),
+    addActivity({
+      entityType: "lead",
+      entityId: lead.id,
+      kind: "system",
+      title: "Lead received (manual entry)",
+      occurredAt: lead.createdAt,
+    }),
   ]);
   return lead;
 }

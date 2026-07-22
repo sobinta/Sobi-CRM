@@ -169,6 +169,14 @@ one-click **"Continue with demo workspace"** button (see
 
 - **Contacts & Companies** — full CRUD, company find-or-create with
   LIKE-injection-safe matching, contact↔company relationships, tags, notes.
+  The list shows business/service (company name, or a service-interest note
+  for individual contacts), phone, email, registration date, lifecycle stage,
+  and lead source (website, manual, chatbot, Telegram, web chat). The 360°
+  detail page's timeline is a true end-to-end history — merged from the
+  contact's own activity **and the originating lead's**, so it reads from the
+  first inbound moment through conversion and everything since — with a
+  manual "Add activity" control (log a call/meeting, or create a real linked
+  Task as a follow-up reminder, visible in the Ops → Tasks workspace too).
 - **Leads** — website-form and chatbot intake into one shared queue, each
   lead carrying `source`, `industry` (field of work), `conversationId`
   (linking a chatbot transcript), and free-form `customFields`. A card-based

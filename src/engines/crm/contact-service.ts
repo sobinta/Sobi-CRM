@@ -3,7 +3,7 @@ import { requireContext } from "@/core/tenancy/context";
 import { authorize } from "@/core/rbac/guard";
 import { publish } from "@/core/event-bus/bus";
 import { record } from "@/core/audit/audit";
-import { addActivity } from "@/engines/timeline/timeline";
+import { addActivity, getTimeline, type TimelineItem } from "@/engines/timeline/timeline";
 import { assertTenantReferences } from "@/core/tenancy/relations";
 import { assertRecordQuota } from "@/core/billing/quota";
 
@@ -185,4 +185,23 @@ export async function deleteContact(id: string) {
     entityType: "contact",
     entityId: id,
   });
+}
+
+/**
+ * The full 360° history for a contact: its own timeline merged with the
+ * originating lead's (if any) — so the record reads from the very first
+ * inbound moment, through conversion, to everything since.
+ */
+export async function getContactFullTimeline(
+  contactId: string,
+  leadId: string | null,
+): Promise<TimelineItem[]> {
+  authorize("crm.contact.read");
+  const [contactItems, leadItems] = await Promise.all([
+    getTimeline("contact", contactId, { take: 100 }),
+    leadId ? getTimeline("lead", leadId, { take: 100 }) : Promise.resolve([]),
+  ]);
+  return [...contactItems, ...leadItems].sort(
+    (a, b) => b.occurredAt.getTime() - a.occurredAt.getTime(),
+  );
 }

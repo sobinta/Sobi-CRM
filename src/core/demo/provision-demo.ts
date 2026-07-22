@@ -189,9 +189,9 @@ export async function provisionPublicDemo(): Promise<DemoProvisionResult> {
     });
 
     const contacts = [
-      { id: "demo-contact-lena", firstName: "Lena", lastName: "Hofer", email: "lena@demo.example", jobTitle: "COO", companyId: "demo-company-alpine", lifecycle: "customer" },
-      { id: "demo-contact-sofia", firstName: "Sofia", lastName: "Reiter", email: "sofia@demo.example", jobTitle: "CTO", companyId: "demo-company-danube", lifecycle: "prospect" },
-      { id: "demo-contact-jonas", firstName: "Jonas", lastName: "Winkler", email: "jonas@demo.example", jobTitle: "Consultant", companyId: null, lifecycle: "lead" },
+      { id: "demo-contact-lena", firstName: "Lena", lastName: "Hofer", email: "lena@demo.example", phone: "+43 660 1234567", jobTitle: "COO", companyId: "demo-company-alpine", lifecycle: "customer", source: "website" },
+      { id: "demo-contact-sofia", firstName: "Sofia", lastName: "Reiter", email: "sofia@demo.example", phone: "+43 660 7654321", jobTitle: "CTO", companyId: "demo-company-danube", lifecycle: "prospect", source: "chatbot" },
+      { id: "demo-contact-jonas", firstName: "Jonas", lastName: "Winkler", email: "jonas@demo.example", jobTitle: "Consultant", companyId: null, lifecycle: "lead", source: "manual", customFields: { serviceInterest: "Business consulting" } },
     ] as const;
     for (const contact of contacts) {
       await tx.contact.upsert({

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Sparkles, Wand2, ListChecks, MessagesSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ export function ContactAiPanel({
   contactId: string;
   hasConversation: boolean;
 }) {
+  const t = useTranslations("contactDetail");
   const [output, setOutput] = useState<string>();
   const [note, setNote] = useState<string>();
   const [pending, startTransition] = useTransition();
@@ -35,7 +37,7 @@ export function ContactAiPanel({
     setOutput(undefined);
     startTransition(async () => {
       const res = await suggestNextStepAction(contactId);
-      setNote(`پیشنهاد: «${res.suggestion}» — برای تأیید به مرکز اقدامات AI ارسال شد.`);
+      setNote(t("nextStepNote", { suggestion: res.suggestion }));
       router.refresh();
     });
   }
@@ -46,10 +48,10 @@ export function ContactAiPanel({
     startTransition(async () => {
       const res = await summarizeConversationAction(contactId);
       if (res.summary) {
-        setNote("خلاصه‌ی گفتگو در کارت «شناخت مشتری» به‌روزرسانی شد.");
+        setNote(t("convoSummaryUpdated"));
         router.refresh();
       } else {
-        setNote("گفتگویی برای این مخاطب یافت نشد.");
+        setNote(t("convoNotFound"));
       }
     });
   }
@@ -58,18 +60,18 @@ export function ContactAiPanel({
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
         <Button variant="subtle" size="sm" onClick={summarize} disabled={pending}>
-          <Sparkles className="h-4 w-4" /> خلاصه
+          <Sparkles className="h-4 w-4" /> {t("summarize")}
         </Button>
         <Button variant="subtle" size="sm" onClick={nextStep} disabled={pending}>
-          <Wand2 className="h-4 w-4" /> پیشنهاد اقدام بعدی
+          <Wand2 className="h-4 w-4" /> {t("nextStep")}
         </Button>
         {hasConversation && (
           <Button variant="subtle" size="sm" onClick={summarizeConvo} disabled={pending}>
-            <MessagesSquare className="h-4 w-4" /> خلاصه‌ی گفتگو
+            <MessagesSquare className="h-4 w-4" /> {t("summarizeConvo")}
           </Button>
         )}
       </div>
-      {pending && <p className="text-sm text-ink-faint">در حال پردازش…</p>}
+      {pending && <p className="text-sm text-ink-faint">{t("processing")}</p>}
       {output && (
         <div className="rounded-lg border border-line bg-surface-sunken/50 p-3 text-sm text-ink">
           {output}

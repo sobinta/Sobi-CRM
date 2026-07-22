@@ -11,7 +11,7 @@ import {
 import { createDeal, moveDealToStage } from "@/engines/crm/deal-service";
 import { createCompany } from "@/engines/crm/company-service";
 import { convertLead, createManualLead, updateLead } from "@/engines/crm/lead-service";
-import { addNote } from "@/engines/timeline/timeline";
+import { addNote, addActivity } from "@/engines/timeline/timeline";
 import { search } from "@/engines/search/search-service";
 import { saveDashboard } from "@/engines/dashboards/dashboard-service";
 import type { LayoutItem } from "@/components/patterns/widgets/widget-types";
@@ -97,6 +97,31 @@ export async function addNoteAction(
   if (!body.trim()) return { ok: false as const };
   await withActionContext(() => addNote(entityType, entityId, body.trim()));
   revalidatePath(`/[locale]/(app)/crm`, "layout");
+  return { ok: true as const };
+}
+
+const activitySchema = z.object({
+  entityType: z.string().min(1),
+  entityId: z.string().min(1),
+  kind: z.enum(["call", "meeting"]),
+  title: z.string().trim().min(1),
+  body: z.string().trim().optional(),
+});
+
+/** Manually log a call/meeting on a record's timeline (a reminder-style note with a type). */
+export async function addActivityAction(input: unknown) {
+  const parsed = activitySchema.safeParse(input);
+  if (!parsed.success) return { ok: false as const };
+  await withActionContext(() =>
+    addActivity({
+      entityType: parsed.data.entityType,
+      entityId: parsed.data.entityId,
+      kind: parsed.data.kind,
+      title: parsed.data.title,
+      body: parsed.data.body,
+    }),
+  );
+  revalidatePath("/[locale]/(app)/crm", "layout");
   return { ok: true as const };
 }
 

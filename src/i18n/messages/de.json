@@ -676,7 +676,21 @@
       "prospect": "Interessent",
       "customer": "Kunde",
       "inactive": "Inaktiv"
-    }
+    },
+    "registered": "Registriert",
+    "source": "Quelle",
+    "businessOrService": "Unternehmen / Leistung",
+    "noValue": "—",
+    "sources": {
+      "website": "Website",
+      "manual": "Manuell erfasst",
+      "chatbot": "Chatbot",
+      "telegram": "Telegram",
+      "chatbox": "Webchat",
+      "unknown": "Unbekannt"
+    },
+    "addActivity": "Aktivität hinzufügen",
+    "addTask": "Aufgabe hinzufügen"
   },
   "formBuilder": {
     "eyebrow": "Studio · Geschäftsformulare",
@@ -1127,6 +1141,10 @@
     "leads": {
       "title": "Über Leads",
       "body": "Ein Lead ist eine unbearbeitete, nicht qualifizierte Anfrage — er kommt automatisch über Ihr öffentliches Website-Formular herein, oder Sie fügen ihn manuell hinzu. Leads werden nie bearbeitet, um besser auszusehen; sie bleiben genau so, wie sie eingegangen sind, damit Sie immer den ursprünglichen Kontext sehen.\n\nAuf dieser Seite können Sie:\n- Einen Lead öffnen, um alle Details zu sehen: Kontaktdaten, Eingangsdatum, Tätigkeitsfeld und aktuellen Status.\n- Ihn mit KI bewerten — ein Fit-Score von 0-100 plus eine kurze Begründung, basierend auf der Vollständigkeit der Angaben und der Geschäftsphase.\n- Einen KI-Content-Vorschlag erhalten — einen passenden Artikel und eine versandfertige Follow-up-Nachricht.\n- Ihn in einen Kontakt umwandeln (und, falls ein Firmenname vorliegt, in ein Unternehmen) — optional gleichzeitig mit einem Deal.\n\nWarum das wichtig ist: Die Umwandlung ist ein bewusster, einseitiger Schritt. Der Lead selbst wird nie gelöscht oder überschrieben, sodass Sie immer eine lückenlose Nachverfolgung vom Erstkontakt bis zum Kunden haben."
+    },
+    "contacts": {
+      "title": "Über Kontakte",
+      "body": "Ein Kontakt ist eine reale Person, mit der Sie in Beziehung stehen — ein Kunde, Interessent oder jemand, der aus einem Lead umgewandelt wurde. Dies ist die 360-Grad-Ansicht: alles über sie an einem Ort.\n\nAuf dieser Seite können Sie:\n- Eine vollständige Zeitleiste sehen, vom ersten Eintreffen als Lead über die Umwandlung bis zu jeder Aktivität seither — Anrufe, Notizen, Aufgaben und Phasenwechsel, vom ältesten zum neuesten.\n- Eine Aktivität oder Aufgabe von Hand hinzufügen, z. B. eine Erinnerung für den nächsten Schritt mit dieser Person.\n- Die KI-„Kundenkenntnis“-Zusammenfassung lesen, erstellt aus einer verknüpften Chatbot-Konversation.\n- Sehen, zu welchem Unternehmen sie gehören (falls vorhanden), und direkt dorthin springen.\n\nDie Listenansicht zeigt, woher jeder Kontakt kam (Website, manuelle Erfassung, Chatbot, Telegram, Webchat) und in welcher Lebenszyklusphase er sich befindet, damit Sie einen brandneuen Interessenten auf einen Blick von einem bestehenden Kunden unterscheiden können."
     }
   },
   "leads": {
@@ -1207,5 +1225,55 @@
     "estimatedValueLabel": "Geschätzter Wert",
     "messagePreviewTitle": "Ursprüngliche Nachricht",
     "sourceLabel": "Quelle"
+  },
+  "activityDialog": {
+    "addActivity": "Aktivität hinzufügen",
+    "addTask": "Aufgabe hinzufügen",
+    "tabActivity": "Aktivität",
+    "tabTask": "Aufgabe",
+    "kindLabel": "Typ",
+    "kindCall": "Anruf",
+    "kindMeeting": "Termin",
+    "titleLabel": "Titel",
+    "titlePlaceholder": "z. B. Wegen des Angebots angerufen",
+    "bodyLabel": "Notizen (optional)",
+    "dueLabel": "Fälligkeitsdatum (optional)",
+    "priorityLabel": "Priorität",
+    "priorityLow": "Niedrig",
+    "priorityNormal": "Normal",
+    "priorityHigh": "Hoch",
+    "priorityUrgent": "Dringend",
+    "taskTitlePlaceholder": "z. B. Nächste Woche nachfassen",
+    "cancel": "Abbrechen",
+    "create": "Hinzufügen",
+    "creating": "Wird hinzugefügt…"
+  },
+  "contactDetail": {
+    "backToContacts": "Zurück zu den Kontakten",
+    "detailsTitle": "Details",
+    "emailLabel": "E-Mail",
+    "phoneLabel": "Telefon",
+    "jobTitleLabel": "Position",
+    "companyLabel": "Unternehmen",
+    "serviceInterestLabel": "Interessierte Leistung",
+    "sourceLabel": "Quelle",
+    "registeredLabel": "Registriert",
+    "lifecycleLabel": "Lebenszyklus",
+    "aiKnowledgeTitle": "Kundenkenntnis (KI)",
+    "aiKnowledgeEmpty": "Noch keine Zusammenfassung. Nutzen Sie den KI-Assistenten unten.",
+    "aiAssistantTitle": "KI-Assistent",
+    "summarize": "Zusammenfassung",
+    "nextStep": "Nächsten Schritt vorschlagen",
+    "summarizeConvo": "Gespräch zusammenfassen",
+    "processing": "Wird bearbeitet…",
+    "nextStepNote": "Vorschlag: „{suggestion}\" — zur Genehmigung an das KI-Aktionscenter gesendet.",
+    "convoSummaryUpdated": "Gesprächszusammenfassung in der Kundenkenntnis-Karte aktualisiert.",
+    "convoNotFound": "Kein Gespräch für diesen Kontakt gefunden.",
+    "addNoteTitle": "Notiz hinzufügen",
+    "timelineTitle": "Zeitleiste",
+    "privacyTitle": "Datenschutz (DSGVO)",
+    "privacyDescription": "Exportieren oder löschen Sie alle personenbezogenen Daten zu diesem Kontakt.",
+    "exportData": "Daten exportieren (JSON)",
+    "noValue": "—"
   }
 }

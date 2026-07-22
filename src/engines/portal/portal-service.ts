@@ -5,6 +5,7 @@ import {
   runWithContext,
 } from "@/core/tenancy/context";
 import { publish } from "@/core/event-bus/bus";
+import { addActivity } from "@/engines/timeline/timeline";
 
 /**
  * Portal engine — public (unauthenticated) intake. A public form submission
@@ -48,6 +49,14 @@ export async function submitPublicLead(
           message: input.message ?? "",
         } as Prisma.InputJsonValue,
       },
+    });
+
+    await addActivity({
+      entityType: "lead",
+      entityId: lead.id,
+      kind: "system",
+      title: "Lead received (website)",
+      occurredAt: lead.createdAt,
     });
 
     await publish({
