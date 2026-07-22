@@ -380,9 +380,15 @@ scaffolds in module activation.
 
 ### Low-code studio
 
-- **Entity Builder** — create a custom entity (fields, relationships,
-  permissions) that gets a generated CRUD API, list/detail views, search,
-  and timeline attachment — no code required for the common case.
+- **Industry Templates** — apply a ready-made vertical solution (Fitness Studio,
+  Dental Clinic, Consulting Firm, …) that instantiates configured entities and
+  sample data on the low-code kernel. Industries are *data, not code*: a
+  business activates its industry and gets a customizable starting point rather
+  than a hardcoded module.
+- **Entity Builder** — create a custom entity (fields, relationships) and use it
+  immediately through the generic entity workspace: a metadata-driven records
+  list and create form generated from the entity's field definitions, with no
+  bespoke code.
 - **Business Rules** — a dedicated editor for reusable validation, eligibility,
   approval, and calculation rules, stored as a safe expression AST and evaluated
   across forms, workflows, and automations.

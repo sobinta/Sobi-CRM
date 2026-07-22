@@ -631,5 +631,14 @@
     "status": "Status",
     "renews": "Renews",
     "noBilling": "No active subscription."
+  },
+  "industries": {
+    "title": "Industry templates",
+    "description": "Apply a ready-made industry solution — it creates configured entities and sample data you can customize. Built on the low-code kernel, not hardcoded.",
+    "apply": "Apply",
+    "applying": "Applying…",
+    "applied": "Applied",
+    "entities": "{count} entities",
+    "view": "View entities"
   }
 }

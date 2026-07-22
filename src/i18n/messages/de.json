@@ -630,5 +630,14 @@
     "status": "Status",
     "renews": "Verlängert am",
     "noBilling": "Kein aktives Abonnement."
+  },
+  "industries": {
+    "title": "Branchenvorlagen",
+    "description": "Wende eine fertige Branchenlösung an – sie erstellt konfigurierte Entitäten und Beispieldaten, die du anpassen kannst. Auf dem Low-Code-Kern gebaut, nicht fest codiert.",
+    "apply": "Anwenden",
+    "applying": "Wird angewendet…",
+    "applied": "Angewendet",
+    "entities": "{count} Entitäten",
+    "view": "Entitäten ansehen"
   }
 }

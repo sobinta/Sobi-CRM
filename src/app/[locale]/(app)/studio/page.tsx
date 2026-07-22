@@ -5,6 +5,7 @@ import {
   Zap,
   Scale,
   LayoutTemplate,
+  Store,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -14,15 +15,18 @@ import { Chip } from "@/components/ui/chip";
 
 interface Tool {
   href: string;
-  labelKey: string;
+  /** i18n key under "nav.", or a plain label via `rawLabel`. */
+  labelKey?: string;
+  rawLabel?: string;
   description: string;
   icon: LucideIcon;
   ready: boolean;
 }
 
 const tools: Tool[] = [
-  { href: "/studio/forms", labelKey: "forms", description: "Design forms with sections, conditional logic, and calculated fields.", icon: FileText, ready: true },
+  { href: "/studio/industries", rawLabel: "Industry templates", description: "Apply a ready-made industry solution — configured entities and sample data on the low-code kernel.", icon: Store, ready: true },
   { href: "/studio/entities", labelKey: "entities", description: "Create custom entities with their own fields, views, and APIs.", icon: Shapes, ready: true },
+  { href: "/studio/forms", labelKey: "forms", description: "Design forms with sections, conditional logic, and calculated fields.", icon: FileText, ready: true },
   { href: "/studio/workflows", labelKey: "workflows", description: "Build stage pipelines with approvals, timers, and SLAs.", icon: Workflow, ready: true },
   { href: "/studio/automations", labelKey: "automations", description: "Automate work: triggers, conditions, and actions.", icon: Zap, ready: true },
   { href: "/studio/rules", labelKey: "rules", description: "Reusable business rules for validation and eligibility.", icon: Scale, ready: true },
@@ -50,7 +54,7 @@ export default async function StudioPage() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-semibold text-ink">
-                    {tNav(tool.labelKey)}
+                    {tool.rawLabel ?? tNav(tool.labelKey!)}
                   </h3>
                   {!tool.ready && (
                     <Chip tone="neutral" dot={false}>
