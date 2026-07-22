@@ -16,12 +16,18 @@ export interface StageSeed {
   isLost?: boolean;
 }
 
-/** Default sales pipeline stages. */
+/**
+ * Default sales pipeline stages: 5 active stages a deal moves through (new →
+ * reviewing → consultation → proposal sent → final contract phase), plus the
+ * two terminal outcomes. Won/Lost deals leave the active kanban board — see
+ * the closed-deals summary below it instead.
+ */
 export const DEFAULT_DEAL_STAGES: StageSeed[] = [
   { key: "new", name: "New", tone: "neutral", probability: 10 },
-  { key: "qualified", name: "Qualified", tone: "info", probability: 25 },
-  { key: "proposal", name: "Proposal", tone: "warning", probability: 50 },
-  { key: "negotiation", name: "Negotiation", tone: "accent", probability: 75 },
+  { key: "qualified", name: "Reviewing", tone: "info", probability: 25 },
+  { key: "consultation", name: "Consultation", tone: "accent", probability: 45 },
+  { key: "proposal", name: "Proposal sent", tone: "warning", probability: 65 },
+  { key: "negotiation", name: "Final contract phase", tone: "brand", probability: 85 },
   { key: "won", name: "Won", tone: "positive", probability: 100, isWon: true },
   { key: "lost", name: "Lost", tone: "danger", probability: 0, isLost: true },
 ];

@@ -57,6 +57,53 @@ export async function listDealsByStage() {
   };
 }
 
+export interface DealPipelineSummary {
+  currency: string;
+  wonValue: number;
+  wonCount: number;
+  lostValue: number;
+  lostCount: number;
+  pendingValue: number;
+  pendingCount: number;
+}
+
+/** Closed (won/lost) + pending totals for the deals page summary strip. */
+export async function getDealPipelineSummary(): Promise<DealPipelineSummary> {
+  authorize("crm.deal.read");
+  const pipeline = await ensureDefaultPipeline("deal");
+  const [wonAgg, lostAgg, pendingAgg, sample] = await Promise.all([
+    db.deal.aggregate({
+      where: { pipelineId: pipeline.id, status: "won" },
+      _sum: { value: true },
+      _count: { _all: true },
+    }),
+    db.deal.aggregate({
+      where: { pipelineId: pipeline.id, status: "lost" },
+      _sum: { value: true },
+      _count: { _all: true },
+    }),
+    db.deal.aggregate({
+      where: { pipelineId: pipeline.id, status: "open" },
+      _sum: { value: true },
+      _count: { _all: true },
+    }),
+    db.deal.findFirst({
+      where: { pipelineId: pipeline.id },
+      select: { currency: true },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+  return {
+    currency: sample?.currency ?? "EUR",
+    wonValue: Number(wonAgg._sum.value ?? 0),
+    wonCount: wonAgg._count._all,
+    lostValue: Number(lostAgg._sum.value ?? 0),
+    lostCount: lostAgg._count._all,
+    pendingValue: Number(pendingAgg._sum.value ?? 0),
+    pendingCount: pendingAgg._count._all,
+  };
+}
+
 export async function getDeal(id: string) {
   authorize("crm.deal.read");
   return db.deal.findFirst({

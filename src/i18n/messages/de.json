@@ -291,11 +291,19 @@
     "creating": "Wird erstellt…",
     "createDeal": "Abschluss erstellen",
     "stageNew": "Neu",
-    "stageQualified": "Qualifiziert",
-    "stageProposal": "Angebot",
-    "stageNegotiation": "Verhandlung",
+    "stageQualified": "In Prüfung",
+    "stageProposal": "Angebot gesendet",
+    "stageNegotiation": "Finale Vertragsphase",
     "stageWon": "Gewonnen",
-    "stageLost": "Verloren"
+    "stageLost": "Verloren",
+    "stageConsultation": "Beratung",
+    "optionsLabel": "Optionen",
+    "moveToLabel": "Verschieben nach",
+    "summaryTitle": "Abgeschlossene & ausstehende Abschlüsse",
+    "wonLabel": "Abgeschlossen & gewonnen",
+    "lostLabel": "Abgeschlossen & verloren",
+    "pendingLabel": "Ausstehend",
+    "dealsCount": "{count, plural, one {# Abschluss} other {# Abschlüsse}}"
   },
   "auth": {
     "signIn": "Anmelden",
@@ -1149,6 +1157,10 @@
     "companies": {
       "title": "Über Firmen",
       "body": "Eine Firma ist die Organisation, zu der ein Kontakt gehört — automatisch erstellt, wenn ein Lead mit Firmennamen umgewandelt wird, oder direkt hier hinzugefügt.\n\nAuf dieser Seite können Sie:\n- Jeden Kontakt sehen, der dort arbeitet, und jeden damit verbundenen Abschluss.\n- Einen Anruf, ein Meeting oder eine Aufgabe genauso hinzufügen wie bei einem Kontakt — sie erscheint auf der eigenen Zeitleiste der Firma.\n- Eine zusammengeführte Zeitleiste sehen, die auch Aktivitäten enthält, die bei einem ihrer Kontakte protokolliert wurden, jeweils mit dem Namen dieses Kontakts versehen, damit bei der Beziehung nichts zwischen einzelnen Personen verloren geht."
+    },
+    "deals": {
+      "title": "Über die Abschluss-Pipeline",
+      "body": "Jeder Abschluss durchläuft 5 aktive Phasen, von links nach rechts: Neu, In Prüfung, Beratung, Angebot gesendet und Finale Vertragsphase. Sobald über einen Abschluss entschieden ist, verlässt er das Board vollständig und wird entweder Gewonnen oder Verloren.\n\nSie können einen Abschluss auf zwei Arten in eine andere Phase verschieben:\n- Die Karte per Drag-and-Drop auf eine andere Spalte ziehen.\n- Auf die Schaltfläche „Optionen\" tippen und eine Phase direkt auswählen — auf einem Touchscreen zuverlässiger, und damit lässt sich auch direkt zu Gewonnen oder Verloren springen.\n\nUnterhalb des Boards zeigt die Zusammenfassung „Abgeschlossen & ausstehend\" die Summe aller aktuell gewonnenen, verlorenen oder noch offenen Abschlüsse, jeweils mit dem zugehörigen Betrag."
     }
   },
   "leads": {

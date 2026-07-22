@@ -291,11 +291,19 @@
     "creating": "Creating…",
     "createDeal": "Create deal",
     "stageNew": "New",
-    "stageQualified": "Qualified",
-    "stageProposal": "Proposal",
-    "stageNegotiation": "Negotiation",
+    "stageQualified": "Reviewing",
+    "stageProposal": "Proposal sent",
+    "stageNegotiation": "Final contract phase",
     "stageWon": "Won",
-    "stageLost": "Lost"
+    "stageLost": "Lost",
+    "stageConsultation": "Consultation",
+    "optionsLabel": "Options",
+    "moveToLabel": "Move to",
+    "summaryTitle": "Closed & pending deals",
+    "wonLabel": "Closed & won",
+    "lostLabel": "Closed & lost",
+    "pendingLabel": "Pending",
+    "dealsCount": "{count, plural, one {# deal} other {# deals}}"
   },
   "auth": {
     "signIn": "Sign in",
@@ -1149,6 +1157,10 @@
     "companies": {
       "title": "About Companies",
       "body": "A company is the organization a contact belongs to — created automatically when a lead with a business name is converted, or added directly here.\n\nFrom this page you can:\n- See every contact who works there, and every deal tied to it.\n- Add a call, meeting, or task the same way you would on a contact — it appears on the company's own timeline.\n- See a rolled-up timeline that also includes activity logged on any of its contacts, labeled with that contact's name, so nothing about the relationship gets lost across individual people."
+    },
+    "deals": {
+      "title": "About the Deals pipeline",
+      "body": "Every deal moves through 5 active stages, left to right: New, Reviewing, Consultation, Proposal sent, and Final contract phase. Once a deal is decided, it leaves the board entirely and becomes either Won or Lost.\n\nYou can move a deal to a different stage two ways:\n- Drag and drop the card onto another column.\n- Tap its \"Options\" button and pick a stage directly — the more reliable way on a touchscreen, and it can also jump straight to Won or Lost.\n\nBelow the board, the closed & pending summary totals every deal that's currently won, lost, or still open, with the amount attached to each."
     }
   },
   "leads": {

@@ -12,8 +12,15 @@ import {
   type DragStartEvent,
   type DragEndEvent,
 } from "@dnd-kit/core";
+import { MoreVertical } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { Chip, type ChipProps } from "@/components/ui/chip";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { moveDealAction } from "../actions";
 import { cn } from "@/lib/utils";
 import { useDemoMode } from "@/components/layout/session-context";
@@ -36,6 +43,14 @@ export interface KanbanColumn {
   deals: KanbanDeal[];
 }
 
+/** Every stage in the pipeline (including Won/Lost) — options for the per-card "move to" menu. */
+export interface KanbanStageOption {
+  stageId: string;
+  name: string;
+  isWon: boolean;
+  isLost: boolean;
+}
+
 function formatMoney(value: number, currency: string) {
   return new Intl.NumberFormat(undefined, {
     style: "currency",
@@ -44,7 +59,18 @@ function formatMoney(value: number, currency: string) {
   }).format(value);
 }
 
-function DealCard({ deal }: { deal: KanbanDeal }) {
+function DealCard({
+  deal,
+  currentStageId,
+  allStages,
+  onMove,
+}: {
+  deal: KanbanDeal;
+  currentStageId: string;
+  allStages: KanbanStageOption[];
+  onMove: (dealId: string, stageId: string) => void;
+}) {
+  const t = useTranslations("deals");
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: deal.id,
   });
@@ -58,7 +84,35 @@ function DealCard({ deal }: { deal: KanbanDeal }) {
         isDragging && "opacity-40",
       )}
     >
-      <p className="text-sm font-medium text-ink">{deal.title}</p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="min-w-0 flex-1 text-sm font-medium text-ink">{deal.title}</p>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              // Stop the pointerdown before dnd-kit's drag listener (on the
+              // card root) sees it, so tapping this button never starts a drag.
+              onPointerDown={(e) => e.stopPropagation()}
+              aria-label={t("optionsLabel")}
+              className="-m-1 shrink-0 rounded p-1 text-ink-faint outline-none hover:bg-surface-sunken hover:text-ink focus-visible:outline-2 focus-visible:outline-focus-ring"
+            >
+              <MoreVertical className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" onPointerDown={(e) => e.stopPropagation()}>
+            <div className="px-2.5 py-1 text-xs text-ink-faint">{t("moveToLabel")}</div>
+            {allStages.map((s) => (
+              <DropdownMenuItem
+                key={s.stageId}
+                disabled={s.stageId === currentStageId}
+                onSelect={() => onMove(deal.id, s.stageId)}
+              >
+                {s.name}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <p className="mt-1 tabular text-sm font-semibold text-brand">
         {formatMoney(deal.value, deal.currency)}
       </p>
@@ -71,7 +125,15 @@ function DealCard({ deal }: { deal: KanbanDeal }) {
   );
 }
 
-function Column({ column }: { column: KanbanColumn }) {
+function Column({
+  column,
+  allStages,
+  onMove,
+}: {
+  column: KanbanColumn;
+  allStages: KanbanStageOption[];
+  onMove: (dealId: string, stageId: string) => void;
+}) {
   const { setNodeRef, isOver } = useDroppable({ id: column.stageId });
   return (
     <div className="flex w-72 shrink-0 flex-col">
@@ -92,14 +154,26 @@ function Column({ column }: { column: KanbanColumn }) {
         )}
       >
         {column.deals.map((deal) => (
-          <DealCard key={deal.id} deal={deal} />
+          <DealCard
+            key={deal.id}
+            deal={deal}
+            currentStageId={column.stageId}
+            allStages={allStages}
+            onMove={onMove}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-export function KanbanBoard({ columns: initial }: { columns: KanbanColumn[] }) {
+export function KanbanBoard({
+  columns: initial,
+  allStages,
+}: {
+  columns: KanbanColumn[];
+  allStages: KanbanStageOption[];
+}) {
   const demoMode = useDemoMode();
   const tShell = useTranslations("shell");
   const [columns, setColumns] = useState(initial);
@@ -131,6 +205,39 @@ export function KanbanBoard({ columns: initial }: { columns: KanbanColumn[] }) {
     return () => window.removeEventListener("sobi:demo-deal-created", addLocalDeal);
   }, [demoMode]);
 
+  /** Move a deal to a target stage — shared by drag-drop and the per-card menu. */
+  function moveDeal(dealId: string, targetStageId: string) {
+    const sourceCol = columns.find((c) => c.deals.some((d) => d.id === dealId));
+    if (!sourceCol || sourceCol.stageId === targetStageId) return;
+    const deal = sourceCol.deals.find((d) => d.id === dealId)!;
+
+    // Leaving the active board entirely (moved to a terminal Won/Lost stage
+    // not present among the visible columns).
+    const targetCol = columns.find((c) => c.stageId === targetStageId);
+
+    setColumns((cols) =>
+      cols.map((c) => {
+        if (c.stageId === sourceCol.stageId) {
+          return {
+            ...c,
+            total: c.total - deal.value,
+            deals: c.deals.filter((d) => d.id !== dealId),
+          };
+        }
+        if (targetCol && c.stageId === targetStageId) {
+          return { ...c, total: c.total + deal.value, deals: [deal, ...c.deals] };
+        }
+        return c;
+      }),
+    );
+
+    if (demoMode) {
+      setSimulated(true);
+      return;
+    }
+    void moveDealAction(dealId, targetStageId).then(() => router.refresh());
+  }
+
   function onDragStart(e: DragStartEvent) {
     for (const col of columns) {
       const deal = col.deals.find((d) => d.id === e.active.id);
@@ -146,34 +253,7 @@ export function KanbanBoard({ columns: initial }: { columns: KanbanColumn[] }) {
     const dealId = String(e.active.id);
     const targetStageId = e.over ? String(e.over.id) : null;
     if (!targetStageId) return;
-
-    // Find source column.
-    const sourceCol = columns.find((c) =>
-      c.deals.some((d) => d.id === dealId),
-    );
-    if (!sourceCol || sourceCol.stageId === targetStageId) return;
-
-    // Optimistic move.
-    const deal = sourceCol.deals.find((d) => d.id === dealId)!;
-    setColumns((cols) =>
-      cols.map((c) => {
-        if (c.stageId === sourceCol.stageId)
-          return {
-            ...c,
-            total: c.total - deal.value,
-            deals: c.deals.filter((d) => d.id !== dealId),
-          };
-        if (c.stageId === targetStageId)
-          return { ...c, total: c.total + deal.value, deals: [deal, ...c.deals] };
-        return c;
-      }),
-    );
-
-    if (demoMode) {
-      setSimulated(true);
-      return;
-    }
-    void moveDealAction(dealId, targetStageId).then(() => router.refresh());
+    moveDeal(dealId, targetStageId);
   }
 
   return (
@@ -187,9 +267,9 @@ export function KanbanBoard({ columns: initial }: { columns: KanbanColumn[] }) {
           {tShell("demoSimulation")}
         </p>
       )}
-      <div className="flex gap-4 overflow-x-auto px-6 py-4">
+      <div className="flex gap-4 overflow-x-auto px-4 py-4 sm:px-6">
         {columns.map((column) => (
-          <Column key={column.stageId} column={column} />
+          <Column key={column.stageId} column={column} allStages={allStages} onMove={moveDeal} />
         ))}
       </div>
       <DragOverlay>

@@ -192,7 +192,12 @@ one-click **"Continue with demo workspace"** button (see
 - **Deals & Pipeline** — a generic staged-record engine (Kanban board,
   native drag-and-drop) reused by deals and five industry-module pipelines;
   configurable stages with `isWon`/`isLost` flags driving deal status
-  automatically.
+  automatically. The default deal pipeline has five active stages — New,
+  Reviewing, Consultation, Proposal sent, Final contract phase — plus the two
+  terminal Won/Lost outcomes. Every card also has a "move to any stage" menu
+  as a tap-friendly alternative to drag-and-drop; below the board, a
+  closed/pending summary strip totals won, lost, and still-open deal value
+  and count.
 - **Activities & Notes** — a per-record timeline (calls, emails, meetings,
   notes, stage changes, files, system events) merged from the `Activity` and
   `Note` tables, automatically fed by anything event-emitting.
