@@ -28,6 +28,11 @@ export interface WorkspaceDef {
   icon: LucideIcon;
   href: string;
   nav: NavItemDef[];
+  /**
+   * Rail grouping. "template" = an activatable industry module, shown under the
+   * collapsible "Templates" group; "core"/undefined = a primary workspace.
+   */
+  group?: "core" | "template";
 }
 
 export const workspaces: WorkspaceDef[] = [

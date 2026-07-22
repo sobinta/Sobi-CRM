@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { ModuleRail } from "./module-rail";
-import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
 import { AnnouncementBar } from "./announcement-bar";
 import { SessionProvider, type SessionUser } from "./session-context";
@@ -62,7 +61,6 @@ export function AppShell({
 
           <div className="flex min-w-0 flex-1 flex-col">
             <Topbar />
-            <Sidebar />
             <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto scroll-smooth">{children}</main>
           </div>
         </div>

@@ -107,7 +107,7 @@
     "menu": "Menu",
     "mobileNav": "Primary",
     "closeMenu": "Close menu",
-    "backToSite": "Back to main site",
+    "backToSite": "Back to main site", "templatesGroup": "Templates",
     "demoStatus": "Demo mode — explore freely; test changes stay in this browser and are never saved.",
     "demoSimulation": "Demo preview updated locally. Reload the page to reset it."
   },

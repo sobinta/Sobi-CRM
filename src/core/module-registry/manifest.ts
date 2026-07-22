@@ -45,5 +45,6 @@ export function manifestToWorkspace(m: ModuleManifest): WorkspaceDef {
     icon: m.workspace.icon,
     href: m.workspace.href,
     nav: m.workspace.nav,
+    group: "template",
   };
 }
