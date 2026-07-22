@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "@/i18n/navigation";
+import { useRouter, Link } from "@/i18n/navigation";
 import { Plus, Trash2, Shapes, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -155,20 +155,22 @@ export function EntitiesClient({ entities }: { entities: EntityRow[] }) {
       ) : (
         <div className="space-y-2.5">
           {entities.map((e) => (
-            <Card key={e.id}>
-              <CardContent className="flex items-center gap-4">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-subtle text-brand-subtle-ink">
-                  <Database className="h-4.5 w-4.5" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-ink">{e.namePlural}</h3>
-                  <p className="text-xs text-ink-muted">
-                    <code className="font-mono">{e.key}</code> · {e.fieldCount} fields
-                  </p>
-                </div>
-                <Chip tone="neutral">{e.recordCount} records</Chip>
-              </CardContent>
-            </Card>
+            <Link key={e.id} href={`/studio/entities/${e.key}`} className="block">
+              <Card className="transition-colors hover:border-brand/50">
+                <CardContent className="flex items-center gap-4">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-subtle text-brand-subtle-ink">
+                    <Database className="h-4.5 w-4.5" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-sm font-semibold text-ink">{e.namePlural}</h3>
+                    <p className="text-xs text-ink-muted">
+                      <code className="font-mono">{e.key}</code> · {e.fieldCount} fields
+                    </p>
+                  </div>
+                  <Chip tone="neutral">{e.recordCount} records</Chip>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}

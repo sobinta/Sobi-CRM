@@ -259,6 +259,42 @@ export async function provisionPublicDemo(): Promise<DemoProvisionResult> {
       create: { id: "demo-article-rollout", tenantId: tenant.id, title: "CRM rollout playbook", body: "A practical guide for moving a sales team from spreadsheets into a shared CRM workspace.", tags: ["rollout", "sales"] },
     });
 
+    // Low-code proof: a custom entity built in the Entity Builder, with records
+    // usable through the generic entity workspace (no bespoke code).
+    await tx.entityDefinition.upsert({
+      where: { id: "demo-ent-project" },
+      update: { tenantId: tenant.id, deletedAt: null },
+      create: {
+        id: "demo-ent-project",
+        tenantId: tenant.id,
+        key: "project",
+        nameSingular: "Project",
+        namePlural: "Projects",
+        source: "custom",
+        fields: [
+          { key: "name", label: "Name", type: "text", required: true },
+          { key: "status", label: "Status", type: "select", options: [
+            { value: "planning", label: "Planning" },
+            { value: "active", label: "Active" },
+            { value: "done", label: "Done" },
+          ] },
+          { key: "budget", label: "Budget", type: "currency" },
+        ],
+        config: { titleField: "name" },
+      },
+    });
+    const projectRecords = [
+      { id: "demo-rec-p1", data: { name: "Website redesign", status: "active", budget: 15000 } },
+      { id: "demo-rec-p2", data: { name: "Mobile app", status: "planning", budget: 42000 } },
+    ] as const;
+    for (const rec of projectRecords) {
+      await tx.customRecord.upsert({
+        where: { id: rec.id },
+        update: { tenantId: tenant.id, entityDefId: "demo-ent-project", data: rec.data, deletedAt: null },
+        create: { id: rec.id, tenantId: tenant.id, entityDefId: "demo-ent-project", ownerId: membership.id, data: rec.data },
+      });
+    }
+
     await tx.event.upsert({
       where: { tenantId_id: { tenantId: tenant.id, id: "demo-event-lead" } },
       update: { type: "lead.created", entityType: "lead", entityId: "demo-lead-fleet", actorId: membership.id, payload: {}, dispatchedAt: now },

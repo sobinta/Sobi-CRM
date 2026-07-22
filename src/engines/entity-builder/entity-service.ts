@@ -82,5 +82,50 @@ export async function createRecord(
       createdById: ctx.membershipId,
     },
   });
+  await record({
+    category: "DATA",
+    action: "record.create",
+    entityType: "custom_record",
+    entityId: rec.id,
+  });
   return rec;
+}
+
+/** Coerce a raw string form value into the typed value for its field. */
+function coerceFieldValue(field: FieldDefinition, raw: unknown): unknown {
+  if (raw == null || raw === "") return field.type === "boolean" ? false : null;
+  switch (field.type) {
+    case "number":
+    case "currency": {
+      const n = Number(raw);
+      return Number.isNaN(n) ? null : n;
+    }
+    case "boolean":
+      return raw === true || raw === "true" || raw === "on";
+    default:
+      return typeof raw === "string" ? raw : String(raw);
+  }
+}
+
+/**
+ * Create a record addressed by entity KEY (used by the generic entity
+ * workspace). Resolves the definition, coerces values against its field types,
+ * and drops keys that aren't declared fields.
+ */
+export async function createRecordByKey(
+  key: string,
+  rawData: Record<string, unknown>,
+) {
+  authorize("studio.entity.update");
+  const def = await db.entityDefinition.findFirst({
+    where: { key, source: "custom" },
+  });
+  if (!def) return null;
+  const fields = (def.fields as unknown as FieldDefinition[]) ?? [];
+  const clean: Record<string, unknown> = {};
+  for (const field of fields) {
+    if (field.system) continue;
+    clean[field.key] = coerceFieldValue(field, rawData[field.key]);
+  }
+  return createRecord(def.id, clean);
 }
