@@ -102,11 +102,12 @@ Demo-Arbeitsbereich fortfahren"** (siehe [Demo-Modus](#demo-modus)).
 
 ### Plattform & Mandantenfähigkeit
 
-- **Mandantenfähigkeit mit Defense-in-Depth** — ein fail-closed
-  Prisma-Zugriff bindet jede Abfrage an den unveränderlichen
-  `PlatformContext`; erzwungenes PostgreSQL-RLS schützt dieselbe Grenze
-  unabhängig. Identity und eng begrenzte Systemzugriffe verwenden getrennte
-  Least-Privilege-Rollen; einen allgemeinen `rawDb`-Bypass gibt es nicht.
+- **Mandantenfähigkeit mit Defense-in-Depth** — eine fail-closed
+  Prisma-Capability injiziert den unveränderlichen AsyncLocalStorage-
+  Mandantenkontext, während erzwungenes PostgreSQL-RLS dieselbe Grenze
+  unabhängig durchsetzt. Identity und eng begrenzte, allowlisted
+  Systemclients verwenden getrennte Least-Privilege-Datenbankrollen; einen
+  allgemeinen `rawDb`-Bypass gibt es nicht.
 - **Mandanten-Provisionierung** — neue Arbeitsbereiche werden über einen
   geführten Onboarding-Flow erstellt, der den Mandanten, die
   Owner-Rolle und Standard-Pipeline/-Stufen anlegt.
@@ -183,17 +184,54 @@ Demo-Arbeitsbereich fortfahren"** (siehe [Demo-Modus](#demo-modus)).
 
 - **Kontakte & Firmen** — vollständiges CRUD, Firmen-Find-or-Create mit
   gegen LIKE-Injection abgesichertem Matching, Kontakt↔Firma-Beziehungen,
-  Tags, Notizen.
+  Tags, Notizen. Die Liste zeigt Geschäft/Dienstleistung (Firmenname oder
+  eine Interessens-Notiz bei Einzelkontakten), Telefon, E-Mail,
+  Registrierungsdatum, Lifecycle-Stufe und Lead-Quelle (Website, manuell,
+  Chatbot, Telegram, Web-Chat). Die Timeline der 360°-Detailseite ist eine
+  echte durchgängige Historie — zusammengeführt aus der Aktivität des
+  Kontakts selbst **und der des ursprünglichen Leads** —, sodass sie vom
+  ersten eingehenden Moment bis zur Konvertierung und darüber hinaus lesbar
+  ist, mit einem manuellen „Aktivität hinzufügen"-Steuerelement (Anruf/
+  Meeting protokollieren oder eine echte verknüpfte Aufgabe als
+  Follow-up-Erinnerung erstellen, ebenfalls sichtbar im Ops → Aufgaben
+  Arbeitsbereich). Firmen erhalten dieselbe Behandlung — eine bearbeitbare
+  Detailkarte und dasselbe „Aktivität hinzufügen"-Steuerelement — plus eine
+  **aufgerollte Timeline**: Aktivität, die bei einem der Kontakte der Firma
+  protokolliert wird, erscheint auch dort, beschriftet mit dem Namen dieses
+  Kontakts, sodass die Beziehung über jede Person in diesem Unternehmen
+  hinweg synchron bleibt.
 - **Leads** — Website-Formular- und Chatbot-Erfassung in einer gemeinsamen
-  Warteschlange, jeder Lead trägt `source`, `conversationId` (verknüpft ein
-  Chatbot-Transkript) und frei definierbare `customFields`.
+  Warteschlange, jeder Lead trägt `source`, `industry` (Tätigkeitsfeld),
+  `conversationId` (verknüpft ein Chatbot-Transkript) und frei definierbare
+  `customFields`. Eine kartenbasierte Liste mit Status-Filtern, Suche und
+  CSV-Export; ein manueller „Neuer Lead"-Einstiegspunkt neben dem
+  öffentlichen Website-Formular; und eine vollständige Detailseite
+  (`/crm/leads/[id]`) mit einer bearbeitbaren Detailkarte, KI-Bewertung,
+  einem KI-Inhaltsvorschlag und dem unten beschriebenen erweiterten
+  Konvertierungsdialog.
 - **Deals & Pipeline** — eine generische Stufen-Engine (Kanban-Board, native
   Drag-and-Drop), wiederverwendet von Deals und fünf
   Branchenmodul-Pipelines; konfigurierbare Stufen mit `isWon`/`isLost`-Flags,
-  die den Deal-Status automatisch steuern.
+  die den Deal-Status automatisch steuern. Die Standard-Deal-Pipeline hat
+  fünf aktive Stufen — Neu, In Prüfung, Beratung, Angebot gesendet,
+  Vertragsphase — plus die beiden Endzustände Gewonnen/Verloren. Jede Karte
+  hat außerdem ein „In beliebige Stufe verschieben"-Menü als
+  tap-freundliche Alternative zu Drag-and-Drop; unter dem Board fasst ein
+  Streifen abgeschlossene/offene Deals nach gewonnenem, verlorenem und noch
+  offenem Wert und Anzahl zusammen.
 - **Aktivitäten & Notizen** — eine Timeline pro Datensatz (Anrufe, E-Mails,
   Meetings, Notizen, Stufenwechsel, Dateien, Systemereignisse), automatisch
   gespeist von allem, was Ereignisse sendet.
+- **Globaler Activity Feed** (`/crm/activity`) — jedes relevante
+  Plattform-Ereignis in einem einzigen chronologischen, filterbaren Strom:
+  Entitätstyp- und Datumsbereich-Filter, jeder Eintrag zeigt den echten
+  Namen des Akteurs und verlinkt direkt zum betroffenen Datensatz, mit
+  vollständig lokalisierten Labels für alle ~45 Ereignisarten (en/de/fa).
+  Eine „Aktivität protokollieren"-Aktion lässt einen Nutzer einen Anruf,
+  ein Meeting, eine E-Mail oder eine Notiz gegen einen beliebigen Kontakt/
+  eine Firma/einen Deal/Lead protokollieren, gefunden über eine
+  Type-Ahead-Auswahl — derselbe Eintrag erscheint auch auf der eigenen
+  Timeline dieses Datensatzes.
 - **Tags & Beziehungen** — ein generisches `Relationship`-Modell plus ein
   eigenständiger **Beziehungsgraph** (React Flow), der Verbindungen
   zwischen beliebigen Datensätzen visualisiert.
@@ -205,7 +243,12 @@ Demo-Arbeitsbereich fortfahren"** (siehe [Demo-Modus](#demo-modus)).
   rohen Lead einen Kontakt, findet oder erstellt dessen Firma, erstellt
   optional einen Deal und legt die ursprüngliche Lead-Nachricht als erste
   Timeline-Notiz ab. Idempotent: eine erneute Konvertierung liefert den
-  bestehenden Kontakt zurück, statt ihn zu duplizieren.
+  bestehenden Kontakt zurück, statt ihn zu duplizieren. Der
+  Konvertierungsdialog erfasst reichhaltigere Felder, als der rohe Lead
+  mitbringt — Vor-/Nachname, Berufsbezeichnung, korrigierte E-Mail/Telefon/
+  Firma, eine Branche, ein Dienstleistungsinteresse für private
+  (Nicht-Geschäfts-)Leads und eine zusätzliche Notiz — ohne dabei jemals
+  den Lead selbst umzuschreiben.
 - **KI-Lead-Bewertung** — ein Score von 0–100 mit einer Begründung.
   Fällt auf eine transparente, erklärbare **Heuristik** zurück
   (Vollständigkeit von E-Mail/Telefon/Firma/Quelle/Nachricht), wenn kein
@@ -250,38 +293,92 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 ### Verträge
 
 - **Automatisch nummerierte** Verträge (`CTR-<Jalali-Jahr>-<Sequenz>`),
-  generiert aus einem Deal/Kontakt/Firma, mit einer 10-Artikel-Vorlage für
-  persische Beratungsverträge, einem 40/30/30-Zahlungsplan und echten
-  eingesetzten Werten.
+  generiert aus einem Deal/Kontakt/Firma, verknüpft mit dem Namen des
+  konkreten Kontakts in der Vertragsliste. **Vier auswählbare
+  Text-Vorlagen** (Beratungsleistungen, Softwareentwicklung, monatliches
+  Retainer, Einzelprojekt), jede ein vollständiges persischsprachiges
+  Rechtsdokument mit echten eingesetzten Werten.
+- **Briefkopf- und Digitalsignatur-Designer** (im Modul, mandantenweit):
+  Firmenname/Logo/Adresse/Fußzeile, ein Unterzeichner-Name + -Titel, und ein
+  admin-konfigurierbarer **Jalali-/Gregorianischer**-Kalender für Dokumente.
+- **Digitale Signatur vor dem Versand erforderlich** — ein Vertrag muss
+  digital signiert sein (`applySignature`), bevor er versendet werden kann;
+  `sendContract` verweigert sonst die Ausstellung eines Freigabelinks. Der
+  Signaturblock (Unterzeichner-Name/-Titel, Signaturdatum und ein lokal
+  generierter QR-Code — nie an einen Drittanbieter-QR-Dienst gesendet, da
+  er den nicht erratbaren Freigabe-Token kodiert) erscheint am Ende jedes
+  signierten Dokuments, sowohl auf der öffentlichen Seite als auch im
+  herunterladbaren PDF.
+- **Vorvertrags-Export** — eine mit Wasserzeichen versehene
+  („VORVERTRAG" + Briefkopf) PDF-Vorschau für die informelle Kundenprüfung
+  ab dem Entwurfsstadium, generiert über
+  `/crm/contracts/[id]/print?mode=pre`; enthält nie die digitale Signatur.
+  Das finale signierte PDF (`?mode=final`) ist verfügbar, sobald signiert
+  wurde. Beide Routen nutzen den nativen Browser-Druck-zu-PDF (keine
+  serverseitige Rendering-Abhängigkeit) mit einem eigenen Print-Stylesheet.
 - **Öffentliche Freigabeseite** — ein nicht erratbarer `shareToken`-Link,
-  über den der Kunde prüft, druckt (eigenes Print-Stylesheet) und
-  **online akzeptiert**; Ansichts-Tracking (`sent → viewed`) und Annahme
-  (`viewed → accepted`) werden serverseitig **awaited** (nicht
-  fire-and-forget), damit ein serverloser Response-Abbruch den Schreibvorgang
-  nicht verlieren kann.
-- **Status-Lebenszyklus**: Entwurf → gesendet → angesehen → akzeptiert /
-  storniert, mit Bearbeitungssperre nach Annahme.
+  über den der Kunde das briefkopf-gebrandete Dokument prüft, den
+  Signatur+QR-Block sieht und **online akzeptiert**, indem er seinen
+  eigenen Namen plus die auf der Seite gezeigte Vertragsnummer eingibt
+  (ein leichtgewichtiger Gegencheck); ein QR-Scan öffnet dieselbe Seite.
+  Ansichts-Tracking (`sent → viewed`) und Annahme (`viewed → accepted`)
+  werden serverseitig **awaited** (nicht fire-and-forget), damit ein
+  serverloser Response-Abbruch den Schreibvorgang nicht verlieren kann.
+- **Status-Lebenszyklus**: Entwurf → digital signiert → gesendet →
+  angesehen → akzeptiert / storniert, mit Bearbeitungssperre nach Annahme.
 - **KI-Umformulierung** des Vertragstexts und **KI-Follow-up**-Nachrichten.
 - Ereignisveröffentlichung im öffentlichen Kontext
   (`contract.created|sent|viewed|accepted`) funktioniert auch ohne
-  authentifizierte Session, über einen `publicContext(tenantId)`-Helfer.
+  authentifizierte Session, über einen `publicContext(tenantId)`-Helfer,
+  der den Schreibvorgang in einen minimalen `PlatformContext` einbettet —
+  sodass Automatisierung/Webhooks für diese Ereignisse weiterhin auslösen.
 
 ### E-Mail-Kampagnen
 
-- **Segment-Builder-Modul**, entkoppelt von der Kampagnen-Engine —
-  benannte, codegesteuerte Zielgruppen-Resolver (verlorene Leads,
-  nicht nachverfolgte Leads, verlorene Deals, gewonnene Kunden), jeweils
-  auf 20 Empfänger begrenzt.
+- **Segment-Builder-Modul** (`engines/campaigns/segments.ts`), entkoppelt
+  von der Kampagnen-Engine — benannte, codegesteuerte Zielgruppen-Resolver
+  (verlorene Leads, nicht nachverfolgte Leads, verlorene Deals, gewonnene
+  Kunden), jeweils auf 20 Empfänger pro Kampagnenlauf begrenzt. Jedes
+  Segment zeigt außerdem uncapped **Live-Statistiken** (echte Gesamtgröße,
+  wie viele per E-Mail erreichbar sind, und — bei deal-basierten Segmenten —
+  Gesamtwert) im Kampagnen-Erstellungsdialog, bevor man sich festlegt.
+  <br>
 - **KI-Personalisierung pro Empfänger** — eine Anfrage nach der anderen
-  (nie parallel), ein System-Prompt mit ≤120 Wörtern/kein Hard-Sell/CTA für
-  kostenlose Beratung, mit Mock-Anbieter-Fallback ohne KI-Schlüssel.
+  (nie stapelweise/parallel), ein System-Prompt mit ≤120 Wörtern/kein
+  Hard-Sell/CTA für kostenlose Beratung, mit Mock-Anbieter-Fallback ohne
+  KI-Schlüssel. Funktioniert sowohl einzeln pro Empfänger als auch als
+  **Massen-„Alle generieren"** (und, sobald Entwürfe freigegeben sind, ein
+  **Massen-„Alle bereiten senden"**) — beide weiterhin strikt sequenziell,
+  sodass eine Kampagne nie eine Welle paralleler Anfragen an den
+  KI-Anbieter oder den E-Mail-Anbieter feuert.
 - **Menschliche Prüfung im Review-Loop** — jede generierte E-Mail ist
   bearbeitbar, kann neu generiert oder übersprungen werden und wird erst
-  nach expliziter Freigabe pro Empfänger versendet.
+  nach Freigabe versendet (einzeln, oder über die Massen-„Alle bereiten
+  senden"-Aktion nach Durchsicht). Die Kampagne selbst wird automatisch
+  abgeschlossen (`status: "sent"`), sobald jeder Empfänger einen
+  Endzustand erreicht hat, und die Listenansicht zeigt einen live
+  gesendet/gesamt-Zähler pro Kampagne, nicht nur eine rohe
+  Empfängerzahl.
+- **Wählbarer E-Mail-Anbieter** — SMTP (Mailpit in der Entwicklung, der
+  Standard), **Resend** oder **Amazon SES** über `EMAIL_PROVIDER`, sodass
+  der Massenversand in Produktion auf einen echten Transaktions-E-Mail-
+  Anbieter zeigen kann, ohne Codeänderungen.
 - **Strikte Zustell-Buchführung** — Kampagnenversand nutzt
-  `emailChannel.sendStrict` (wirft echte SMTP-Fehler weiter, sodass ein
+  `emailChannel.sendStrict` (wirft echte Sendefehler weiter, sodass ein
   Versand als `failed` erfasst wird statt still als „erfolgreich" zu
-  gelten).
+  gelten), im Unterschied zum Best-Effort `emailChannel.send`, das für die
+  In-App-Benachrichtigungsverteilung verwendet wird.
+- **Eingehender E-Mail-Webhook** (`POST /api/v1/inbound-email`) — ein
+  providerunabhängiger Empfänger (SendGrid Inbound Parse, Mailgun Routes,
+  Postmark usw. leiten alle eine ähnliche Form weiter) für Antworten:
+  prüft ein gemeinsames Secret, löst den Mandanten aus der „an"-Adresse
+  auf und stellt die eigentliche Verarbeitung als Hintergrund-Job in die
+  Warteschlange, sodass der Anbieter nur auf ein schnelles 200-OK wartet,
+  nie auf einen Datenbank-Schreibvorgang. Der Job protokolliert die
+  Nachricht in derselben `Communication`-Historie, die ausgehende Sends
+  bereits nutzen (zugeordnet zu einem Kontakt/Lead anhand der
+  Absenderadresse), und zeigt sie auf der Timeline dieses Datensatzes und
+  im globalen Activity Feed an.
 
 ### Wissensdatenbank & KI-Inhaltsvorschläge
 
@@ -298,10 +395,21 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 
 - **Tabellarische Berichte** (Deals, Pipeline, Aufgaben, Kontakte) mit
   CSV-Export, protokolliert.
-- **Visuelle Einblicke-Seite** (`/mgmt/reports/insights`) — Conversion-
-  Trichter, Lead-Quellen-Aufschlüsselung und 12-Monats-Umsatz nach
-  **Jalali-Kalender** (echte Jalali-Monatsbuckets über `jalaali-js`),
-  gerendert mit Recharts im Stil der App-eigenen Dashboard-Widgets.
+- **Visuelle Einblicke-Seite** (`/crm/reports/insights`) — vier
+  Recharts-Visualisierungen nach dem Referenz-Layout: ein
+  Conversion-Trichter (Lead → konvertiert → Deal → über erste Stufe
+  hinaus → gewonnen, mit % vom oberen Trichterende), **Pipeline-Wert nach
+  Stufe** (farblich passend zum Tone jeder Stufe, sodass eine Stufe hier
+  dieselbe Farbe zeigt wie auf dem Deals-Board), Lead-Quellen-
+  Aufschlüsselung und 12-Monats-Umsatz nach **Jalali-Kalender** (echte
+  Jalali-Monatsbuckets über `jalaali-js`, nicht umbeschriftete
+  gregorianische).
+- Jedes Label auf dieser Seite — Trichterschritte, Pipeline-Stufennamen,
+  Lead-Quellen — ist ein in en/de/fa aufgelöster Übersetzungsschlüssel,
+  kein in die Analytics-Engine eingebackener Rohstring; dieselben
+  Stufennamen stimmen jetzt exakt zwischen dem Deals-Board, dem
+  Pipeline-Widget des CRM-Dashboards, dem Pipeline-Widget des
+  anpassbaren Dashboard-Builders und diesem Diagramm überein.
 
 ### Formular-Engine
 
@@ -318,15 +426,18 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 - **Aufgaben** — Unteraufgaben, Wiederholung, Abhängigkeiten, Kommentare,
   Überfälligkeitserkennung per geplantem Job.
 - **Kalender** — Monats-/Wochenansichten, Verfügbarkeit,
-  Buchungskonflikterkennung.
+  Buchungskonflikterkennung (gemeinsam mit den Service-Branchenmodulen).
 - **Benachrichtigungen** — In-App-Center, E-Mail-Kanal, Präferenzen pro
   Nutzer, Erinnerungs-/Überfälligkeits-Scheduler.
+- **Kommunikationshistorie** — ein einheitliches Protokoll pro Datensatz
+  für E-Mails/Anrufe über jeden Kanal hinweg.
 
 ### Dashboards
 
 - **Dashboard-Builder** — eine `react-grid-layout`-Canvas mit einer
-  Widget-Bibliothek, persönlichen/Rollen-/Mandanten-/geteilten Layouts und
-  versionierten Vorlagen.
+  Widget-Bibliothek (KPI, Pipeline-Aufschlüsselung, Aktivitätstrend,
+  Aufgaben, Activity Feed, modulregistrierte Widgets), persönlichen/
+  Rollen-/Mandanten-/geteilten Layouts und versionierten Vorlagen.
 
 ### Finanzen
 
@@ -343,34 +454,65 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 - **Automatisierungs-Engine** — Ereignis-/Zeitplan-Trigger → Regeln →
   Aktionen (Aufgabe erstellen, benachrichtigen, Feld aktualisieren, Stufe
   verschieben, E-Mail senden, Webhook aufrufen, KI-Skill auslösen), mit
-  vollständigem `AutomationRun`-Log.
+  vollständigem `AutomationRun`-Log, das in Observability einfließt.
+- Ein gemeinsamer, sandboxed **JSON-AST-Ausdrucks-Evaluator** treibt
+  bedingte Formularlogik, Workflow-Gates und Automatisierungsbedingungen
+  an — eine Implementierung, drei Konsumenten.
 
 ### Integrationen
 
 - **Ausgehende Webhooks** — signiert (`HMAC-SHA256`, `X-Sobi-Signature` /
-  `X-Sobi-Event`-Header), mit HTTPS-Pflicht, Sperre privater/Metadata-Netze,
-  DNS-Pinning und ohne Redirect-Folgen.
-- **API-Schlüssel mit Scopes** für die öffentliche REST-API und gehashten
-  Throttle-Kennungen.
+  `X-Sobi-Event` / stabile `X-Sobi-Delivery`-Header), pro Mandant
+  abonnierbar nach Ereignistyp, dauerhaft und unabhängig wiederholte
+  Zustellung mit Statuserfassung, HTTPS-Pflicht, Sperre privater/
+  Metadata-Netze, DNS-Pinning und ohne Redirect-Folgen.
+- **API-Schlüssel mit Scopes** für die öffentliche REST-API
+  (`/api/v1/...`) mit gehashten Throttle-Kennungen, Cursor-Paginierung,
+  stabilen Fehler-Envelopes, monatlichen Kontingenten, einem
+  OpenAPI-Vertrag und einem abhängigkeitsfreien TypeScript-SDK.
+- **SaaS-Kern** — providerneutrale Abos, Testphasen, maschinenlesbare
+  Plan-Entitlements/-Limits, atomare Nutzungszähler und ein konservativer
+  Free-Plan-Fallback. Manuelle Abrechnung ist explizit, bis ein
+  PSP-Adapter konfiguriert ist.
+- **Kontakt-CSV-Importe** — private Quellenspeicherung, begrenztes
+  Parsen und Mapping, dauerhafte Verarbeitung, Fehlerzusammenfassungen
+  pro Zeile, Kontingentprüfungen und idempotente Wiederholungskoordinaten.
 - OAuth- und Drittanbieter-Gerüst (Google, Microsoft, WhatsApp, Telegram,
   Stripe, PayPal) ist konzipiert, aber nicht an echte Zugangsdaten
   angebunden — siehe [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ### Branchenmodule
 
+Jedes Modul ist eine schlanke Komposition der gemeinsamen Engines
+(Pipeline, Booking, Documents, Finance) plus ein Manifest (Arbeitsbereich,
+Navigation, Berechtigungen, Beziehungsarten, i18n). **Alle acht liefern ein
+maßgeschneidertes Dashboard (KPI-Karten + eine bevorstehende/aktuelle
+Liste) und Listenansichten mit Erstellungs-Flow**, mit Demo-Daten
+vorbelegt:
+
 | Modul | Zusammensetzung |
 |---|---|
-| **Versicherung** *(voll umgesetzter Referenzbau)* | Produkte, Versicherer, Policen mit Verlängerungserinnerungen, Schäden, Provisionen |
-| **Kredit & Banking** | Anträge, Bankpartner, verschlüsseltes Antragstellerprofil, Bonitätscheckliste |
-| **Immobilien** | Objekte, Käufer-/Verkäuferrollen, Besichtigungen, Angebote, Verträge |
+| **Versicherung** | Produkte, Versicherer, Policen mit Verlängerungserinnerungen, Schäden, Provisionen |
+| **Kredit & Banking** | Anträge, Bankpartner, verschlüsseltes Antragstellerprofil, Bonitätscheckliste, Rückzahlungspläne |
+| **Immobilien** | Objekte, Käufer-/Verkäuferrollen, Besichtigungen, Angebote, Verträge, Kunde↔Objekt-Matching |
 | **Vertrieb & Agentur** | Kampagnen, Angebote, Ziele, Leistung |
-| **Einwanderung** | Visum-/Genehmigungsfälle, Behördeneinreichungen, Dokumentvorlagen, Fristen |
-| **Friseursalon** | Leistungen, Personal, Stühle, Termine, Laufkundschaft |
+| **Einwanderung** | Visum-/Genehmigungsfälle, Behördeneinreichungen, Dokumentvorlagen, Fristen, Servicepakete |
+| **Friseursalon** | Leistungen, Personal, Stühle, Termine, Laufkundschaft, Besuchshistorie |
 | **Kosmetikstudio** | + Behandlungsserien, Vorher/Nachher-Fotos, Einwilligungsformulare |
-| **Restaurant** | Tischreservierungen, Gästeallergien/-präferenzen, Catering-Leads |
+| **Restaurant** | Tischreservierungen, Gästeallergien/-präferenzen, Event-/Catering-Leads, Treueprogramm |
+
+Sechs weitere Spec-Module (Investment, Recht, Bildung, Gesundheitswesen,
+Service & Wartung, Projektmanagement) sind als „demnächst verfügbar"
+registrierte Scaffolds in der Modulaktivierung hinterlegt.
 
 ### Low-Code-Studio
 
+- **Industrie-Vorlagen** — eine fertige Branchenlösung (Fitnessstudio,
+  Zahnarztpraxis, Beratungsunternehmen, …) anwenden, die konfigurierte
+  Entitäten und Beispieldaten auf dem Low-Code-Kernel instanziiert.
+  Branchen sind *Daten, kein Code*: ein Unternehmen aktiviert seine
+  Branche und erhält einen anpassbaren Startpunkt statt eines fest
+  codierten Moduls.
 - **Entity Builder** — eigene Entität erstellen (Felder, Beziehungen,
   Berechtigungen), die eine generierte CRUD-API, Listen-/Detailansichten,
   Suche und Timeline-Anbindung erhält.
@@ -387,13 +529,11 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 
 ### Sicherheit, Audit & DSGVO
 
-- Der SaaS-Kern umfasst providerneutrale Abos, Plan-Entitlements/-Limits,
-  atomare Nutzung, eine paginierte OpenAPI/SDK-Schnittstelle und persistente
-  CSV-Importjobs.
-
-- Argon2-Passwort-Hashing, DB-Sessions (httpOnly, SameSite), Rate-Limiting.
+- Argon2-Passwort-Hashing, DB-Sessions (httpOnly, SameSite), in Produktion
+  Redis-gestütztes verteiltes Rate-Limiting.
 - CSP mit Nonce pro Request (`strict-dynamic`, keine Inline-Skripte in
-  Produktion), HSTS und weitere Sicherheitsheader.
+  Produktion), HSTS, `X-Content-Type-Options`, `X-Frame-Options`,
+  `Referrer-Policy` und `Permissions-Policy`-Sicherheitsheader.
 - AES-256-GCM-Feldverschlüsselung für sensible Daten.
 - Soft-Delete + Papierkorb für Kern-Entitäten; vollständiger Audit-Trail.
 - DSGVO: Einwilligungsdatensätze, Export personenbezogener Daten
@@ -435,11 +575,25 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
   auf Desktop immer sichtbar, ein- und ausklappbar zwischen reiner
   Icon-Ansicht und einer beschrifteten, erweiterten Ansicht (Einstellung
   bleibt sitzungsübergreifend gespeichert) — wird auf Mobilgeräten zu einer
-  aufklappbaren Schublade mit demselben Ein-/Ausklapp-Steuerelement (geöffnet
-  über ein Hamburger-Icon in der Topbar). Die Unternavigation je
-  Arbeitsbereich (Dashboard, Kontakte, …) läuft auf jeder Bildschirmgröße als
-  horizontale, scrollbare Tableiste oberhalb des Seiteninhalts, und jede
-  Datentabelle scrollt horizontal statt abzuschneiden.
+  aufklappbaren Schublade (geöffnet über ein Hamburger-Icon in der Topbar)
+  mit demselben Ein-/Ausklapp-Steuerelement, und jede Datentabelle scrollt
+  horizontal statt abzuschneiden.
+- **Akkordeon-Seitennavigation** — die Unterseiten jedes Arbeitsbereichs
+  (Kontakte, Firmen, Leads, Deals, …) verschachteln sich direkt im Rail als
+  aufklappbarer Abschnitt statt in einer separaten oberen Leiste; der aktive
+  Abschnitt öffnet sich automatisch. Die 8 Branchenmodule sind in einer
+  einklappbaren **Vorlagen**-Gruppe zusammengefasst, was die
+  Industrie-Vorlagen-Richtung widerspiegelt (siehe
+  [Industrie-Vorlagen](#low-code-studio)), statt die primäre Navigation zu
+  überladen.
+- **Hilfe pro Funktion** — ein „?"-Button neben dem Titel fast jeder Seite
+  öffnet einen kurzen Erklärtext (wie die Funktion funktioniert, warum sie
+  nützlich ist), lokalisiert in der aktiven Arbeitsbereichs-Sprache; siehe
+  `helpTopics` in den i18n-Nachrichten und
+  `src/components/patterns/feature-help.tsx`.
+- Jeder Dialog behält auf schmalen Bildschirmen einen angenehmen seitlichen
+  Rand (`calc(100%-2rem)` statt randlosem `100%`) — ein kleiner, systemischer
+  Fix, der jedem Modal in der App auf Mobilgeräten zugutekommt.
 
 ### Branding & Internationalisierung
 
