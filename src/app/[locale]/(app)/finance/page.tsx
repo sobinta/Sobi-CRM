@@ -40,7 +40,7 @@ export default async function FinancePage() {
 
   return (
     <div>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader title={t("title")} description={t("description")} helpTopic="finance" />
       <div className="mx-auto max-w-5xl space-y-6 px-6 py-6">
         <StatCards
           stats={[

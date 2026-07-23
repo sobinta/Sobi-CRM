@@ -42,6 +42,7 @@ export default async function StudioPage() {
       <PageHeader
         title="Studio"
         description="Low-code tools to shape the platform to your business — no engineering required."
+        helpTopic="studio"
       />
       <div className="mx-auto grid max-w-4xl gap-4 px-6 py-6 sm:grid-cols-2">
         {tools.map((tool) => {

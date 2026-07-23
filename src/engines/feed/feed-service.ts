@@ -68,26 +68,61 @@ const ACTIVITY_KIND_LABEL_KEY: Record<string, string> = {
   note: "activityLoggedNote",
 };
 
-/** Best-effort deep link for an entity — omitted (no href) for types without a record view. */
-const ENTITY_HREF: Record<string, (id: string) => string> = {
+/**
+ * Best-effort deep link for an entity — omitted (no href) for types without a
+ * record view. Two shapes:
+ *   - "detail" links resolve to a specific record page (`/crm/contacts/{id}`),
+ *     so they only make sense while that record still exists.
+ *   - "list" links resolve to a workspace list page, which is always present.
+ * Detail links are existence-gated in `getFeed` so a feed entry that points at
+ * a since-deleted record renders as plain (non-clickable) text instead of a
+ * hard 404 — this matters for real tenants (records get deleted) and for demo
+ * data whose events may outlive the records they reference.
+ */
+const ENTITY_DETAIL_HREF: Record<string, (id: string) => string> = {
   contact: (id) => `/crm/contacts/${id}`,
   company: (id) => `/crm/companies/${id}`,
   lead: (id) => `/crm/leads/${id}`,
-  deal: () => `/crm/deals`,
-  task: () => `/ops/tasks`,
-  file: () => `/ops/files`,
-  appointment: () => `/ops/calendar`,
   contract: (id) => `/crm/contracts/${id}`,
   campaign: (id) => `/crm/campaigns/${id}`,
-  policy: () => `/m/insurance/policies`,
-  loan: () => `/m/loans/applications`,
-  property: () => `/m/realestate/properties`,
-  immigration_case: () => `/m/immigration/cases`,
 };
 
-export function hrefForEntity(entityType: string | null, entityId: string | null): string | null {
+const ENTITY_LIST_HREF: Record<string, string> = {
+  deal: `/crm/deals`,
+  task: `/ops/tasks`,
+  file: `/ops/files`,
+  appointment: `/ops/calendar`,
+  policy: `/m/insurance/policies`,
+  loan: `/m/loans/applications`,
+  property: `/m/realestate/properties`,
+  immigration_case: `/m/immigration/cases`,
+};
+
+/** The Prisma delegate that owns each detail-linkable entity, for existence checks. */
+const DETAIL_MODEL: Record<string, { findMany: (args: { where: { id: { in: string[] } }; select: { id: true } }) => Promise<{ id: string }[]> }> = {
+  contact: db.contact,
+  company: db.company,
+  lead: db.lead,
+  contract: db.contract,
+  campaign: db.campaign,
+};
+
+/**
+ * Resolves an href for a feed entry. `existing` is the set of detail-record ids
+ * confirmed to still exist (batched by `getFeed`); when a detail link's target
+ * isn't in it, we return null so the entry is shown but not linked.
+ */
+export function hrefForEntity(
+  entityType: string | null,
+  entityId: string | null,
+  existing?: Set<string>,
+): string | null {
   if (!entityType || !entityId) return null;
-  return ENTITY_HREF[entityType]?.(entityId) ?? null;
+  if (ENTITY_LIST_HREF[entityType]) return ENTITY_LIST_HREF[entityType];
+  const detail = ENTITY_DETAIL_HREF[entityType];
+  if (!detail) return null;
+  if (existing && !existing.has(entityId)) return null;
+  return detail(entityId);
 }
 
 /** i18n key for an event's label — `activity.logged` resolves via its kind, everything else by type. */
@@ -143,6 +178,28 @@ export async function getFeed(filter: FeedFilter = {}): Promise<{ items: FeedIte
     : [];
   const actorNames = new Map(memberships.map((m) => [m.id, m.user.name]));
 
+  // Batch-confirm which detail-linked records still exist, so we never link a
+  // feed entry to a since-deleted record (which would hard-404). Grouped by
+  // type: one query per detail entity type present in this page of results.
+  const idsByType = new Map<string, Set<string>>();
+  for (const e of items) {
+    if (e.entityType && e.entityId && DETAIL_MODEL[e.entityType]) {
+      const set = idsByType.get(e.entityType) ?? new Set<string>();
+      set.add(e.entityId);
+      idsByType.set(e.entityType, set);
+    }
+  }
+  const existingByType = new Map<string, Set<string>>();
+  await Promise.all(
+    [...idsByType.entries()].map(async ([type, ids]) => {
+      const rows = await DETAIL_MODEL[type].findMany({
+        where: { id: { in: [...ids] } },
+        select: { id: true },
+      });
+      existingByType.set(type, new Set(rows.map((r) => r.id)));
+    }),
+  );
+
   return {
     items: items.map((e) => {
       const payload = e.payload as Record<string, unknown>;
@@ -152,7 +209,11 @@ export async function getFeed(filter: FeedFilter = {}): Promise<{ items: FeedIte
         labelKey: labelKeyForEvent(e.type, payload),
         entityType: e.entityType,
         entityId: e.entityId,
-        href: hrefForEntity(e.entityType, e.entityId),
+        href: hrefForEntity(
+          e.entityType,
+          e.entityId,
+          e.entityType ? existingByType.get(e.entityType) : undefined,
+        ),
         actorId: e.actorId,
         actorName: e.actorId ? (actorNames.get(e.actorId) ?? null) : null,
         payload,

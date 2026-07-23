@@ -19,7 +19,7 @@ export interface AutomationInput {
 }
 
 export async function listAutomations() {
-  authorize("admin.automation.read");
+  authorize("studio.automation.read");
   return db.automation.findMany({
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { runs: true } } },
@@ -27,7 +27,7 @@ export async function listAutomations() {
 }
 
 export async function createAutomation(input: AutomationInput) {
-  authorize("admin.automation.update");
+  authorize("studio.automation.update");
   const ctx = requireContext();
   const automation = await db.automation.create({
     data: {
@@ -51,7 +51,7 @@ export async function createAutomation(input: AutomationInput) {
 }
 
 export async function toggleAutomation(id: string, enabled: boolean) {
-  authorize("admin.automation.update");
+  authorize("studio.automation.update");
   await db.automation.update({ where: { id }, data: { enabled } });
   await record({
     category: "ADMIN",
@@ -62,7 +62,7 @@ export async function toggleAutomation(id: string, enabled: boolean) {
 }
 
 export async function listRuns(automationId: string) {
-  authorize("admin.automation.read");
+  authorize("studio.automation.read");
   return db.automationRun.findMany({
     where: { automationId },
     orderBy: { createdAt: "desc" },

@@ -15,39 +15,14 @@ import { ThemeToggle } from "./theme-toggle";
 import { LocaleSwitcher } from "./locale-switcher";
 import { LogoMark } from "@/components/brand/logo";
 import { useMobileNav } from "./mobile-nav-context";
+import { useRailState } from "./rail-state-context";
 import { ChevronsLeft, ChevronsRight, Globe, ChevronDown, LayoutGrid } from "lucide-react";
 import { localeMeta, type AppLocale } from "@/i18n/routing";
 import { getRailChevronDirection } from "./rail-direction";
 import { RailAccountUtility } from "./rail-account-utility";
 import type { WorkspaceDef } from "@/core/module-registry/workspaces";
 
-const RAIL_STORAGE_KEY = "sobi:rail-expanded";
 const TEMPLATES_KEY = "__templates__";
-
-/** Remembers the user's expand/collapse choice across sessions. */
-function useRailExpanded() {
-  const [expanded, setExpanded] = useState(false);
-  useEffect(() => {
-    try {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate browser preference after SSR
-      setExpanded(localStorage.getItem(RAIL_STORAGE_KEY) === "1");
-    } catch {
-      // Storage may be blocked in privacy modes; collapsed remains a safe default.
-    }
-  }, []);
-  function toggle() {
-    setExpanded((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem(RAIL_STORAGE_KEY, next ? "1" : "0");
-      } catch {
-        // The in-memory preference still works for the current page session.
-      }
-      return next;
-    });
-  }
-  return { expanded, toggle };
-}
 
 /**
  * The Module Rail — SOBI CRM's signature element.
@@ -67,7 +42,7 @@ export function ModuleRail({ mobile = false }: { mobile?: boolean }) {
   const workspaces = useWorkspaces();
   const user = useSessionUser();
   const { close } = useMobileNav();
-  const railState = useRailExpanded();
+  const railState = useRailState();
   const expanded = mobile || railState.expanded;
   const locale = useLocale() as AppLocale;
   const direction = localeMeta[locale].dir;

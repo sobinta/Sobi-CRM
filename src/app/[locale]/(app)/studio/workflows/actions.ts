@@ -11,7 +11,7 @@ export async function saveWorkflowAction(
     return { ok: false };
   }
   await withActionContext(() => saveWorkflow(input), {
-    permission: "admin.workflow.update",
+    permission: "studio.workflow.update",
   });
   revalidatePath("/[locale]/(app)/studio/workflows", "page");
   return { ok: true };

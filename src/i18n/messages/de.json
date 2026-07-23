@@ -175,7 +175,13 @@
       "meetingPlus": "Termin oder später",
       "won": "Gewonnen"
     },
-    "pipelineByStage": "Pipeline-Wert nach Phase"
+    "pipelineByStage": "Pipeline-Wert nach Phase",
+    "viewVisual": "Diagramme",
+    "viewTable": "Tabellen",
+    "kpiLeads": "Leads gesamt",
+    "kpiConversion": "Lead → gewonnen",
+    "kpiOpenPipeline": "Offene Pipeline",
+    "kpiRevenue12": "Umsatz (12 Mon.)"
   },
   "dashboard": {
     "welcome": "Willkommen zurück, {name}",
@@ -1237,6 +1243,26 @@
     "reports": {
       "title": "Über Berichte",
       "body": "Tabellarische Berichte (Deals, Pipeline, Aufgaben, Kontakte) liefern die Rohdaten hinter jeder Zahl, exportierbar als CSV. „Visuelle Einblicke“ verwandelt dieselben Daten in Diagramme: einen Conversion-Trichter vom Lead bis zum gewonnenen Deal, den Pipeline-Wert nach Phase, die Herkunft Ihrer Leads und den Umsatz der letzten 12 Monate.\n\nWarum das wichtig ist: Die Tabellen dienen der Prüfung genauer Zahlen oder dem Export in ein anderes Tool; die Diagramme helfen, einen Trend oder Engpass auf einen Blick zu erkennen."
+    },
+    "knowledge": {
+      "title": "Wissensdatenbank",
+      "body": "Die Wissensdatenbank ist eine kleine Bibliothek eigener Referenzartikel — Produktnotizen, FAQs, Anleitungen.\n\nDie KI-Inhaltsvorschlags-Funktion nutzt sie beim Entwerfen einer Follow-up-Nachricht an einen Lead: Sie bewertet jeden Artikel nach Relevanz, wählt den besten und stützt ihre Nachricht auf dessen echten Inhalt, statt Fakten zu erfinden.\n\n- Halten Sie Artikel kurz und auf ein Thema fokussiert\n- Vergeben Sie Tags, damit die Zuordnung sie findet\n- Nichts hier ist öffentlich sichtbar — es speist nur interne KI-Vorschläge"
+    },
+    "graph": {
+      "title": "Beziehungen",
+      "body": "Dies ist eine visuelle Karte, wie Ihre Datensätze zusammenhängen — welche Kontakte bei welcher Firma arbeiten und welche Deals zu ihnen gehören.\n\nJeder Punkt ist ein Datensatz, jede Linie eine Beziehung. Praktisch, um das ganze Umfeld eines Accounts auf einen Blick zu sehen: alle Beteiligten und alle laufenden Deals, ohne sich durch Seiten zu klicken.\n\n- Firmen, Kontakte und Deals sind farblich gekennzeichnet\n- Die Karte füllt sich automatisch, sobald Sie Datensätze verknüpfen\n- Wenn Sie selten mit Accounts mit mehreren Personen arbeiten, brauchen Sie diese Ansicht evtl. nicht"
+    },
+    "operations": {
+      "title": "Betrieb",
+      "body": "Der Betrieb-Arbeitsbereich ist der Ort für die tägliche Arbeit — das, was kein bestimmter Kundendatensatz ist.\n\n- Aufgaben: Ihre To-dos mit Fälligkeiten, Prioritäten, Unteraufgaben und Wiederholung\n- Kalender: Termine und Fristen mit Erkennung von Buchungskonflikten\n- Dateien: sichere Dokumentablage mit Kategorien und Ablauf\n\nDiese Übersicht fasst alles zusammen, damit Sie sehen, was offen, was überfällig und was diese Woche ansteht."
+    },
+    "studio": {
+      "title": "Studio",
+      "body": "Studio ist die Low-Code-Zentrale der Plattform — hier passen Sie das System ohne Entwicklung an Ihr Geschäft an.\n\n- Branchenvorlagen: eine fertige Vertikale anwenden (z. B. Zahnarztpraxis), die Entitäten und Beispieldaten anlegt\n- Entitäten: eigene Datensatztypen mit eigenen Feldern erstellen\n- Formulare, Workflows, Automatisierungen, Regeln, Vorlagen: die Logik dahinter bauen\n\nÄnderungen hier sind versioniert — Sie können den Verlauf prüfen und zurückrollen."
+    },
+    "finance": {
+      "title": "Finanzen",
+      "body": "Der Finanzen-Arbeitsbereich fasst die finanzielle Seite des CRM über alle Module hinweg zusammen.\n\n- Gewonnener Umsatz und offener Pipeline-Wert aus Ihren Deals\n- Gesamtvertragswert, aufgeschlüsselt nach Status\n- Gewinnrate und kürzlich gewonnene Deals\n- Abrechnungs- und Abo-Status Ihres Arbeitsbereichs\n\nEs ist eine schreibgeschützte Übersicht — die Zahlen stammen aus den Deals, Verträgen und der Abrechnung, die Sie anderswo verwalten."
     }
   },
   "leads": {
@@ -1662,5 +1688,33 @@
     "regenerate": "Neu generieren",
     "skip": "Überspringen",
     "confirmAndSend": "Bestätigen & senden"
+  },
+  "ops": {
+    "title": "Betrieb",
+    "description": "Ihre Aufgaben, Ihr Kalender und Ihre Dateien auf einen Blick.",
+    "openTasks": "Offene Aufgaben",
+    "overdueTasks": "Überfällig",
+    "upcomingEvents": "Anstehende Termine",
+    "filesStored": "Gespeicherte Dateien",
+    "upcomingTasksTitle": "Anstehende Aufgaben",
+    "upcomingEventsTitle": "Anstehende Termine",
+    "noTasks": "Keine anstehenden Aufgaben.",
+    "noEvents": "In den nächsten zwei Wochen ist nichts geplant.",
+    "viewTasks": "Aufgaben ansehen",
+    "viewCalendar": "Kalender öffnen",
+    "viewFiles": "Dateien durchsuchen"
+  },
+  "knowledge": {
+    "title": "Wissensdatenbank",
+    "description": "Kurze Artikel, auf die der KI-Assistent zurückgreift, um Leads Inhalte vorzuschlagen."
+  },
+  "graph": {
+    "title": "Beziehungen",
+    "description": "Wie Ihre Firmen, Kontakte und Deals zusammenhängen.",
+    "companies": "Firmen",
+    "contacts": "Kontakte",
+    "deals": "Deals",
+    "emptyTitle": "Noch keine Verbindungen",
+    "emptyBody": "Sobald Sie Kontakte mit Firmen und Deals verknüpfen, füllt sich der Beziehungsgraph."
   }
 }

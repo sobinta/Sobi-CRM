@@ -28,17 +28,17 @@ export interface WorkflowInput {
 }
 
 export async function listWorkflows() {
-  authorize("admin.workflow.read");
+  authorize("studio.workflow.read");
   return db.workflowDefinition.findMany({ orderBy: { createdAt: "desc" } });
 }
 
 export async function getWorkflow(key: string) {
-  authorize("admin.workflow.read");
+  authorize("studio.workflow.read");
   return db.workflowDefinition.findFirst({ where: { key } });
 }
 
 export async function saveWorkflow(input: WorkflowInput) {
-  authorize("admin.workflow.update");
+  authorize("studio.workflow.update");
   const ctx = requireContext();
 
   const existing = await db.workflowDefinition.findFirst({

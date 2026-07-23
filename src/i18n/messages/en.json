@@ -175,7 +175,13 @@
       "meetingPlus": "Meeting or later",
       "won": "Won"
     },
-    "pipelineByStage": "Pipeline value by stage"
+    "pipelineByStage": "Pipeline value by stage",
+    "viewVisual": "Charts",
+    "viewTable": "Tables",
+    "kpiLeads": "Total leads",
+    "kpiConversion": "Lead → won",
+    "kpiOpenPipeline": "Open pipeline",
+    "kpiRevenue12": "Revenue (12 mo)"
   },
   "dashboard": {
     "welcome": "Welcome back, {name}",
@@ -1237,6 +1243,26 @@
     "reports": {
       "title": "About Reports",
       "body": "Tabular reports (deals, pipeline, tasks, contacts) give you the raw rows behind each number, exportable as CSV. \"Visual insights\" turns the same underlying data into charts: a conversion funnel from lead through won deal, pipeline value by stage, where your leads come from, and monthly revenue over the last 12 months.\n\nWhy this matters: the tables are for auditing exact figures or exporting to another tool; the charts are for spotting a trend or a bottleneck at a glance."
+    },
+    "knowledge": {
+      "title": "Knowledge base",
+      "body": "The knowledge base is a small library of your own reference articles — product notes, FAQs, how-tos.\n\nThe AI content-suggestion skill reads these when drafting a follow-up to a lead: it scores every article for relevance, picks the best match, and grounds its message in that article's real content instead of inventing facts.\n\n- Keep articles short and focused on one topic\n- Add tags so the matcher can find them\n- Nothing here is shown publicly — it only feeds internal AI suggestions"
+    },
+    "graph": {
+      "title": "Relationships",
+      "body": "This is a visual map of how your records connect — which contacts work at which company, and which deals belong to them.\n\nEach dot is a record; each line is a relationship. It's useful for seeing the whole picture around an account at a glance: everyone involved and every deal in play, without clicking through pages.\n\n- Companies, contacts, and deals are colour-coded\n- The map fills in automatically as you link records\n- If you rarely work with multi-person accounts, you may not need this view"
+    },
+    "operations": {
+      "title": "Operations",
+      "body": "The Operations workspace is where the day-to-day work lives — the things that aren't a specific customer record.\n\n- Tasks: your to-dos, with due dates, priorities, subtasks, and recurrence\n- Calendar: appointments and deadlines, with booking-conflict detection\n- Files: secure document storage with categories and expiry\n\nThis overview rolls them up so you can see what's open, what's overdue, and what's coming this week."
+    },
+    "studio": {
+      "title": "Studio",
+      "body": "Studio is the low-code home of the platform — where you shape the system to your business without engineering.\n\n- Industry templates: apply a ready-made vertical (e.g. dental clinic) that sets up entities and sample data\n- Entities: create your own record types with custom fields\n- Forms, Workflows, Automations, Rules, Templates: build the logic behind them\n\nChanges here are versioned, so you can review history and roll back."
+    },
+    "finance": {
+      "title": "Finance",
+      "body": "The Finance workspace rolls up the money side of the CRM across every module.\n\n- Won revenue and open pipeline value from your deals\n- Total contract value, broken down by status\n- Win rate and recently won deals\n- Your workspace's billing and subscription status\n\nIt's a read-only summary — the numbers come from the deals, contracts, and billing you manage elsewhere."
     }
   },
   "leads": {
@@ -1662,5 +1688,33 @@
     "regenerate": "Regenerate",
     "skip": "Skip",
     "confirmAndSend": "Confirm & send"
+  },
+  "ops": {
+    "title": "Operations",
+    "description": "Your tasks, calendar, and files at a glance.",
+    "openTasks": "Open tasks",
+    "overdueTasks": "Overdue",
+    "upcomingEvents": "Upcoming events",
+    "filesStored": "Files stored",
+    "upcomingTasksTitle": "Upcoming tasks",
+    "upcomingEventsTitle": "Upcoming events",
+    "noTasks": "No upcoming tasks.",
+    "noEvents": "Nothing scheduled in the next two weeks.",
+    "viewTasks": "View tasks",
+    "viewCalendar": "Open calendar",
+    "viewFiles": "Browse files"
+  },
+  "knowledge": {
+    "title": "Knowledge base",
+    "description": "Short articles the AI assistant draws on to suggest content to leads."
+  },
+  "graph": {
+    "title": "Relationships",
+    "description": "How your companies, contacts, and deals connect.",
+    "companies": "Companies",
+    "contacts": "Contacts",
+    "deals": "Deals",
+    "emptyTitle": "No connections yet",
+    "emptyBody": "As you link contacts to companies and deals, the relationship graph fills in."
   }
 }

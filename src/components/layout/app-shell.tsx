@@ -6,6 +6,8 @@ import { SessionProvider, type SessionUser } from "./session-context";
 import { WorkspacesProvider } from "./workspaces-context";
 import { MobileNavProvider } from "./mobile-nav-context";
 import { MobileNavOverlay } from "./mobile-nav-overlay";
+import { RailStateProvider } from "./rail-state-context";
+import { WorkspaceSubnavBar } from "./workspace-subnav-bar";
 import { CommandPalette } from "@/components/patterns/command-palette";
 import { DemoStatusBar } from "./demo-status-bar";
 import { OnboardingTourProvider } from "@/components/onboarding/onboarding-tour";
@@ -46,6 +48,7 @@ export function AppShell({
       readOnly={user.accessMode === "read-only"}
     >
     <MobileNavProvider>
+    <RailStateProvider>
       <div className="flex h-dvh flex-col overflow-hidden">
         <a href="#main-content" className="skip-link">{skipLabel}</a>
         {announcement && <AnnouncementBar {...announcement} />}
@@ -61,11 +64,15 @@ export function AppShell({
 
           <div className="flex min-w-0 flex-1 flex-col">
             <Topbar />
+            {/* Only rendered while the rail is collapsed — surfaces the active
+                workspace's sub-pages that the icon rail can't show. */}
+            <WorkspaceSubnavBar />
             <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto scroll-smooth">{children}</main>
           </div>
         </div>
       </div>
       <CommandPalette />
+    </RailStateProvider>
     </MobileNavProvider>
     </WorkspacesProvider>
     </OnboardingTourProvider>
