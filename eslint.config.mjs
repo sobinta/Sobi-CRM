@@ -36,6 +36,7 @@ const databaseCapabilityRule = {
               "engines/integrations/api-key-service.ts",
               "engines/contracts/contract-service.ts",
               "engines/contracts/letterhead.ts",
+              "engines/campaigns/inbound-email.ts",
             ],
             ["engines/platform-admin/"],
           )

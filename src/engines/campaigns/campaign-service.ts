@@ -5,7 +5,7 @@ import { record } from "@/core/audit/audit";
 import { publish } from "@/core/event-bus/bus";
 import { getProvider } from "@/engines/ai/provider";
 import { emailChannel } from "@/engines/notifications/channels";
-import { getSegment } from "./segments";
+import { getSegment, SEGMENTS, type SegmentStats } from "./segments";
 
 /**
  * Campaign engine — human-in-the-loop personalized email campaigns.
@@ -66,12 +66,40 @@ export async function createCampaign(input: CreateCampaignInput) {
   return campaign;
 }
 
-export async function listCampaigns() {
+export interface CampaignListRow {
+  id: string;
+  name: string;
+  segmentKey: string;
+  status: string;
+  createdAt: Date;
+  recipientCount: number;
+  sentCount: number;
+}
+
+export async function listCampaigns(): Promise<CampaignListRow[]> {
   authorize("crm.campaign.read");
-  return db.campaign.findMany({
+  const campaigns = await db.campaign.findMany({
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { emails: true } } },
   });
+  if (campaigns.length === 0) return [];
+
+  const sentCounts = await db.campaignEmail.groupBy({
+    by: ["campaignId"],
+    where: { campaignId: { in: campaigns.map((c) => c.id) }, status: "sent" },
+    _count: { _all: true },
+  });
+  const sentByCampaign = new Map(sentCounts.map((s) => [s.campaignId, s._count._all]));
+
+  return campaigns.map((c) => ({
+    id: c.id,
+    name: c.name,
+    segmentKey: c.segmentKey,
+    status: c.status,
+    createdAt: c.createdAt,
+    recipientCount: c._count.emails,
+    sentCount: sentByCampaign.get(c.id) ?? 0,
+  }));
 }
 
 export async function getCampaign(id: string) {
@@ -80,6 +108,19 @@ export async function getCampaign(id: string) {
     where: { id },
     include: { emails: { orderBy: { toEmail: "asc" } } },
   });
+}
+
+/** True (uncapped) segment size + reachable count, for the create-campaign preview. */
+export async function getSegmentStats(key: string): Promise<SegmentStats | null> {
+  authorize("crm.campaign.read");
+  const segment = getSegment(key);
+  if (!segment) return null;
+  return segment.stats();
+}
+
+export function listSegments() {
+  authorize("crm.campaign.read");
+  return SEGMENTS.map((s) => ({ key: s.key, nameKey: s.nameKey, descriptionKey: s.descriptionKey }));
 }
 
 async function loadAiSetting(tenantId: string) {
@@ -161,9 +202,23 @@ export async function updateCampaignEmail(id: string, subject: string, bodyText:
   return db.campaignEmail.update({ where: { id }, data: { subject, bodyText } });
 }
 
+/** Once every recipient is in a terminal state (sent/skipped/failed), the campaign itself is done. */
+async function maybeCompleteCampaign(campaignId: string): Promise<void> {
+  const outstanding = await db.campaignEmail.count({
+    where: { campaignId, status: { in: ["pending", "ready"] } },
+  });
+  if (outstanding > 0) return;
+  await db.campaign.updateMany({
+    where: { id: campaignId, status: { not: "sent" } },
+    data: { status: "sent", sentAt: new Date() },
+  });
+}
+
 export async function skipCampaignEmail(id: string) {
   authorize("crm.campaign.update");
-  return db.campaignEmail.update({ where: { id }, data: { status: "skipped" } });
+  const updated = await db.campaignEmail.update({ where: { id }, data: { status: "skipped" } });
+  await maybeCompleteCampaign(updated.campaignId);
+  return updated;
 }
 
 /** Send one approved draft. Works without RESEND/SMTP config up through review. */
@@ -194,12 +249,14 @@ export async function sendCampaignEmail(id: string) {
       publish({ type: "campaign.email_sent", entityType: "campaign_email", entityId: id }),
       record({ category: "DATA", action: "campaign.email_send", entityType: "campaign_email", entityId: id }),
     ]);
+    await maybeCompleteCampaign(item.campaignId);
     return { ok: true };
   } catch (err) {
     await db.campaignEmail.update({
       where: { id },
       data: { status: "failed", error: (err as Error).message },
     });
+    await maybeCompleteCampaign(item.campaignId);
     return { ok: false, error: (err as Error).message };
   }
 }

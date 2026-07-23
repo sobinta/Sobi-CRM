@@ -1213,6 +1213,10 @@
     "contracts": {
       "title": "About Contracts",
       "body": "Every contract starts from a template — Consulting, Software development, Monthly retainer, or One-time project — and can be edited further as Markdown before it's finalized.\n\nBefore a contract can be shared, it must be digitally signed: configure your company's letterhead (logo, address) and signatory once from \"Letterhead & signature\", then apply the signature to each contract. Only after that can you send it — a share link is never issued for an unsigned contract.\n\nOnce sent, the client reviews the contract on a public page carrying your letterhead and, at the end, the signature block with a QR code. They accept by entering their own name and the contract number shown on the page.\n\nFrom this page you can also:\n- Download a watermarked pre-contract PDF for informal client review — it never carries the digital signature.\n- Download the final signed PDF once the contract has been signed.\n- Get an AI-drafted follow-up message for a contract that's been sent but not yet accepted."
+    },
+    "campaigns": {
+      "title": "About Email campaigns",
+      "body": "A campaign targets a segment — a live, code-driven audience like lost leads, leads unfollowed for over a week, lost deals, or won customers — and AI writes a personalized email for every recipient, one at a time, based on their own situation in the CRM.\n\nBefore creating a campaign, the segment picker shows the true size of that audience and how many are reachable by email; each run is capped at 20 recipients.\n\nFrom the review page you can:\n- Generate a draft for one recipient, or generate all pending drafts at once (still one request at a time, so no burst hits the AI provider).\n- Edit any draft before it goes out.\n- Send one approved draft, or send every ready draft in one action, once you've reviewed them.\n\nWhy this matters: nothing is ever sent without a human having generated (and optionally edited) that specific message first — even \"send all\" only sends drafts that were already generated and approved."
     }
   },
   "leads": {
@@ -1571,5 +1575,72 @@
     "signedBy": "Digitally signed by",
     "scanToVerify": "Scan to view this contract",
     "orOpenLink": "or open the verification link"
+  },
+  "campaigns": {
+    "title": "Email campaigns",
+    "count": "{count, plural, one {# campaign} other {# campaigns}}",
+    "newCampaign": "New campaign",
+    "newCampaignTitle": "New email campaign",
+    "nameLabel": "Campaign name",
+    "namePlaceholder": "Re-engage cold leads",
+    "segmentLabel": "Segment",
+    "goalLabel": "Campaign goal (for AI)",
+    "goalPlaceholder": "Invite them back and introduce our new consulting service",
+    "statsLoading": "Loading segment stats…",
+    "statsTotal": "{count, plural, one {# match in total} other {# matches in total}}",
+    "statsReachable": "{count, plural, one {# reachable by email (this run)} other {# reachable by email (this run)}}",
+    "cancel": "Cancel",
+    "creating": "Creating…",
+    "createCampaign": "Create campaign",
+    "emptyTitle": "No campaigns yet",
+    "emptyBody": "Pick a segment and AI will write a personalized email for every recipient.",
+    "columnName": "Name",
+    "columnRecipients": "Recipients",
+    "columnStatus": "Status",
+    "recipientsCell": "{sent} of {total} sent",
+    "statuses": {
+      "draft": "Draft",
+      "generating": "Generating",
+      "ready": "Ready for review",
+      "sent": "Sent"
+    },
+    "segments": {
+      "lostLeads": {
+        "name": "Lost leads",
+        "description": "Leads that have been rejected."
+      },
+      "unfollowedLeads": {
+        "name": "Unfollowed leads (7+ days)",
+        "description": "Open leads that haven't been followed up on in over a week."
+      },
+      "lostDeals": {
+        "name": "Lost deals",
+        "description": "Contacts whose deal closed unsuccessfully."
+      },
+      "wonCustomers": {
+        "name": "Won customers",
+        "description": "Contacts with at least one successful deal."
+      }
+    },
+    "goalPrefix": "Goal",
+    "recipientCount": "{count, plural, one {# recipient} other {# recipients}}",
+    "generateAll": "Generate all ({count})",
+    "generatingAllProgress": "Generating… ({done}/{total})",
+    "sendAllReady": "Send all ready ({count})",
+    "sendingAllProgress": "Sending… ({done}/{total})",
+    "emailStatuses": {
+      "pending": "Awaiting generation",
+      "ready": "Ready to send",
+      "sent": "Sent",
+      "skipped": "Skipped",
+      "failed": "Failed"
+    },
+    "generating": "Generating…",
+    "generateEmail": "Generate email",
+    "subjectPlaceholder": "Email subject",
+    "save": "Save",
+    "regenerate": "Regenerate",
+    "skip": "Skip",
+    "confirmAndSend": "Confirm & send"
   }
 }

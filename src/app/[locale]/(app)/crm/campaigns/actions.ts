@@ -9,6 +9,7 @@ import {
   updateCampaignEmail,
   skipCampaignEmail,
   sendCampaignEmail,
+  getSegmentStats,
 } from "@/engines/campaigns/campaign-service";
 import { validatePublishedCustomFields } from "@/engines/forms/service";
 
@@ -25,6 +26,10 @@ export async function createCampaignAction(input: unknown) {
   const campaign = await withActionContext(async () => createCampaign({ ...parsed.data, customFields: await validatePublishedCustomFields("campaign", parsed.data.customFields) }));
   revalidatePath("/[locale]/(app)/crm/campaigns", "page");
   return { ok: true as const, id: campaign.id, recipientCount: campaign.emails.length };
+}
+
+export async function getSegmentStatsAction(key: string) {
+  return withActionContext(() => getSegmentStats(key), { intent: "read" });
 }
 
 export async function generateCampaignEmailAction(campaignEmailId: string) {

@@ -51,6 +51,8 @@ model Communication {
   entityType String?
   entityId   String?
   actorId    String?
+  /// Extra channel-specific facts (e.g. inbound-email attachments, message id).
+  meta       Json     @default("{}")
   createdAt  DateTime @default(now())
 
   @@index([tenantId, entityType, entityId])

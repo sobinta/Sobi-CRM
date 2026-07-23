@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { Sparkles, Send, X, RotateCcw, Save } from "lucide-react";
+import { Sparkles, Send, X, RotateCcw, Save, SendHorizonal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import {
   skipCampaignEmailAction,
   sendCampaignEmailAction,
 } from "../actions";
+import { useDemoMode } from "@/components/layout/session-context";
 
 export interface CampaignEmailRow {
   id: string;
@@ -33,13 +35,6 @@ const statusTone: Record<string, ChipProps["tone"]> = {
   skipped: "neutral",
   failed: "danger",
 };
-const statusLabel: Record<string, string> = {
-  pending: "در انتظار تولید",
-  ready: "آماده‌ی ارسال",
-  sent: "ارسال‌شده",
-  skipped: "رد شده",
-  failed: "ناموفق",
-};
 
 export function CampaignReviewClient({
   goal,
@@ -48,10 +43,16 @@ export function CampaignReviewClient({
   goal: string;
   emails: CampaignEmailRow[];
 }) {
+  const t = useTranslations("campaigns");
+  const tShell = useTranslations("shell");
+  const demoMode = useDemoMode();
   const router = useRouter();
   const [emails, setEmails] = useState(initialEmails);
   const [generatingAll, setGeneratingAll] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [genProgress, setGenProgress] = useState(0);
+  const [sendingAll, setSendingAll] = useState(false);
+  const [sendProgress, setSendProgress] = useState(0);
+  const [simulated, setSimulated] = useState(false);
   const [, startTransition] = useTransition();
 
   function patch(id: string, p: Partial<CampaignEmailRow>) {
@@ -59,6 +60,10 @@ export function CampaignReviewClient({
   }
 
   async function generateOne(id: string) {
+    if (demoMode) {
+      setSimulated(true);
+      return;
+    }
     const res = await generateCampaignEmailAction(id);
     if (res.ok) {
       patch(id, { subject: res.subject, bodyText: res.bodyText, status: "ready" });
@@ -66,25 +71,61 @@ export function CampaignReviewClient({
   }
 
   async function generateAll() {
+    if (demoMode) {
+      setSimulated(true);
+      return;
+    }
     setGeneratingAll(true);
-    setProgress(0);
+    setGenProgress(0);
     const pendingIds = emails.filter((e) => e.status === "pending").map((e) => e.id);
     for (let i = 0; i < pendingIds.length; i++) {
       // Sequential — one request at a time, so no single call risks a
       // timeout and the AI provider isn't hit with a burst of parallel calls.
       await generateOne(pendingIds[i]);
-      setProgress(i + 1);
+      setGenProgress(i + 1);
     }
     setGeneratingAll(false);
   }
 
+  async function sendOne(id: string) {
+    const res = await sendCampaignEmailAction(id);
+    if (res.ok) patch(id, { status: "sent" });
+    else patch(id, { status: "failed", error: res.error ?? null });
+  }
+
+  async function sendAll() {
+    if (demoMode) {
+      setSimulated(true);
+      return;
+    }
+    setSendingAll(true);
+    setSendProgress(0);
+    const readyIds = emails.filter((e) => e.status === "ready").map((e) => e.id);
+    for (let i = 0; i < readyIds.length; i++) {
+      // Same one-at-a-time discipline as generateAll — no parallel burst of
+      // outbound sends against the configured email provider.
+      await sendOne(readyIds[i]);
+      setSendProgress(i + 1);
+    }
+    setSendingAll(false);
+    router.refresh();
+  }
+
   function save(id: string, subject: string, bodyText: string) {
+    if (demoMode) {
+      setSimulated(true);
+      return;
+    }
     startTransition(async () => {
       await updateCampaignEmailAction(id, subject, bodyText);
     });
   }
 
   function skip(id: string) {
+    if (demoMode) {
+      setSimulated(true);
+      return;
+    }
     startTransition(async () => {
       await skipCampaignEmailAction(id);
       patch(id, { status: "skipped" });
@@ -92,36 +133,53 @@ export function CampaignReviewClient({
   }
 
   function send(id: string) {
+    if (demoMode) {
+      setSimulated(true);
+      return;
+    }
     startTransition(async () => {
-      const res = await sendCampaignEmailAction(id);
-      if (res.ok) patch(id, { status: "sent" });
-      else patch(id, { status: "failed", error: res.error ?? null });
+      await sendOne(id);
       router.refresh();
     });
   }
 
   const pendingCount = emails.filter((e) => e.status === "pending").length;
+  const readyCount = emails.filter((e) => e.status === "ready").length;
   const total = emails.length;
 
   return (
     <div className="mx-auto max-w-3xl space-y-4 px-6 py-6">
-      <div className="flex items-center justify-between rounded-lg border border-line bg-surface-raised p-4">
+      {simulated && (
+        <p role="status" className="text-xs font-medium text-brand">
+          {tShell("demoSimulation")}
+        </p>
+      )}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface-raised p-4">
         <div>
-          <p className="text-sm text-ink-muted">هدف: {goal}</p>
-          <p className="mt-1 text-xs text-ink-faint">{total} گیرنده</p>
+          <p className="text-sm text-ink-muted">{t("goalPrefix")}: {goal}</p>
+          <p className="mt-1 text-xs text-ink-faint">{t("recipientCount", { count: total })}</p>
         </div>
-        {pendingCount > 0 && (
-          <Button variant="primary" onClick={generateAll} disabled={generatingAll}>
-            <Sparkles className="h-4 w-4" />
-            {generatingAll ? `در حال تولید… (${progress}/${pendingCount})` : `تولید همه (${pendingCount})`}
-          </Button>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {pendingCount > 0 && (
+            <Button variant="primary" onClick={generateAll} disabled={generatingAll}>
+              <Sparkles className="h-4 w-4" />
+              {generatingAll ? t("generatingAllProgress", { done: genProgress, total: pendingCount }) : t("generateAll", { count: pendingCount })}
+            </Button>
+          )}
+          {readyCount > 0 && (
+            <Button variant="subtle" onClick={sendAll} disabled={sendingAll}>
+              <SendHorizonal className="h-4 w-4" />
+              {sendingAll ? t("sendingAllProgress", { done: sendProgress, total: readyCount }) : t("sendAllReady", { count: readyCount })}
+            </Button>
+          )}
+        </div>
       </div>
 
       {emails.map((email) => (
         <EmailCard
           key={email.id}
           email={email}
+          t={t}
           onGenerate={() => generateOne(email.id)}
           onSave={(s, b) => save(email.id, s, b)}
           onSkip={() => skip(email.id)}
@@ -134,12 +192,14 @@ export function CampaignReviewClient({
 
 function EmailCard({
   email,
+  t,
   onGenerate,
   onSave,
   onSkip,
   onSend,
 }: {
   email: CampaignEmailRow;
+  t: ReturnType<typeof useTranslations<"campaigns">>;
   onGenerate: () => void;
   onSave: (subject: string, bodyText: string) => void;
   onSkip: () => void;
@@ -166,7 +226,7 @@ function EmailCard({
             <p className="text-sm font-medium text-ink">{email.toName}</p>
             <p className="text-xs text-ink-faint" dir="ltr">{email.toEmail}</p>
           </div>
-          <Chip tone={statusTone[email.status] ?? "neutral"}>{statusLabel[email.status] ?? email.status}</Chip>
+          <Chip tone={statusTone[email.status] ?? "neutral"}>{t(`emailStatuses.${email.status}`)}</Chip>
         </div>
 
         <div className="flex flex-wrap gap-1.5">
@@ -179,7 +239,7 @@ function EmailCard({
 
         {email.status === "pending" && (
           <Button variant="subtle" size="sm" onClick={handleGenerate} disabled={busy}>
-            <Sparkles className="h-3.5 w-3.5" /> {busy ? "در حال تولید…" : "تولید ایمیل"}
+            <Sparkles className="h-3.5 w-3.5" /> {busy ? t("generating") : t("generateEmail")}
           </Button>
         )}
 
@@ -189,7 +249,7 @@ function EmailCard({
               value={subject}
               onChange={(e) => { setSubject(e.target.value); setDirty(true); }}
               disabled={locked}
-              placeholder="موضوع ایمیل"
+              placeholder={t("subjectPlaceholder")}
             />
             <Textarea
               value={body}
@@ -207,16 +267,16 @@ function EmailCard({
                   onClick={() => { onSave(subject, body); setDirty(false); }}
                   disabled={!dirty}
                 >
-                  <Save className="h-3.5 w-3.5" /> ذخیره
+                  <Save className="h-3.5 w-3.5" /> {t("save")}
                 </Button>
                 <Button variant="subtle" size="sm" onClick={handleGenerate} disabled={busy}>
-                  <RotateCcw className="h-3.5 w-3.5" /> بازتولید
+                  <RotateCcw className="h-3.5 w-3.5" /> {t("regenerate")}
                 </Button>
                 <Button variant="ghost" size="sm" onClick={onSkip} className="text-danger">
-                  <X className="h-3.5 w-3.5" /> رد کردن
+                  <X className="h-3.5 w-3.5" /> {t("skip")}
                 </Button>
                 <Button variant="primary" size="sm" onClick={onSend} className="ms-auto">
-                  <Send className="h-3.5 w-3.5" /> تأیید و ارسال
+                  <Send className="h-3.5 w-3.5" /> {t("confirmAndSend")}
                 </Button>
               </div>
             )}

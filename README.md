@@ -304,19 +304,41 @@ Action Center → Human Approval → AI Audit`.
 - **Segment-builder module** (`engines/campaigns/segments.ts`), decoupled
   from the campaign engine — named, code-driven audience resolvers (lost
   leads, unfollowed leads, lost deals, won customers), each capped at 20
-  recipients.
+  recipients per campaign run. Every segment also exposes uncapped **live
+  stats** (true total size, how many are reachable by email, and — for
+  deal-based segments — total value) shown in the create-campaign picker
+  before you commit.
   <br>
 - **Per-recipient AI personalization** — one request at a time (never
   batched/parallel), a ≤120-word/no-hard-sell/free-consultation-CTA system
-  prompt, with a mock-provider fallback when no AI key is set.
+  prompt, with a mock-provider fallback when no AI key is set. Works both
+  one recipient at a time and as a **bulk "generate all"** (and, once
+  drafts are approved, a **bulk "send all ready"**) — both still strictly
+  sequential, so a campaign never bursts a wave of parallel requests at
+  the AI provider or the email provider.
 - **Human-in-the-loop review** — every generated email is editable, can be
-  regenerated or skipped, and only sends after an explicit per-recipient
-  approval. A "generate all" button runs the sequential loop with a visible
-  progress indicator.
+  regenerated or skipped, and only sends after approval (individually, or
+  in the bulk "send all ready" action once reviewed). The campaign itself
+  automatically completes (`status: "sent"`) once every recipient reaches a
+  terminal state, and the list view shows a live sent/total count per
+  campaign, not just a raw recipient total.
+- **Selectable email provider** — SMTP (Mailpit in dev, the default),
+  **Resend**, or **Amazon SES** via `EMAIL_PROVIDER`, so bulk sending can
+  point at a real transactional-email provider in production without code
+  changes.
 - **Strict delivery accounting** — campaign sends use `emailChannel.sendStrict`
-  (rethrows real SMTP failures so a send is recorded as `failed`, not
+  (rethrows real send failures so a send is recorded as `failed`, not
   silently "succeeded"), distinct from the best-effort `emailChannel.send`
   used for in-app notification fan-out.
+- **Inbound email webhook** (`POST /api/v1/inbound-email`) — a
+  provider-agnostic receiver (SendGrid Inbound Parse, Mailgun Routes,
+  Postmark, etc. all forward a similar shape) for replies: verifies a
+  shared secret, resolves the tenant from the "to" address, and queues the
+  actual processing as a background job so the provider only waits on a
+  fast 200 OK, never on a database write. The job logs the message to the
+  same `Communication` history outbound sends already use (matched to a
+  contact/lead by sender address) and surfaces it on that record's timeline
+  and the global Activity Feed.
 
 ### Knowledge base & AI content suggestions
 

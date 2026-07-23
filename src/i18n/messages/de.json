@@ -1213,6 +1213,10 @@
     "contracts": {
       "title": "Über Verträge",
       "body": "Jeder Vertrag beginnt mit einer Vorlage — Beratungsleistungen, Softwareentwicklung, monatliche Pauschale oder einmaliges Projekt — und kann vor der Fertigstellung als Markdown weiter bearbeitet werden.\n\nBevor ein Vertrag geteilt werden kann, muss er digital signiert werden: Richten Sie einmalig unter „Briefkopf & Signatur“ den Briefkopf Ihres Unternehmens (Logo, Adresse) und den Unterzeichner ein, und bringen Sie dann die Signatur auf jedem Vertrag an. Erst danach können Sie ihn senden — für einen unsignierten Vertrag wird nie ein Freigabelink ausgestellt.\n\nNach dem Senden prüft der Kunde den Vertrag auf einer öffentlichen Seite mit Ihrem Briefkopf und am Ende dem Signaturbereich mit QR-Code. Er nimmt an, indem er seinen eigenen Namen und die auf der Seite angezeigte Vertragsnummer eingibt.\n\nAuf dieser Seite können Sie außerdem:\n- Ein Vorvertrags-PDF mit Wasserzeichen für die informelle Prüfung durch den Kunden herunterladen — es trägt nie die digitale Signatur.\n- Das endgültige signierte PDF herunterladen, sobald der Vertrag signiert wurde.\n- Eine von der KI entworfene Nachfassnachricht für einen gesendeten, aber noch nicht angenommenen Vertrag erhalten."
+    },
+    "campaigns": {
+      "title": "Über E-Mail-Kampagnen",
+      "body": "Eine Kampagne richtet sich an ein Segment — eine live, code-basierte Zielgruppe wie verlorene Leads, seit über einer Woche unbearbeitete Leads, verlorene Deals oder gewonnene Kunden — und die KI schreibt für jeden Empfänger einzeln eine persönliche E-Mail, basierend auf dessen eigener Situation im CRM.\n\nVor dem Erstellen einer Kampagne zeigt die Segmentauswahl die tatsächliche Größe dieser Zielgruppe und wie viele per E-Mail erreichbar sind; jeder Durchlauf ist auf 20 Empfänger begrenzt.\n\nAuf der Prüfseite können Sie:\n- Einen Entwurf für einen Empfänger generieren, oder alle ausstehenden Entwürfe auf einmal generieren (weiterhin nacheinander, damit die KI nie mit einem Schwall von Anfragen konfrontiert wird).\n- Jeden Entwurf vor dem Versand bearbeiten.\n- Einen freigegebenen Entwurf senden, oder nach der Prüfung alle versandbereiten Entwürfe in einem Schritt senden.\n\nWarum das wichtig ist: Es wird nie etwas versendet, ohne dass zuvor ein Mensch diese konkrete Nachricht generiert (und optional bearbeitet) hat — auch „Alle senden“ verschickt nur bereits generierte und freigegebene Entwürfe."
     }
   },
   "leads": {
@@ -1571,5 +1575,72 @@
     "signedBy": "Digital signiert von",
     "scanToVerify": "Scannen, um diesen Vertrag anzuzeigen",
     "orOpenLink": "oder den Verifizierungslink öffnen"
+  },
+  "campaigns": {
+    "title": "E-Mail-Kampagnen",
+    "count": "{count, plural, one {# Kampagne} other {# Kampagnen}}",
+    "newCampaign": "Neue Kampagne",
+    "newCampaignTitle": "Neue E-Mail-Kampagne",
+    "nameLabel": "Kampagnenname",
+    "namePlaceholder": "Kalte Leads reaktivieren",
+    "segmentLabel": "Segment",
+    "goalLabel": "Kampagnenziel (für KI)",
+    "goalPlaceholder": "Erneut einladen und unseren neuen Beratungsservice vorstellen",
+    "statsLoading": "Segment-Statistik wird geladen…",
+    "statsTotal": "{count, plural, one {# Treffer insgesamt} other {# Treffer insgesamt}}",
+    "statsReachable": "{count, plural, one {# per E-Mail erreichbar (dieser Durchlauf)} other {# per E-Mail erreichbar (dieser Durchlauf)}}",
+    "cancel": "Abbrechen",
+    "creating": "Wird erstellt…",
+    "createCampaign": "Kampagne erstellen",
+    "emptyTitle": "Noch keine Kampagnen",
+    "emptyBody": "Wählen Sie ein Segment, und die KI schreibt für jeden Empfänger eine persönliche E-Mail.",
+    "columnName": "Name",
+    "columnRecipients": "Empfänger",
+    "columnStatus": "Status",
+    "recipientsCell": "{sent} von {total} gesendet",
+    "statuses": {
+      "draft": "Entwurf",
+      "generating": "Wird erstellt",
+      "ready": "Bereit zur Prüfung",
+      "sent": "Gesendet"
+    },
+    "segments": {
+      "lostLeads": {
+        "name": "Verlorene Leads",
+        "description": "Leads, die abgelehnt wurden."
+      },
+      "unfollowedLeads": {
+        "name": "Unbearbeitete Leads (7+ Tage)",
+        "description": "Offene Leads, die seit über einer Woche nicht nachverfolgt wurden."
+      },
+      "lostDeals": {
+        "name": "Verlorene Deals",
+        "description": "Kontakte, deren Deal erfolglos abgeschlossen wurde."
+      },
+      "wonCustomers": {
+        "name": "Gewonnene Kunden",
+        "description": "Kontakte mit mindestens einem erfolgreichen Deal."
+      }
+    },
+    "goalPrefix": "Ziel",
+    "recipientCount": "{count, plural, one {# Empfänger} other {# Empfänger}}",
+    "generateAll": "Alle generieren ({count})",
+    "generatingAllProgress": "Wird generiert… ({done}/{total})",
+    "sendAllReady": "Alle bereiten senden ({count})",
+    "sendingAllProgress": "Wird gesendet… ({done}/{total})",
+    "emailStatuses": {
+      "pending": "Wartet auf Generierung",
+      "ready": "Versandbereit",
+      "sent": "Gesendet",
+      "skipped": "Übersprungen",
+      "failed": "Fehlgeschlagen"
+    },
+    "generating": "Wird generiert…",
+    "generateEmail": "E-Mail generieren",
+    "subjectPlaceholder": "Betreff",
+    "save": "Speichern",
+    "regenerate": "Neu generieren",
+    "skip": "Überspringen",
+    "confirmAndSend": "Bestätigen & senden"
   }
 }

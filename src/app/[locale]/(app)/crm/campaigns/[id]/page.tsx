@@ -26,7 +26,7 @@ export default async function CampaignDetailPage({
 
   return (
     <div>
-      <PageHeader title={campaign.name} />
+      <PageHeader title={campaign.name} helpTopic="campaigns" />
       <CampaignReviewClient goal={campaign.goal} emails={emails} />
     </div>
   );

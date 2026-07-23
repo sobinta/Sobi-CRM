@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { Plus, Megaphone } from "lucide-react";
+import { Plus, Megaphone, Users, Mail, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,8 +21,10 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { createCampaignAction } from "./actions";
+import { createCampaignAction, getSegmentStatsAction } from "./actions";
 import { BusinessCustomFields } from "@/components/patterns/business-custom-fields";
+import { useDemoMode } from "@/components/layout/session-context";
+import type { SegmentStats } from "@/engines/campaigns/segments";
 
 export interface CampaignRow {
   id: string;
@@ -29,13 +32,14 @@ export interface CampaignRow {
   segmentKey: string;
   status: string;
   recipientCount: number;
+  sentCount: number;
   createdAt: string;
 }
 
 export interface SegmentOption {
   key: string;
-  name: string;
-  description: string;
+  nameKey: string;
+  descriptionKey: string;
 }
 
 const statusTone: Record<string, ChipProps["tone"]> = {
@@ -43,12 +47,6 @@ const statusTone: Record<string, ChipProps["tone"]> = {
   generating: "warning",
   ready: "info",
   sent: "positive",
-};
-const statusLabel: Record<string, string> = {
-  draft: "پیش‌نویس",
-  generating: "در حال تولید",
-  ready: "آماده‌ی بازبینی",
-  sent: "ارسال‌شده",
 };
 
 export function CampaignsClient({
@@ -58,14 +56,45 @@ export function CampaignsClient({
   campaigns: CampaignRow[];
   segments: SegmentOption[];
 }) {
+  const t = useTranslations("campaigns");
+  const tShell = useTranslations("shell");
+  const demoMode = useDemoMode();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [segmentKey, setSegmentKey] = useState(segments[0]?.key ?? "");
+  const [stats, setStats] = useState<SegmentStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
   const [pending, startTransition] = useTransition();
   const [customFields, setCustomFields] = useState<Record<string, unknown>>({});
+  const [simulated, setSimulated] = useState(false);
+
+  useEffect(() => {
+    if (!open || !segmentKey) return;
+    let cancelled = false;
+    setTimeout(() => {
+      if (cancelled) return;
+      setStatsLoading(true);
+      setStats(null);
+    }, 0);
+    void getSegmentStatsAction(segmentKey).then((res) => {
+      if (!cancelled) {
+        setStats(res);
+        setStatsLoading(false);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, segmentKey]);
 
   function onCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (demoMode) {
+      setOpen(false);
+      setSimulated(true);
+      e.currentTarget.reset();
+      return;
+    }
     const form = new FormData(e.currentTarget);
     startTransition(async () => {
       const res = await createCampaignAction({
@@ -83,23 +112,28 @@ export function CampaignsClient({
 
   return (
     <div className="px-6 py-4">
+      {simulated && (
+        <p role="status" className="mb-3 text-xs font-medium text-brand">
+          {tShell("demoSimulation")}
+        </p>
+      )}
       <div className="mb-4 flex justify-end">
         <Dialog open={open} onOpenChange={setOpen}>
           <Button variant="primary" onClick={() => setOpen(true)}>
-            <Plus className="h-4 w-4" /> کمپین جدید
+            <Plus className="h-4 w-4" /> {t("newCampaign")}
           </Button>
           <DialogContent>
             <form onSubmit={onCreate}>
               <DialogHeader>
-                <DialogTitle>کمپین ایمیلی جدید</DialogTitle>
+                <DialogTitle>{t("newCampaignTitle")}</DialogTitle>
               </DialogHeader>
               <DialogBody className="space-y-3">
                 <div>
-                  <Label htmlFor="name" required>نام کمپین</Label>
-                  <Input id="name" name="name" required autoFocus placeholder="فعال‌سازی مجدد لیدهای سرد" />
+                  <Label htmlFor="name" required>{t("nameLabel")}</Label>
+                  <Input id="name" name="name" required autoFocus placeholder={t("namePlaceholder")} />
                 </div>
                 <div>
-                  <Label htmlFor="segmentKey" required>سگمنت</Label>
+                  <Label htmlFor="segmentKey" required>{t("segmentLabel")}</Label>
                   <NativeSelect
                     id="segmentKey"
                     name="segmentKey"
@@ -107,31 +141,53 @@ export function CampaignsClient({
                     onChange={(e) => setSegmentKey(e.target.value)}
                   >
                     {segments.map((s) => (
-                      <option key={s.key} value={s.key}>{s.name}</option>
+                      <option key={s.key} value={s.key}>{t(`segments.${s.nameKey}.name`)}</option>
                     ))}
                   </NativeSelect>
                   <p className="mt-1 text-xs text-ink-faint">
-                    {segments.find((s) => s.key === segmentKey)?.description}
+                    {t(`segments.${segments.find((s) => s.key === segmentKey)?.descriptionKey}.description`)}
                   </p>
+                  <div className="mt-2 rounded-md border border-line bg-surface-sunken/50 p-2.5">
+                    {statsLoading ? (
+                      <p className="text-xs text-ink-faint">{t("statsLoading")}</p>
+                    ) : stats ? (
+                      <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-ink-muted">
+                        <span className="inline-flex items-center gap-1">
+                          <Users className="h-3.5 w-3.5" aria-hidden="true" />
+                          {t("statsTotal", { count: stats.totalCount })}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <Mail className="h-3.5 w-3.5" aria-hidden="true" />
+                          {t("statsReachable", { count: Math.min(stats.emailableCount, 20) })}
+                        </span>
+                        {typeof stats.totalValue === "number" && (
+                          <span className="inline-flex items-center gap-1" dir="ltr">
+                            <Wallet className="h-3.5 w-3.5" aria-hidden="true" />
+                            {new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(stats.totalValue)}
+                          </span>
+                        )}
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
                 <div>
-                  <Label htmlFor="goal" required>هدف کمپین (برای AI)</Label>
+                  <Label htmlFor="goal" required>{t("goalLabel")}</Label>
                   <Textarea
                     id="goal"
                     name="goal"
                     required
                     rows={3}
-                    placeholder="دعوت مجدد به همکاری و معرفی خدمات مشاوره‌ی جدید"
+                    placeholder={t("goalPlaceholder")}
                   />
                 </div>
                 <BusinessCustomFields entityKey="campaign" onChange={setCustomFields} />
               </DialogBody>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="ghost" type="button">انصراف</Button>
+                  <Button variant="ghost" type="button">{t("cancel")}</Button>
                 </DialogClose>
                 <Button variant="primary" type="submit" disabled={pending}>
-                  {pending ? "در حال ساخت…" : "ساخت کمپین"}
+                  {pending ? t("creating") : t("createCampaign")}
                 </Button>
               </DialogFooter>
             </form>
@@ -142,17 +198,17 @@ export function CampaignsClient({
       {campaigns.length === 0 ? (
         <EmptyState
           icon={Megaphone}
-          title="کمپینی ساخته نشده"
-          description="یک سگمنت انتخاب کنید تا AI برای هر گیرنده ایمیلی اختصاصی بنویسد."
+          title={t("emptyTitle")}
+          description={t("emptyBody")}
         />
       ) : (
         <div className="overflow-x-auto rounded-xl border border-line">
           <table className="w-full text-sm">
             <thead className="bg-surface-sunken text-xs text-ink-faint">
               <tr>
-                <th className="px-4 py-2.5 text-start font-medium">نام</th>
-                <th className="px-4 py-2.5 text-start font-medium">گیرندگان</th>
-                <th className="px-4 py-2.5 text-start font-medium">وضعیت</th>
+                <th className="px-4 py-2.5 text-start font-medium">{t("columnName")}</th>
+                <th className="px-4 py-2.5 text-start font-medium">{t("columnRecipients")}</th>
+                <th className="px-4 py-2.5 text-start font-medium">{t("columnStatus")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
@@ -163,9 +219,11 @@ export function CampaignsClient({
                       {c.name}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 tabular text-ink-muted">{c.recipientCount}</td>
+                  <td className="px-4 py-3 tabular text-ink-muted">
+                    {t("recipientsCell", { sent: c.sentCount, total: c.recipientCount })}
+                  </td>
                   <td className="px-4 py-3">
-                    <Chip tone={statusTone[c.status] ?? "neutral"}>{statusLabel[c.status] ?? c.status}</Chip>
+                    <Chip tone={statusTone[c.status] ?? "neutral"}>{t(`statuses.${c.status}`)}</Chip>
                   </td>
                 </tr>
               ))}
