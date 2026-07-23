@@ -2,16 +2,32 @@
 
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
-import type { FunnelStep, LeadSourceBreakdown, MonthlyRevenuePoint } from "@/engines/analytics/analytics-service";
+import type { FunnelStep, LeadSourceBreakdown, MonthlyRevenuePoint, PipelineBreakdown } from "@/engines/analytics/analytics-service";
 
 const tooltipStyle = { background: "var(--surface-overlay)", border: "1px solid var(--line)", borderRadius: 8, fontSize: 12 };
 const chartColors = ["var(--brand)", "var(--accent)", "var(--positive)", "var(--info)", "var(--warning)"];
 
-export function InsightsCharts({ funnel, sources, revenue, labels }: {
-  funnel: FunnelStep[];
-  sources: LeadSourceBreakdown[];
+/** Same tone vocabulary the Deals kanban and status chips use, mapped to the matching CSS token, so a stage reads the same color everywhere it appears. */
+const toneColor: Record<string, string> = {
+  neutral: "var(--ink-faint)",
+  brand: "var(--brand)",
+  accent: "var(--accent)",
+  positive: "var(--positive)",
+  warning: "var(--warning)",
+  danger: "var(--danger)",
+  info: "var(--info)",
+};
+
+function money(value: number): string {
+  return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(value);
+}
+
+export function InsightsCharts({ funnel, sources, revenue, pipeline, labels }: {
+  funnel: (FunnelStep & { label: string })[];
+  sources: (LeadSourceBreakdown & { label: string })[];
   revenue: MonthlyRevenuePoint[];
-  labels: { funnel: string; sources: string; revenue: string; count: string; noSources: string };
+  pipeline: (PipelineBreakdown & { label: string })[];
+  labels: { funnel: string; sources: string; revenue: string; pipeline: string; count: string; noSources: string };
 }) {
   return (
     <div className="grid grid-cols-1 gap-4 px-4 py-6 sm:px-6 lg:grid-cols-2">
@@ -21,10 +37,31 @@ export function InsightsCharts({ funnel, sources, revenue, labels }: {
             <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" horizontal={false} />
             <XAxis type="number" tick={{ fontSize: 11, fill: "var(--ink-faint)" }} axisLine={false} tickLine={false} allowDecimals={false} />
             <YAxis type="category" dataKey="label" tick={{ fontSize: 12, fill: "var(--ink-muted)" }} axisLine={false} tickLine={false} width={90} />
-            <Tooltip contentStyle={tooltipStyle} formatter={(value, _name, entry) => [`${value} (${(entry.payload as FunnelStep).pct}%)`, labels.count]} />
+            <Tooltip contentStyle={tooltipStyle} formatter={(value, _name, entry) => [`${value} (${(entry.payload as FunnelStep & { pct: number }).pct}%)`, labels.count]} />
             <Bar dataKey="count" radius={[4, 4, 4, 4]}>{funnel.map((step, index) => <Cell key={step.key} fill={chartColors[index % chartColors.length]} />)}</Bar>
           </BarChart>
         </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard title={labels.pipeline}>
+        {pipeline.length === 0 ? (
+          <p className="grid h-full place-items-center text-sm text-ink-faint">{labels.noSources}</p>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%" debounce={80}>
+            <BarChart data={pipeline} layout="vertical" margin={{ top: 8, right: 24, bottom: 0, left: 8 }} accessibilityLayer>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 11, fill: "var(--ink-faint)" }} axisLine={false} tickLine={false} tickFormatter={money} />
+              <YAxis type="category" dataKey="label" tick={{ fontSize: 12, fill: "var(--ink-muted)" }} axisLine={false} tickLine={false} width={100} />
+              <Tooltip
+                contentStyle={tooltipStyle}
+                formatter={(value, _name, entry) => [money(Number(value)), `${(entry.payload as PipelineBreakdown).count}×`]}
+              />
+              <Bar dataKey="value" radius={[4, 4, 4, 4]}>
+                {pipeline.map((stage) => <Cell key={stage.stageKey} fill={toneColor[stage.tone] ?? "var(--brand)"} />)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </ChartCard>
 
       <ChartCard title={labels.sources}>

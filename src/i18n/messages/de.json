@@ -160,7 +160,22 @@
     "leadSources": "Lead-Quellen",
     "monthlyRevenue": "Monatsumsatz · letzte 12 Jalali-Monate",
     "count": "Anzahl",
-    "noSources": "Noch keine Lead-Quellen verfügbar."
+    "noSources": "Noch keine Lead-Quellen verfügbar.",
+    "stageNew": "Neu",
+    "stageQualified": "In Prüfung",
+    "stageConsultation": "Beratung",
+    "stageProposal": "Angebot gesendet",
+    "stageNegotiation": "Finale Vertragsphase",
+    "stageWon": "Gewonnen",
+    "stageLost": "Verloren",
+    "funnelSteps": {
+      "leads": "Leads",
+      "converted": "Konvertiert",
+      "deal": "Deal erstellt",
+      "meetingPlus": "Termin oder später",
+      "won": "Gewonnen"
+    },
+    "pipelineByStage": "Pipeline-Wert nach Phase"
   },
   "dashboard": {
     "welcome": "Willkommen zurück, {name}",
@@ -272,14 +287,15 @@
     "activityTaskCompleted": "Eine Aufgabe wurde abgeschlossen",
     "activityUpdated": "Ein CRM-Datensatz wurde aktualisiert",
     "stageNew": "Neu",
-    "stageQualified": "Qualifiziert",
-    "stageProposal": "Angebot",
-    "stageNegotiation": "Verhandlung",
+    "stageQualified": "In Prüfung",
+    "stageProposal": "Angebot gesendet",
+    "stageNegotiation": "Finale Vertragsphase",
     "stageWon": "Gewonnen",
     "stageLost": "Verloren",
     "errorTitle": "Das CRM-Dashboard konnte nicht geladen werden",
     "errorBody": "Ihre Daten wurden nicht geändert. Laden Sie das Dashboard erneut.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "stageConsultation": "Beratung"
   },
   "deals": {
     "title": "Abschlüsse",
@@ -1217,6 +1233,10 @@
     "campaigns": {
       "title": "Über E-Mail-Kampagnen",
       "body": "Eine Kampagne richtet sich an ein Segment — eine live, code-basierte Zielgruppe wie verlorene Leads, seit über einer Woche unbearbeitete Leads, verlorene Deals oder gewonnene Kunden — und die KI schreibt für jeden Empfänger einzeln eine persönliche E-Mail, basierend auf dessen eigener Situation im CRM.\n\nVor dem Erstellen einer Kampagne zeigt die Segmentauswahl die tatsächliche Größe dieser Zielgruppe und wie viele per E-Mail erreichbar sind; jeder Durchlauf ist auf 20 Empfänger begrenzt.\n\nAuf der Prüfseite können Sie:\n- Einen Entwurf für einen Empfänger generieren, oder alle ausstehenden Entwürfe auf einmal generieren (weiterhin nacheinander, damit die KI nie mit einem Schwall von Anfragen konfrontiert wird).\n- Jeden Entwurf vor dem Versand bearbeiten.\n- Einen freigegebenen Entwurf senden, oder nach der Prüfung alle versandbereiten Entwürfe in einem Schritt senden.\n\nWarum das wichtig ist: Es wird nie etwas versendet, ohne dass zuvor ein Mensch diese konkrete Nachricht generiert (und optional bearbeitet) hat — auch „Alle senden“ verschickt nur bereits generierte und freigegebene Entwürfe."
+    },
+    "reports": {
+      "title": "Über Berichte",
+      "body": "Tabellarische Berichte (Deals, Pipeline, Aufgaben, Kontakte) liefern die Rohdaten hinter jeder Zahl, exportierbar als CSV. „Visuelle Einblicke“ verwandelt dieselben Daten in Diagramme: einen Conversion-Trichter vom Lead bis zum gewonnenen Deal, den Pipeline-Wert nach Phase, die Herkunft Ihrer Leads und den Umsatz der letzten 12 Monate.\n\nWarum das wichtig ist: Die Tabellen dienen der Prüfung genauer Zahlen oder dem Export in ein anderes Tool; die Diagramme helfen, einen Trend oder Engpass auf einen Blick zu erkennen."
     }
   },
   "leads": {

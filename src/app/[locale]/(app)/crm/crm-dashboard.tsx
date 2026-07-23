@@ -71,6 +71,7 @@ const activityKey: Record<string, string> = {
 const stageKey: Record<string, string> = {
   new: "stageNew",
   qualified: "stageQualified",
+  consultation: "stageConsultation",
   proposal: "stageProposal",
   negotiation: "stageNegotiation",
   won: "stageWon",

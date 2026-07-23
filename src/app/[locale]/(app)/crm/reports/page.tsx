@@ -23,6 +23,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
       <PageHeader
         title={t("reportsTitle")}
         description={t("reportsDescription")}
+        helpTopic="reports"
         actions={
           <div className="flex items-center gap-2">
             <Link href="/crm/reports/insights" className="inline-flex min-h-9 items-center gap-1.5 rounded-md px-3 text-sm text-ink-muted hover:bg-surface-sunken hover:text-ink">

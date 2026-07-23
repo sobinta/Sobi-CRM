@@ -45,6 +45,9 @@ export async function getKpis(): Promise<Kpi[]> {
 }
 
 export interface PipelineBreakdown {
+  /** Stage key (e.g. "new", "consultation") — stable across locales, for i18n lookup. */
+  stageKey: string;
+  /** Stage's stored name — a display fallback only; callers should prefer translating stageKey. */
   stage: string;
   tone: string;
   count: number;
@@ -70,6 +73,7 @@ export async function getPipelineBreakdown(): Promise<PipelineBreakdown[]> {
   return pipeline.stages
     .filter((s) => !s.isLost)
     .map((s) => ({
+      stageKey: s.key,
       stage: s.name,
       tone: s.tone,
       count: byStage.get(s.id)?._count._all ?? 0,
@@ -119,8 +123,8 @@ export async function getActivityTrend(days = 14, eventTypes?: string[]): Promis
 }
 
 export interface FunnelStep {
+  /** i18n key under `reporting.funnelSteps.<key>` — this engine has no access to next-intl (server-only code), so callers resolve display text from this key. */
   key: string;
-  label: string;
   count: number;
   pct: number;
 }
@@ -152,27 +156,21 @@ export async function getConversionFunnel(): Promise<FunnelStep[]> {
   const won = await db.deal.count({ where: { status: "won" } });
 
   const steps = [
-    { key: "leads", label: "لید", count: totalLeads },
-    { key: "converted", label: "تبدیل‌شده", count: convertedLeads },
-    { key: "deal", label: "معامله", count: withDeal },
-    { key: "meeting_plus", label: "جلسه به بعد", count: pastFirstStage },
-    { key: "won", label: "برد", count: won },
+    { key: "leads", count: totalLeads },
+    { key: "converted", count: convertedLeads },
+    { key: "deal", count: withDeal },
+    { key: "meetingPlus", count: pastFirstStage },
+    { key: "won", count: won },
   ];
   const base = totalLeads || 1;
   return steps.map((s) => ({ ...s, pct: Math.round((s.count / base) * 100) }));
 }
 
 export interface LeadSourceBreakdown {
+  /** Raw source value (e.g. "website", "manual") — callers translate via `businessForms.sources.<source>`, falling back to "unknown". */
   source: string;
-  label: string;
   count: number;
 }
-
-const SOURCE_LABEL: Record<string, string> = {
-  website: "وب‌سایت",
-  chatbot: "چت‌بات",
-  manual: "دستی",
-};
 
 export async function getLeadSourceBreakdown(): Promise<LeadSourceBreakdown[]> {
   requireContext();
@@ -180,7 +178,6 @@ export async function getLeadSourceBreakdown(): Promise<LeadSourceBreakdown[]> {
   return rows
     .map((r) => ({
       source: r.source ?? "unknown",
-      label: SOURCE_LABEL[r.source ?? ""] ?? "نامشخص",
       count: r._count._all,
     }))
     .sort((a, b) => b.count - a.count);

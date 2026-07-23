@@ -69,10 +69,20 @@ function KpiWidget({ item, data }: { item: LayoutItem; data: WidgetData }) {
   );
 }
 
+const stageKey: Record<string, string> = {
+  new: "stageNew",
+  qualified: "stageQualified",
+  consultation: "stageConsultation",
+  proposal: "stageProposal",
+  negotiation: "stageNegotiation",
+  won: "stageWon",
+  lost: "stageLost",
+};
+
 function PipelineWidget({ data }: { data: WidgetData }) {
   const t = useTranslations("dashboard");
   const chartData = data.pipeline.map((p) => ({
-    name: p.stage,
+    name: stageKey[p.stageKey] ? t(stageKey[p.stageKey]) : p.stage,
     value: p.value,
     count: p.count,
   }));

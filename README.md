@@ -355,11 +355,18 @@ Action Center → Human Approval → AI Audit`.
 
 - **Tabular reports** (deals, pipeline, tasks, contacts) with CSV export,
   audited.
-- **Visual insights page** (`/mgmt/reports/insights`) — conversion funnel
+- **Visual insights page** (`/crm/reports/insights`) — four Recharts
+  visualizations matching the reference layout: a conversion funnel
   (lead → converted → deal → past-first-stage → won, with % of top-of-funnel),
-  lead-source breakdown, and 12-month **Jalali-calendar** revenue (real
-  Jalali month buckets via `jalaali-js`, not relabeled Gregorian ones),
-  rendered with Recharts to match the in-app dashboard-widget style.
+  **pipeline value by stage** (color-matched to each stage's tone, so a
+  stage reads the same color here as on the Deals board), lead-source
+  breakdown, and 12-month **Jalali-calendar** revenue (real Jalali month
+  buckets via `jalaali-js`, not relabeled Gregorian ones).
+- Every label on this page — funnel steps, pipeline stage names, lead
+  sources — is a translation key resolved in en/de/fa, not a raw string
+  baked into the analytics engine; the same stage names now match exactly
+  across the Deals board, the CRM dashboard's pipeline widget, the
+  customizable Dashboard Builder's pipeline widget, and this chart.
 
 ### Forms engine
 

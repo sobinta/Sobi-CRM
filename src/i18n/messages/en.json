@@ -160,7 +160,22 @@
     "leadSources": "Lead sources",
     "monthlyRevenue": "Monthly revenue · last 12 Jalali months",
     "count": "Count",
-    "noSources": "No lead sources are available yet."
+    "noSources": "No lead sources are available yet.",
+    "stageNew": "New",
+    "stageQualified": "Reviewing",
+    "stageConsultation": "Consultation",
+    "stageProposal": "Proposal sent",
+    "stageNegotiation": "Final contract phase",
+    "stageWon": "Won",
+    "stageLost": "Lost",
+    "funnelSteps": {
+      "leads": "Leads",
+      "converted": "Converted",
+      "deal": "Deal created",
+      "meetingPlus": "Meeting or later",
+      "won": "Won"
+    },
+    "pipelineByStage": "Pipeline value by stage"
   },
   "dashboard": {
     "welcome": "Welcome back, {name}",
@@ -272,14 +287,15 @@
     "activityTaskCompleted": "A task was completed",
     "activityUpdated": "A CRM record was updated",
     "stageNew": "New",
-    "stageQualified": "Qualified",
-    "stageProposal": "Proposal",
-    "stageNegotiation": "Negotiation",
+    "stageQualified": "Reviewing",
+    "stageProposal": "Proposal sent",
+    "stageNegotiation": "Final contract phase",
     "stageWon": "Won",
     "stageLost": "Lost",
     "errorTitle": "The CRM dashboard could not load",
     "errorBody": "Your data was not changed. Try loading the dashboard again.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "stageConsultation": "Consultation"
   },
   "deals": {
     "title": "Deals",
@@ -1217,6 +1233,10 @@
     "campaigns": {
       "title": "About Email campaigns",
       "body": "A campaign targets a segment — a live, code-driven audience like lost leads, leads unfollowed for over a week, lost deals, or won customers — and AI writes a personalized email for every recipient, one at a time, based on their own situation in the CRM.\n\nBefore creating a campaign, the segment picker shows the true size of that audience and how many are reachable by email; each run is capped at 20 recipients.\n\nFrom the review page you can:\n- Generate a draft for one recipient, or generate all pending drafts at once (still one request at a time, so no burst hits the AI provider).\n- Edit any draft before it goes out.\n- Send one approved draft, or send every ready draft in one action, once you've reviewed them.\n\nWhy this matters: nothing is ever sent without a human having generated (and optionally edited) that specific message first — even \"send all\" only sends drafts that were already generated and approved."
+    },
+    "reports": {
+      "title": "About Reports",
+      "body": "Tabular reports (deals, pipeline, tasks, contacts) give you the raw rows behind each number, exportable as CSV. \"Visual insights\" turns the same underlying data into charts: a conversion funnel from lead through won deal, pipeline value by stage, where your leads come from, and monthly revenue over the last 12 months.\n\nWhy this matters: the tables are for auditing exact figures or exporting to another tool; the charts are for spotting a trend or a bottleneck at a glance."
     }
   },
   "leads": {
