@@ -1715,6 +1715,7 @@
     "contacts": "Kontakte",
     "deals": "Deals",
     "emptyTitle": "Noch keine Verbindungen",
-    "emptyBody": "Sobald Sie Kontakte mit Firmen und Deals verknüpfen, füllt sich der Beziehungsgraph."
+    "emptyBody": "Sobald Sie Kontakte mit Firmen und Deals verknüpfen, füllt sich der Beziehungsgraph.",
+    "dragHint": "Blöcke ziehen zum Umordnen · auf einen Block klicken, um seine Verbindungen hervorzuheben"
   }
 }

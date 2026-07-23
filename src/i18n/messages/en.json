@@ -1715,6 +1715,7 @@
     "contacts": "Contacts",
     "deals": "Deals",
     "emptyTitle": "No connections yet",
-    "emptyBody": "As you link contacts to companies and deals, the relationship graph fills in."
+    "emptyBody": "As you link contacts to companies and deals, the relationship graph fills in.",
+    "dragHint": "Drag blocks to rearrange · click a block to focus its connections"
   }
 }

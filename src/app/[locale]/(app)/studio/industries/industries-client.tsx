@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { Card, CardContent } from "@/components/ui/card";
+import { useDemoMode } from "@/components/layout/session-context";
 import { applyIndustryAction } from "./actions";
 
 export interface IndustryRow {
@@ -34,11 +35,20 @@ const ICONS: Record<string, LucideIcon> = {
 
 export function IndustriesClient({ industries }: { industries: IndustryRow[] }) {
   const t = useTranslations("industries");
+  const tShell = useTranslations("shell");
+  const demo = useDemoMode();
   const router = useRouter();
   const [pendingKey, setPendingKey] = useState<string | null>(null);
+  const [simulated, setSimulated] = useState(false);
   const [, startTransition] = useTransition();
 
   function apply(key: string) {
+    // In the read-only demo, applying a template would write records — show the
+    // simulation notice instead of calling the server (which would 500).
+    if (demo) {
+      setSimulated(true);
+      return;
+    }
     setPendingKey(key);
     startTransition(async () => {
       await applyIndustryAction({ key });
@@ -48,7 +58,13 @@ export function IndustriesClient({ industries }: { industries: IndustryRow[] }) 
   }
 
   return (
-    <div className="mx-auto grid max-w-4xl gap-4 px-6 py-6 sm:grid-cols-2">
+    <div className="mx-auto max-w-4xl px-6 py-6">
+      {simulated && (
+        <p role="status" className="mb-3 text-xs font-medium text-brand">
+          {tShell("demoSimulation")}
+        </p>
+      )}
+      <div className="grid gap-4 sm:grid-cols-2">
       {industries.map((ind) => {
         const Icon = ICONS[ind.icon] ?? Shapes;
         const busy = pendingKey === ind.key;
@@ -97,6 +113,7 @@ export function IndustriesClient({ industries }: { industries: IndustryRow[] }) 
           </Card>
         );
       })}
+      </div>
     </div>
   );
 }
