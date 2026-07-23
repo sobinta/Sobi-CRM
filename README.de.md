@@ -233,8 +233,23 @@ Demo-Arbeitsbereich fortfahren"** (siehe [Demo-Modus](#demo-modus)).
   Type-Ahead-Auswahl — derselbe Eintrag erscheint auch auf der eigenen
   Timeline dieses Datensatzes.
 - **Tags & Beziehungen** — ein generisches `Relationship`-Modell plus ein
-  eigenständiger **Beziehungsgraph** (React Flow), der Verbindungen
-  zwischen beliebigen Datensätzen visualisiert.
+  eigenständiger **Beziehungsgraph** (`/crm/graph`, React Flow): jede Firma,
+  jeder Kontakt und jeder Deal wird als farbcodierter, verschiebbarer Block
+  gerendert (Icon + Titel + eine Faktenzeile — eine Firma zeigt ihre
+  Kontakt-/Deal-Anzahl, ein Kontakt zeigt seine Firma, ein Deal zeigt seinen
+  Betrag), automatisch als Baum von links nach rechts angeordnet, sodass die
+  Form eines Accounts auf einen Blick erkennbar ist. Blöcke lassen sich frei
+  verschieben; ein Klick auf einen Block fokussiert seine Verbindungen
+  (Nachbarn und deren Verknüpfungen leuchten auf, alles andere wird
+  abgedunkelt); Typ-Filter-Chips blenden Firmen/Kontakte/Deals ein oder aus;
+  eine Minimap sowie Pan/Zoom helfen bei größeren Graphen. Über die durch
+  bestehende Fremdschlüssel implizierten Verbindungen hinaus kann man **eine
+  neue Verknüpfung durch Ziehen von einem Block zu einem anderen erstellen**
+  — sie wird als echte `Relationship`-Zeile gespeichert (kein reiner
+  visueller Entwurf) und lässt sich von der Leinwand aus auch wieder
+  entfernen; die automatisch abgeleiteten Kanten (die einen echten
+  Fremdschlüssel an anderer Stelle widerspiegeln) lassen sich hier
+  absichtlich nicht löschen.
 - **CSV-Import/-Export** für Kern-Entitäten.
 
 ### Lead-Konvertierung & KI-Bewertung
@@ -393,17 +408,24 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 
 ### Berichte & Einblicke
 
-- **Tabellarische Berichte** (Deals, Pipeline, Aufgaben, Kontakte) mit
-  CSV-Export, protokolliert.
-- **Visuelle Einblicke-Seite** (`/crm/reports/insights`) — vier
-  Recharts-Visualisierungen nach dem Referenz-Layout: ein
-  Conversion-Trichter (Lead → konvertiert → Deal → über erste Stufe
+- **Diagramme als Standardansicht** (`/crm/reports`) — vier
+  Recharts-Visualisierungen werden zuerst angezeigt, damit ein Unternehmen
+  auf einen Blick sieht, was es tatsächlich erreicht hat: eine KPI-Zeile
+  (Leads gesamt, Lead-→-Gewonnen-Quote, offene Pipeline, 12-Monats-Umsatz),
+  ein Conversion-Trichter (Lead → konvertiert → Deal → über erste Stufe
   hinaus → gewonnen, mit % vom oberen Trichterende), **Pipeline-Wert nach
   Stufe** (farblich passend zum Tone jeder Stufe, sodass eine Stufe hier
   dieselbe Farbe zeigt wie auf dem Deals-Board), Lead-Quellen-
   Aufschlüsselung und 12-Monats-Umsatz nach **Jalali-Kalender** (echte
   Jalali-Monatsbuckets über `jalaali-js`, nicht umbeschriftete
-  gregorianische).
+  gregorianische). Diagramme rendern unabhängig von der aktiven Sprache
+  innerhalb eines erzwungenen LTR-Zeichenbereichs, sodass die Achsen-/
+  Balkengeometrie unter RTL nie zerbricht, während die Tick-Beschriftungen
+  weiterhin in der Leserichtung der aktiven Sprache erscheinen.
+- **Tabellarische Berichte** (Deals, Pipeline, Aufgaben, Kontakte) mit
+  CSV-Export, protokolliert — für alle, die lieber die Rohdaten statt der
+  visuellen Zusammenfassung sehen wollen, einen Klick entfernt hinter einem
+  **Diagramme-/Tabellen-Umschalter**.
 - Jedes Label auf dieser Seite — Trichterschritte, Pipeline-Stufennamen,
   Lead-Quellen — ist ein in en/de/fa aufgelöster Übersetzungsschlüssel,
   kein in die Analytics-Engine eingebackener Rohstring; dieselben
@@ -421,6 +443,10 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 
 ### Dateien, Aufgaben, Kalender, Benachrichtigungen
 
+- **Betrieb-Übersicht** (`/ops`) — eine Einstiegsseite des Arbeitsbereichs,
+  die offene/überfällige Aufgabenzahlen, anstehende Kalendertermine und
+  gespeicherte Dateien in einem Blick zusammenfasst, mit Schnellzugriff auf
+  Aufgaben, Kalender und Dateien.
 - **Dokument-/Datei-Engine** — sicherer Upload, Kategorien, Versionen,
   Vorschau, Ablauf, Pflichtdokument-Checklisten pro Datensatz.
 - **Aufgaben** — Unteraufgaben, Wiederholung, Abhängigkeiten, Kommentare,
@@ -450,7 +476,9 @@ Pipeline: `Anbieter → Prompt-Bibliothek → Skills → Tools → Agenten-Schle
 
 - **Visueller Workflow-Builder** — Stufen/Schritte, Rules-geleitete
   Freigabeketten, Bedingungen, Timer, SLAs, Eskalationen, Pflichtfelder/
-  -dokumente, Vorlagen, Versionierung.
+  -dokumente, Vorlagen, Versionierung; jedes Feld, jede Stufen-Farboption
+  und jedes Steuerelement ist in allen drei Sprachen übersetzt (diese
+  Seite war in einer früheren Version vollständig englischsprachig).
 - **Automatisierungs-Engine** — Ereignis-/Zeitplan-Trigger → Regeln →
   Aktionen (Aufgabe erstellen, benachrichtigen, Feld aktualisieren, Stufe
   verschieben, E-Mail senden, Webhook aufrufen, KI-Skill auslösen), mit
@@ -504,6 +532,13 @@ vorbelegt:
 Sechs weitere Spec-Module (Investment, Recht, Bildung, Gesundheitswesen,
 Service & Wartung, Projektmanagement) sind als „demnächst verfügbar"
 registrierte Scaffolds in der Modulaktivierung hinterlegt.
+
+Jedes Dashboard, jede Liste und jeder Dialog in allen acht Modulen — plus
+die gemeinsamen Buchungskomponenten von Friseursalon, Kosmetikstudio und
+Restaurant — ist vollständig auf Englisch, Deutsch und Persisch übersetzt;
+Status-/Typ-Enums (Policenstatus, Kreditzweck, Objekttyp, Visumtyp,
+Terminstatus, …) werden pro Wert auf einen sicheren Übersetzungsschlüssel
+abgebildet statt als Rohcode angezeigt.
 
 ### Low-Code-Studio
 
@@ -578,6 +613,16 @@ registrierte Scaffolds in der Modulaktivierung hinterlegt.
   aufklappbaren Schublade (geöffnet über ein Hamburger-Icon in der Topbar)
   mit demselben Ein-/Ausklapp-Steuerelement, und jede Datentabelle scrollt
   horizontal statt abzuschneiden.
+- **Subnav-Leiste bei eingeklapptem Rail** — das Einklappen des Module Rail
+  auf reine Icons blendet die Akkordeon-Unterseiten aus, die es normalerweise
+  auflisten würde; ohne Ersatz würde ein Nutzer, der nicht weiß, dass er es
+  wieder ausklappen muss, den einfachen Zugriff auf die meisten Optionen
+  eines Arbeitsbereichs verlieren. Eine horizontale Unternavigationsleiste
+  schließt diese Lücke automatisch: Solange das Rail eingeklappt ist,
+  erscheint die vollständige Unterseiten-Liste des aktiven Arbeitsbereichs
+  (Kontakte, Firmen, Leads, …) als Zeile oben im Inhaltsbereich; sie
+  verschwindet wieder, sobald das Rail ausgeklappt wird, damit dieselben
+  Links nie doppelt angezeigt werden.
 - **Akkordeon-Seitennavigation** — die Unterseiten jedes Arbeitsbereichs
   (Kontakte, Firmen, Leads, Deals, …) verschachteln sich direkt im Rail als
   aufklappbarer Abschnitt statt in einer separaten oberen Leiste; der aktive
@@ -609,11 +654,37 @@ registrierte Scaffolds in der Modulaktivierung hinterlegt.
   `--landing-font-*`-Tausch).
 - Jalali-(Shamsi-)Kalenderunterstützung für Vertragsnummerierung und den
   Umsatzbericht.
+- **Jeder Bereich des Arbeitsbereichs hat einen kontextuellen Hilfe-Button**
+  — ein „?" neben dem Seitentitel (über das gemeinsame `PageHeader`/
+  `FeatureHelp`-Muster), der einen kurzen Dialog öffnet, der erklärt, was
+  die Funktion tut und wozu sie nützlich ist, in der aktiven Sprache. Das
+  beschränkt sich nicht auf die eingebauten CRM-Bildschirme: Es deckt auch
+  die Verwaltung (Einstellungen, Audit, Zustand, Integrationen, Module,
+  Rollen, Nutzer), den KI-Arbeitsbereich und -Assistenten, jeden
+  Studio-Builder (Entitäten, Automatisierungen, Workflows, Regeln,
+  Vorlagen), Support, Abrechnung, Profil und alle acht Branchenmodule ab —
+  ein vollständiger Durchgang hat gezielt die Lücken geschlossen, die bei
+  der manuellen QA gefunden wurden (Workflow-Builder und der
+  Beziehungsgraph waren vor diesem Durchgang die zwei auffälligsten
+  Lücken).
+- **Keine fest codierten Sprach-Strings** — jedes Label, jeder Status-Chip,
+  jeder Enum-Wert und sogar Demo-/Platzhalterinhalte werden über next-intl
+  für die aktive Sprache aufgelöst, statt in einer Sprache fest codiert zu
+  sein. Dies wurde bei einem app-weiten Audit als echter Fehler an zwei
+  Stellen gefunden und behoben: Die KI-Assistenten-Seite zeigte
+  unabhängig von der gewählten Sprache festen persischen Text an, und das
+  Demo-Ticket im Support-Center tat dasselbe — beide übersetzen jetzt
+  korrekt in allen drei Sprachen.
+- Wo eine Einstellung oder ein Menüpunkt einen natürlichen, gebräuchlichen
+  persischen oder deutschen Begriff hat (statt einer holprigen wörtlichen
+  Übersetzung), verwenden die persische und deutsche Übersetzung diesen
+  gebräuchlichen Begriff.
 
 ### Demo-Modus
 
 - Ein **Ein-Klick-Button „Mit Demo-Arbeitsbereich fortfahren"** auf der
-  Login-Seite und der Landingpage, der als vorbelegter Demo-Nutzer
+  Login-Seite und der Landingpage, der als schreibgeschütztes öffentliches
+  Demo-Konto (`public-demo@sobi.local`, Arbeitsbereich „Sobi CRM Demo")
   anmeldet — keine Registrierung zum Ausprobieren nötig.
 - **Aus Produktions-Builds ausgeschlossen** — geprüft, dass er inklusive
   des Zugangsdaten-Strings vollständig aus dem Produktions-Client-Bundle

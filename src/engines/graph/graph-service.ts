@@ -1,5 +1,6 @@
 import { db } from "@/core/db";
 import { requireContext } from "@/core/tenancy/context";
+import { listManualRelationships } from "./relationship-service";
 
 /**
  * Relationship Graph service — assembles a node/edge graph of CRM connections
@@ -37,6 +38,10 @@ export interface GraphEdge {
   source: string;
   target: string;
   label: string;
+  /** Set only for a manually-drawn link — its Relationship row id, so the
+   *  canvas knows this specific edge can be deleted (derived edges, which
+   *  mirror a real foreign key, cannot be). */
+  relationshipId?: string;
 }
 
 export async function buildGraph(): Promise<{
@@ -111,6 +116,20 @@ export async function buildGraph(): Promise<{
       edges.push({ id: `e-${d.id}-ct`, source: `deal:${d.id}`, target: `contact:${d.contactId}`, label: "with" });
     else if (d.companyId)
       edges.push({ id: `e-${d.id}-co`, source: `deal:${d.id}`, target: `company:${d.companyId}`, label: "with" });
+  }
+
+  // Manually-drawn links (from the graph canvas' drag-to-connect gesture) —
+  // the only edges a user can delete from the canvas, since every other edge
+  // mirrors a real foreign key elsewhere.
+  const manual = await listManualRelationships();
+  for (const r of manual) {
+    edges.push({
+      id: `rel:${r.id}`,
+      source: `${r.fromType}:${r.fromId}`,
+      target: `${r.toType}:${r.toId}`,
+      label: "linked",
+      relationshipId: r.id,
+    });
   }
 
   // Keep only nodes that participate in an edge (avoid orphan clutter).

@@ -51,6 +51,7 @@ import {
   updateEventAction,
 } from "../actions";
 import { BusinessCustomFields } from "@/components/patterns/business-custom-fields";
+import { FeatureHelp } from "@/components/patterns/feature-help";
 
 const SOURCE_STYLES: Record<CalendarSource, string> = {
   event: "border-brand bg-brand-subtle text-brand-subtle-ink",
@@ -266,7 +267,10 @@ export function CalendarWorkspace({
             <CalendarDays aria-hidden="true" className="h-5 w-5" />
             <span className="text-xs font-semibold tracking-[0.14em] uppercase">{t("eyebrow")}</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-ink">{t("title")}</h1>
+          <div className="flex items-center gap-1">
+            <h1 className="text-2xl font-bold tracking-tight text-ink">{t("title")}</h1>
+            <FeatureHelp topicKey="operations" />
+          </div>
           <p className="mt-1 max-w-2xl text-sm text-ink-muted">{t("description")}</p>
         </div>
         <div className="flex flex-wrap gap-2">

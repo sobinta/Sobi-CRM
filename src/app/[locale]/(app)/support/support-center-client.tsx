@@ -24,19 +24,22 @@ type TicketSummary = {
 type Message = { id: string; senderKind: string; body: string; createdAt: string };
 type TicketDetail = Omit<TicketSummary, "messageCount" | "lastMessage"> & { messages: Message[] };
 
-const demoTickets: TicketSummary[] = [{
-  id: "demo-support-welcome", subject: "راهنمای شروع کار با Sobi CRM", category: "general",
-  priority: "NORMAL", status: "WAITING_ON_CUSTOMER", channel: "LIVE_CHAT",
-  lastMessageAt: new Date().toISOString(), requesterLastReadAt: null, messageCount: 2,
-  lastMessage: "سلام! تیم Sobinta آماده پاسخ‌گویی است.",
-}];
-const demoMessages: Message[] = [
-  { id: "demo-1", senderKind: "CUSTOMER", body: "برای شروع تنظیم داشبورد به راهنمایی نیاز دارم.", createdAt: new Date(Date.now() - 180_000).toISOString() },
-  { id: "demo-2", senderKind: "OPERATOR", body: "سلام! خوش آمدید. از بخش فرم‌ساز و تقویم شروع می‌کنیم؛ هر سؤال دیگری هم همین‌جا بپرسید.", createdAt: new Date(Date.now() - 120_000).toISOString() },
-];
+const DEMO_NOW = new Date().toISOString();
+const DEMO_MESSAGE_1_AT = new Date(Date.now() - 180_000).toISOString();
+const DEMO_MESSAGE_2_AT = new Date(Date.now() - 120_000).toISOString();
 
 export function SupportCenterClient({ initialTickets, liveAvailable, demo }: { initialTickets: TicketSummary[]; liveAvailable: boolean; demo: boolean }) {
   const t = useTranslations("support");
+  const demoMessages: Message[] = useMemo(() => [
+    { id: "demo-1", senderKind: "CUSTOMER", body: t("demoCustomerMessage"), createdAt: DEMO_MESSAGE_1_AT },
+    { id: "demo-2", senderKind: "OPERATOR", body: t("demoOperatorMessage"), createdAt: DEMO_MESSAGE_2_AT },
+  ], [t]);
+  const demoTickets: TicketSummary[] = useMemo(() => [{
+    id: "demo-support-welcome", subject: t("demoWelcomeSubject"), category: "general",
+    priority: "NORMAL", status: "WAITING_ON_CUSTOMER", channel: "LIVE_CHAT",
+    lastMessageAt: DEMO_NOW, requesterLastReadAt: null, messageCount: 2,
+    lastMessage: t("demoWelcomeLastMessage"),
+  }], [t]);
   const [tickets, setTickets] = useState<TicketSummary[]>(demo && initialTickets.length === 0 ? demoTickets : initialTickets);
   const [selectedId, setSelectedId] = useState<string | null>(demo ? (tickets[0]?.id ?? null) : null);
   const [detail, setDetail] = useState<TicketDetail | null>(demo && tickets[0] ? { ...demoTickets[0], messages: demoMessages } : null);
@@ -65,7 +68,7 @@ export function SupportCenterClient({ initialTickets, liveAvailable, demo }: { i
       const result = await loadSupportTicketAction(id);
       if (result.ok) setDetail(result.ticket);
     });
-  }, [demo, tickets]);
+  }, [demo, tickets, demoMessages]);
 
   useEffect(() => {
     if (demo || detail?.channel !== "LIVE_CHAT" || !selectedId) return;
@@ -135,7 +138,7 @@ export function SupportCenterClient({ initialTickets, liveAvailable, demo }: { i
   }
 
   return <div className="min-h-full">
-    <PageHeader title={t("title")} description={t("description")} actions={<Button variant="primary" onClick={() => setCreating(true)}><Plus className="h-4 w-4" />{t("newTicket")}</Button>} />
+    <PageHeader title={t("title")} description={t("description")} helpTopic="support" actions={<Button variant="primary" onClick={() => setCreating(true)}><Plus className="h-4 w-4" />{t("newTicket")}</Button>} />
     <div className="mx-auto grid max-w-7xl gap-5 p-4 lg:grid-cols-[340px_minmax(0,1fr)] lg:p-6">
       <aside className="overflow-hidden rounded-2xl border border-line bg-surface-raised shadow-raised">
         <div className="flex items-center justify-between border-b border-line px-4 py-3"><div className="flex items-center gap-2 font-semibold text-ink"><TicketCheck className="h-4 w-4 text-brand" />{t("myTickets")}</div>{unread > 0 && <span className="rounded-full bg-brand px-2 py-0.5 text-xs font-semibold text-ink-on-brand">{unread}</span>}</div>

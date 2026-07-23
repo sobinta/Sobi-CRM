@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { isModuleEnabled } from "@/core/features/features";
 import { getModule } from "@/core/module-registry/catalog";
@@ -20,19 +21,26 @@ export default async function ModuleLanding({
   const entry = getModule(module);
   if (!entry) notFound();
 
-  const enabled = await withPlatformContext(() => isModuleEnabled(module));
+  const [enabled, t] = await Promise.all([
+    withPlatformContext(() => isModuleEnabled(module)),
+    getTranslations("moduleGeneric"),
+  ]);
 
   return (
     <div>
-      <PageHeader title={entry.name} description={entry.description} />
+      <PageHeader title={entry.name} description={entry.description} helpTopic="moduleGeneric" />
       <div className="mx-auto max-w-3xl px-6 py-10">
         <EmptyState
           icon={entry.icon ?? Sparkles}
-          title={enabled ? `${entry.name} is active` : `${entry.name} is not active`}
+          title={
+            enabled
+              ? t("activeTitle", { name: entry.name })
+              : t("inactiveTitle", { name: entry.name })
+          }
           description={
             enabled
-              ? `This workspace composes the ${entry.engines.join(", ")} engines. Detailed screens for ${entry.name} build on the same shared patterns as the Insurance and CRM workspaces.`
-              : "Activate this module in Administration → Modules to use it."
+              ? t("activeDescription", { name: entry.name, engines: entry.engines.join(", ") })
+              : t("inactiveDescription")
           }
         />
       </div>

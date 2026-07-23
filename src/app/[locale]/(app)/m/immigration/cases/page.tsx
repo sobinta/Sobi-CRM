@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Plane } from "lucide-react";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { listCases } from "@/modules/immigration/service";
@@ -16,31 +17,53 @@ const statusTone: Record<string, ChipProps["tone"]> = {
   appeal: "brand",
 };
 
+const statusKey: Record<string, string> = {
+  intake: "statusIntake",
+  preparing: "statusPreparing",
+  submitted: "statusSubmitted",
+  approved: "statusApproved",
+  rejected: "statusRejected",
+  appeal: "statusAppeal",
+};
+
+const visaKey: Record<string, string> = {
+  work: "visaWork",
+  student: "visaStudent",
+  family: "visaFamily",
+  business: "visaBusiness",
+  asylum: "visaAsylum",
+  permanent: "visaPermanent",
+};
+
 export default async function CasesPage() {
-  const cases = await withPlatformContext(() => listCases());
+  const [cases, t] = await Promise.all([
+    withPlatformContext(() => listCases()),
+    getTranslations("moduleImmigration"),
+  ]);
   if (!cases) notFound();
 
   return (
     <div>
       <PageHeader
-        title="Cases"
-        description={`${cases.length} ${cases.length === 1 ? "case" : "cases"}`}
+        title={t("casesTitle")}
+        description={t("caseCount", { count: cases.length })}
+        helpTopic="moduleImmigration"
         actions={<NewCaseButton />}
       />
       <div className="px-6 py-4">
         {cases.length === 0 ? (
-          <EmptyState icon={Plane} title="No cases yet" description="Open your first case to track submissions and deadlines." />
+          <EmptyState icon={Plane} title={t("noCasesTitle")} description={t("noCasesBody")} />
         ) : (
           <div className="overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
               <thead className="bg-surface-sunken text-xs text-ink-faint">
                 <tr>
-                  <th className="px-4 py-2.5 text-start font-medium">Reference</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Client</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Visa type</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Authority</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Deadline</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Status</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colReference")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colClient")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colVisaType")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colAuthority")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colDeadline")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colStatus")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -48,10 +71,16 @@ export default async function CasesPage() {
                   <tr key={c.id} className="bg-surface-raised">
                     <td className="px-4 py-3 font-mono text-xs font-medium text-ink">{c.reference}</td>
                     <td className="px-4 py-3 text-ink-muted">{c.clientName}</td>
-                    <td className="px-4 py-3 capitalize text-ink-muted">{c.visaType}</td>
+                    <td className="px-4 py-3 capitalize text-ink-muted">
+                      {visaKey[c.visaType] ? t(visaKey[c.visaType] as never) : c.visaType}
+                    </td>
                     <td className="px-4 py-3 text-ink-muted">{c.authority ?? "—"}</td>
                     <td className="px-4 py-3 tabular text-ink-muted">{c.deadline ? new Date(c.deadline).toLocaleDateString() : "—"}</td>
-                    <td className="px-4 py-3"><Chip tone={statusTone[c.status] ?? "neutral"}>{c.status}</Chip></td>
+                    <td className="px-4 py-3">
+                      <Chip tone={statusTone[c.status] ?? "neutral"}>
+                        {statusKey[c.status] ? t(statusKey[c.status] as never) : c.status}
+                      </Chip>
+                    </td>
                   </tr>
                 ))}
               </tbody>

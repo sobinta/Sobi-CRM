@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Plus, Trash2, Webhook, KeyRound, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,8 @@ export function IntegrationsClient({
   webhooks: WebhookRow[];
   apiKeys: ApiKeyRow[];
 }) {
+  const t = useTranslations("admin");
+  const locale = useLocale();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [hookOpen, setHookOpen] = useState(false);
@@ -96,28 +99,28 @@ export function IntegrationsClient({
       <Card>
         <CardHeader className="flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Webhook className="h-4 w-4 text-ink-muted" /> Webhooks
+            <Webhook className="h-4 w-4 text-ink-muted" /> {t("webhooksCardTitle")}
           </CardTitle>
           <Dialog open={hookOpen} onOpenChange={setHookOpen}>
             <Button variant="secondary" size="sm" onClick={() => setHookOpen(true)}>
-              <Plus className="h-3.5 w-3.5" /> Add webhook
+              <Plus className="h-3.5 w-3.5" /> {t("addWebhook")}
             </Button>
             <DialogContent>
               <form onSubmit={createHook}>
                 <DialogHeader>
-                  <DialogTitle>New webhook</DialogTitle>
+                  <DialogTitle>{t("newWebhook")}</DialogTitle>
                 </DialogHeader>
                 <DialogBody className="space-y-3">
                   <div>
-                    <Label htmlFor="wh-name" required>Name</Label>
+                    <Label htmlFor="wh-name" required>{t("whName")}</Label>
                     <Input id="wh-name" name="name" required autoFocus />
                   </div>
                   <div>
-                    <Label htmlFor="wh-url" required>Endpoint URL</Label>
+                    <Label htmlFor="wh-url" required>{t("whUrl")}</Label>
                     <Input id="wh-url" name="url" type="url" dir="ltr" placeholder="https://…" required />
                   </div>
                   <div>
-                    <Label>Events</Label>
+                    <Label>{t("whEvents")}</Label>
                     <div className="flex flex-wrap gap-1.5">
                       {EVENT_CHOICES.map((ev) => {
                         const on = selected.includes(ev);
@@ -145,10 +148,10 @@ export function IntegrationsClient({
                 </DialogBody>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button variant="ghost" type="button">Cancel</Button>
+                    <Button variant="ghost" type="button">{t("cancel")}</Button>
                   </DialogClose>
                   <Button variant="primary" type="submit" disabled={pending || selected.length === 0}>
-                    Create webhook
+                    {t("createWebhook")}
                   </Button>
                 </DialogFooter>
               </form>
@@ -158,7 +161,7 @@ export function IntegrationsClient({
         <CardContent>
           {webhooks.length === 0 ? (
             <p className="py-2 text-sm text-ink-faint">
-              No webhooks. Add one to receive events at your endpoint.
+              {t("noWebhooks")}
             </p>
           ) : (
             <ul className="space-y-2">
@@ -174,7 +177,7 @@ export function IntegrationsClient({
                     </p>
                   </div>
                   <span className="text-xs text-ink-faint">
-                    {w.events.length} events
+                    {t("eventsCount", { count: w.events.length })}
                   </span>
                   {w.lastStatus && (
                     <Chip tone={w.lastStatus < 400 ? "positive" : "danger"}>
@@ -189,7 +192,7 @@ export function IntegrationsClient({
                       })
                     }
                     className="rounded p-1 text-ink-faint hover:text-danger"
-                    aria-label="Delete"
+                    aria-label={t("deleteAria")}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -204,7 +207,7 @@ export function IntegrationsClient({
       <Card>
         <CardHeader className="flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <KeyRound className="h-4 w-4 text-ink-muted" /> API keys
+            <KeyRound className="h-4 w-4 text-ink-muted" /> {t("apiKeysCardTitle")}
           </CardTitle>
           <Dialog
             open={keyOpen}
@@ -214,17 +217,17 @@ export function IntegrationsClient({
             }}
           >
             <Button variant="secondary" size="sm" onClick={() => setKeyOpen(true)}>
-              <Plus className="h-3.5 w-3.5" /> Create key
+              <Plus className="h-3.5 w-3.5" /> {t("createKeyBtn")}
             </Button>
             <DialogContent>
               {newKey ? (
                 <>
                   <DialogHeader>
-                    <DialogTitle>Copy your API key</DialogTitle>
+                    <DialogTitle>{t("copyKeyTitle")}</DialogTitle>
                   </DialogHeader>
                   <DialogBody className="space-y-3">
                     <p className="text-sm text-ink-muted">
-                      This key is shown once. Store it securely.
+                      {t("copyKeyNotice")}
                     </p>
                     <div className="flex items-center gap-2 rounded-md border border-line bg-surface-sunken px-3 py-2">
                       <code className="flex-1 truncate font-mono text-xs text-ink" dir="ltr">
@@ -236,7 +239,7 @@ export function IntegrationsClient({
                           setCopied(true);
                         }}
                         className="text-ink-muted hover:text-ink"
-                        aria-label="Copy"
+                        aria-label={t("copyAria")}
                       >
                         {copied ? (
                           <Check className="h-4 w-4 text-positive" />
@@ -249,7 +252,7 @@ export function IntegrationsClient({
                   <DialogFooter>
                     <DialogClose asChild>
                       <Button variant="primary" type="button">
-                        Done
+                        {t("done")}
                       </Button>
                     </DialogClose>
                   </DialogFooter>
@@ -257,18 +260,18 @@ export function IntegrationsClient({
               ) : (
                 <form onSubmit={createKey}>
                   <DialogHeader>
-                    <DialogTitle>New API key</DialogTitle>
+                    <DialogTitle>{t("newApiKeyTitle")}</DialogTitle>
                   </DialogHeader>
                   <DialogBody>
-                    <Label htmlFor="key-name" required>Name</Label>
-                    <Input id="key-name" name="name" required autoFocus placeholder="Zapier integration" />
+                    <Label htmlFor="key-name" required>{t("keyName")}</Label>
+                    <Input id="key-name" name="name" required autoFocus placeholder={t("keyNamePlaceholder")} />
                   </DialogBody>
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button variant="ghost" type="button">Cancel</Button>
+                      <Button variant="ghost" type="button">{t("cancel")}</Button>
                     </DialogClose>
                     <Button variant="primary" type="submit" disabled={pending}>
-                      Create key
+                      {t("createKeyBtn")}
                     </Button>
                   </DialogFooter>
                 </form>
@@ -279,7 +282,7 @@ export function IntegrationsClient({
         <CardContent>
           {apiKeys.length === 0 ? (
             <p className="py-2 text-sm text-ink-faint">
-              No API keys. Create one to access the public API.
+              {t("noApiKeys")}
             </p>
           ) : (
             <ul className="space-y-2">
@@ -296,8 +299,8 @@ export function IntegrationsClient({
                   </div>
                   <span className="text-xs text-ink-faint">
                     {k.lastUsedAt
-                      ? `Used ${new Date(k.lastUsedAt).toLocaleDateString()}`
-                      : "Never used"}
+                      ? t("usedOn", { date: new Date(k.lastUsedAt).toLocaleDateString(locale) })
+                      : t("neverUsed")}
                   </span>
                   <button
                     onClick={() =>
@@ -308,7 +311,7 @@ export function IntegrationsClient({
                     }
                     className="rounded px-2 py-1 text-xs text-danger hover:bg-danger-subtle"
                   >
-                    Revoke
+                    {t("revoke")}
                   </button>
                 </li>
               ))}

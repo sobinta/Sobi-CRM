@@ -18,6 +18,7 @@ export default async function PlatformAdminAnnouncementPage() {
       <PageHeader
         title={t("announcementTitle")}
         description={t("announcementDesc")}
+        helpTopic="platformAdmin"
       />
       <div className="mx-auto max-w-2xl px-6 py-6">
         <AnnouncementAdminClient

@@ -21,7 +21,7 @@ export default async function IndustriesPage() {
 
   return (
     <div>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader title={t("title")} description={t("description")} helpTopic="industries" />
       <IndustriesClient industries={rows} />
     </div>
   );

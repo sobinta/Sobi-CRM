@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,7 @@ export function AppointmentDialog({
   action,
   triggerLabel,
   title,
-  customerLabel = "Customer name",
+  customerLabel,
   showPartySize = false,
 }: {
   services: ServiceOption[];
@@ -44,9 +45,11 @@ export function AppointmentDialog({
   customerLabel?: string;
   showPartySize?: boolean;
 }) {
+  const t = useTranslations("bookingModules");
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
+  const effectiveCustomerLabel = customerLabel ?? t("customerName");
 
   function onCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -77,12 +80,12 @@ export function AppointmentDialog({
           </DialogHeader>
           <DialogBody className="space-y-3">
             <div>
-              <Label htmlFor="customerName" required>{customerLabel}</Label>
+              <Label htmlFor="customerName" required>{effectiveCustomerLabel}</Label>
               <Input id="customerName" name="customerName" required autoFocus />
             </div>
             {services.length > 0 && (
               <div>
-                <Label htmlFor="serviceId">Service</Label>
+                <Label htmlFor="serviceId">{t("serviceLabel")}</Label>
                 <NativeSelect id="serviceId" name="serviceId" defaultValue="">
                   <option value="">—</option>
                   {services.map((s) => (
@@ -93,12 +96,12 @@ export function AppointmentDialog({
             )}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="startAt" required>Date &amp; time</Label>
+                <Label htmlFor="startAt" required>{t("dateTime")}</Label>
                 <Input id="startAt" name="startAt" type="datetime-local" required dir="ltr" />
               </div>
               {showPartySize && (
                 <div>
-                  <Label htmlFor="partySize">Party size</Label>
+                  <Label htmlFor="partySize">{t("partySize")}</Label>
                   <Input id="partySize" name="partySize" type="number" min={1} defaultValue={2} dir="ltr" />
                 </div>
               )}
@@ -106,10 +109,10 @@ export function AppointmentDialog({
           </DialogBody>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="ghost" type="button">Cancel</Button>
+              <Button variant="ghost" type="button">{t("cancel")}</Button>
             </DialogClose>
             <Button variant="primary" type="submit" disabled={pending}>
-              {pending ? "Saving…" : triggerLabel}
+              {pending ? t("saving") : triggerLabel}
             </Button>
           </DialogFooter>
         </form>

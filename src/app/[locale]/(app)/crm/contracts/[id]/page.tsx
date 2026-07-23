@@ -51,6 +51,7 @@ export default async function ContractDetailPage({
       <PageHeader
         title={`${contract.title} · ${contract.contractNo}`}
         actions={<Chip tone={statusTone[contract.status] ?? "neutral"}>{t(`statuses.${contract.status}`)}</Chip>}
+        helpTopic="contractsDetail"
       />
       <ContractEditorClient contract={detail} signatureReady={Boolean(letterhead.signatoryName)} />
     </div>

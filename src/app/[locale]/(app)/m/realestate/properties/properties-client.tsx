@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import { createPropertyAction } from "../actions";
 import { BusinessCustomFields } from "@/components/patterns/business-custom-fields";
 
 export function NewPropertyButton() {
+  const t = useTranslations("moduleRealestate");
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
@@ -47,38 +49,38 @@ export function NewPropertyButton() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button variant="primary" onClick={() => setOpen(true)}>
-        <Plus className="h-4 w-4" /> New property
+        <Plus className="h-4 w-4" /> {t("newProperty")}
       </Button>
       <DialogContent>
         <form onSubmit={onCreate}>
           <DialogHeader>
-            <DialogTitle>New property</DialogTitle>
+            <DialogTitle>{t("newProperty")}</DialogTitle>
           </DialogHeader>
           <DialogBody className="space-y-3">
             <div>
-              <Label htmlFor="title" required>Title</Label>
+              <Label htmlFor="title" required>{t("titleLabel")}</Label>
               <Input id="title" name="title" required autoFocus />
             </div>
             <div>
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address">{t("addressLabel")}</Label>
               <Input id="address" name="address" />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <Label htmlFor="propertyType" required>Type</Label>
+                <Label htmlFor="propertyType" required>{t("typeLabel")}</Label>
                 <NativeSelect id="propertyType" name="propertyType" defaultValue="apartment">
-                  <option value="apartment">Apartment</option>
-                  <option value="house">House</option>
-                  <option value="commercial">Commercial</option>
-                  <option value="land">Land</option>
+                  <option value="apartment">{t("typeApartment")}</option>
+                  <option value="house">{t("typeHouse")}</option>
+                  <option value="commercial">{t("typeCommercial")}</option>
+                  <option value="land">{t("typeLand")}</option>
                 </NativeSelect>
               </div>
               <div>
-                <Label htmlFor="bedrooms">Bedrooms</Label>
+                <Label htmlFor="bedrooms">{t("bedroomsLabel")}</Label>
                 <Input id="bedrooms" name="bedrooms" type="number" min={0} dir="ltr" />
               </div>
               <div>
-                <Label htmlFor="price">Price</Label>
+                <Label htmlFor="price">{t("priceLabel")}</Label>
                 <Input id="price" name="price" type="number" min={0} defaultValue={0} dir="ltr" />
               </div>
             </div>
@@ -86,10 +88,10 @@ export function NewPropertyButton() {
           </DialogBody>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="ghost" type="button">Cancel</Button>
+              <Button variant="ghost" type="button">{t("cancel")}</Button>
             </DialogClose>
             <Button variant="primary" type="submit" disabled={pending}>
-              {pending ? "Creating…" : "Create property"}
+              {pending ? t("creating") : t("createProperty")}
             </Button>
           </DialogFooter>
         </form>

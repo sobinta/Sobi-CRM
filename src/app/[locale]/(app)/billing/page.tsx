@@ -74,7 +74,7 @@ export default async function BillingPage() {
 
   return (
     <div className="pb-10">
-      <PageHeader title={t("billingTitle")} description={t("billingDescription")} />
+      <PageHeader title={t("billingTitle")} description={t("billingDescription")} helpTopic="billing" />
       <div className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-6">
         <section className="mb-5 flex flex-col gap-3 rounded-xl border border-brand-200 bg-brand-subtle p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">

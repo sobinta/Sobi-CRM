@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ScrollText } from "lucide-react";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { list } from "@/core/audit/audit";
@@ -17,38 +18,51 @@ const categoryTone: Record<string, ChipProps["tone"]> = {
   AI: "accent",
 };
 
+const categoryKey: Record<string, string> = {
+  AUTH: "categoryAuth",
+  DATA: "categoryData",
+  FILE: "categoryFile",
+  PERMISSION: "categoryPermission",
+  EXPORT: "categoryExport",
+  ADMIN: "categoryAdmin",
+  SECURITY: "categorySecurity",
+  AI: "categoryAi",
+};
+
 export default async function AuditPage() {
-  const data = await withPlatformContext(async () => {
-    return list({ take: 100 });
-  });
+  const [data, t] = await Promise.all([
+    withPlatformContext(async () => list({ take: 100 })),
+    getTranslations("admin"),
+  ]);
 
   if (!data) notFound();
 
   return (
     <div>
       <PageHeader
-        title="Audit log"
-        description="A record of security-relevant actions across the workspace."
+        title={t("auditTitle")}
+        description={t("auditDesc")}
+        helpTopic="audit"
       />
       <div className="mx-auto max-w-5xl px-6 py-6">
         {data.items.length === 0 ? (
           <EmptyState
             icon={ScrollText}
-            title="No audit entries yet"
-            description="Sign-ins, permission changes, exports, and admin actions will appear here."
+            title={t("noAuditTitle")}
+            description={t("noAuditBody")}
           />
         ) : (
           <div className="overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
               <thead className="bg-surface-sunken text-xs text-ink-faint">
                 <tr>
-                  <th className="px-4 py-2.5 text-start font-medium">When</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colWhen")}</th>
                   <th className="px-4 py-2.5 text-start font-medium">
-                    Category
+                    {t("colCategory")}
                   </th>
-                  <th className="px-4 py-2.5 text-start font-medium">Action</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Actor</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Entity</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colAction")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colActor")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colEntity")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -59,7 +73,7 @@ export default async function AuditPage() {
                     </td>
                     <td className="px-4 py-2.5">
                       <Chip tone={categoryTone[row.category] ?? "neutral"}>
-                        {row.category}
+                        {categoryKey[row.category] ? t(categoryKey[row.category] as never) : row.category}
                       </Chip>
                     </td>
                     <td className="px-4 py-2.5">
@@ -68,7 +82,7 @@ export default async function AuditPage() {
                       </code>
                     </td>
                     <td className="px-4 py-2.5 text-ink-muted">
-                      {row.actorLabel ?? row.actorId ?? "System"}
+                      {row.actorLabel ?? row.actorId ?? t("systemActor")}
                     </td>
                     <td className="px-4 py-2.5 text-ink-muted">
                       {row.entityType

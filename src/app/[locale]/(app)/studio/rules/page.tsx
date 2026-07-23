@@ -40,7 +40,7 @@ export default async function RulesPage() {
 
   return (
     <div>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader title={t("title")} description={t("description")} helpTopic="rules" />
       <RulesClient rules={rows} />
     </div>
   );

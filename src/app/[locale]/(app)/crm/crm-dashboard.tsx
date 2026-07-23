@@ -17,6 +17,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { FeatureHelp } from "@/components/patterns/feature-help";
 import { Card } from "@/components/ui/card";
 import type {
   CrmDashboardData,
@@ -168,9 +169,12 @@ export async function CrmDashboard({
           <p className="mb-1 text-xs font-semibold tracking-[0.16em] text-brand uppercase">
             {t("operationalPulse")}
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">
-            {t("welcome", { name: firstName })}
-          </h1>
+          <div className="flex items-center gap-1">
+            <h1 className="text-2xl font-semibold tracking-tight text-ink">
+              {t("welcome", { name: firstName })}
+            </h1>
+            <FeatureHelp topicKey="dashboard" />
+          </div>
           <p className="mt-1 text-sm text-ink-muted">
             {t("workspaceSnapshot", { tenant: tenantName, date: dateLabel })}
           </p>

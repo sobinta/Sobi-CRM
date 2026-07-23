@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Users } from "lucide-react";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { db } from "@/core/db";
@@ -12,48 +13,58 @@ const statusTone: Record<string, ChipProps["tone"]> = {
   SUSPENDED: "danger",
 };
 
-const kindLabel: Record<string, string> = {
-  INTERNAL: "Staff",
-  EXTERNAL: "External",
-  CLIENT: "Client",
+const kindKey: Record<string, string> = {
+  INTERNAL: "kindStaff",
+  EXTERNAL: "kindExternal",
+  CLIENT: "kindClient",
+};
+
+const statusKey: Record<string, string> = {
+  ACTIVE: "statusActive",
+  INVITED: "statusInvited",
+  SUSPENDED: "statusSuspended",
 };
 
 export default async function UsersPage() {
-  const data = await withPlatformContext(async () => {
-    const members = await db.membership.findMany({
-      orderBy: { createdAt: "asc" },
-      include: {
-        user: { select: { name: true, email: true } },
-        roles: { include: { role: { select: { name: true } } } },
-      },
-    });
-    return { members };
-  });
+  const [data, t] = await Promise.all([
+    withPlatformContext(async () => {
+      const members = await db.membership.findMany({
+        orderBy: { createdAt: "asc" },
+        include: {
+          user: { select: { name: true, email: true } },
+          roles: { include: { role: { select: { name: true } } } },
+        },
+      });
+      return { members };
+    }),
+    getTranslations("admin"),
+  ]);
 
   if (!data) notFound();
 
   return (
     <div>
       <PageHeader
-        title="Users & teams"
-        description="People with access to this workspace and their roles."
+        title={t("usersTitle")}
+        description={t("usersDesc")}
+        helpTopic="users"
       />
       <div className="mx-auto max-w-4xl px-6 py-6">
         {data.members.length === 0 ? (
           <EmptyState
             icon={Users}
-            title="No members yet"
-            description="Invite colleagues to collaborate in this workspace."
+            title={t("noMembersTitle")}
+            description={t("noMembersBody")}
           />
         ) : (
           <div className="overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
               <thead className="bg-surface-sunken text-xs text-ink-faint">
                 <tr>
-                  <th className="px-4 py-2.5 text-start font-medium">Member</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Type</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Roles</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Status</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colMember")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colType")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colRoles")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colStatus")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -80,7 +91,7 @@ export default async function UsersPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-ink-muted">
-                      {kindLabel[m.kind] ?? m.kind}
+                      {kindKey[m.kind] ? t(kindKey[m.kind] as never) : m.kind}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
@@ -93,7 +104,7 @@ export default async function UsersPage() {
                     </td>
                     <td className="px-4 py-3">
                       <Chip tone={statusTone[m.status] ?? "neutral"}>
-                        {m.status}
+                        {statusKey[m.status] ? t(statusKey[m.status] as never) : m.status}
                       </Chip>
                     </td>
                   </tr>

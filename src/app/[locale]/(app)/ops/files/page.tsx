@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { FileText, Download } from "lucide-react";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { listFiles } from "@/engines/files/file-service";
@@ -13,32 +14,36 @@ function formatSize(bytes: number) {
 }
 
 export default async function FilesPage() {
-  const files = await withPlatformContext(() => listFiles());
+  const [files, t] = await Promise.all([
+    withPlatformContext(() => listFiles()),
+    getTranslations("ops"),
+  ]);
   if (!files) notFound();
 
   return (
     <div>
       <PageHeader
-        title="Files"
-        description={`${files.length} ${files.length === 1 ? "file" : "files"}`}
+        title={t("filesTitle")}
+        description={t("filesCount", { count: files.length })}
         actions={<UploadButton />}
+        helpTopic="operations"
       />
       <div className="px-6 py-4">
         {files.length === 0 ? (
           <EmptyState
             icon={FileText}
-            title="No files yet"
-            description="Upload documents to keep them secure and organized."
+            title={t("noFilesTitle")}
+            description={t("noFilesBody")}
           />
         ) : (
           <div className="overflow-x-auto rounded-xl border border-line">
             <table className="w-full text-sm">
               <thead className="bg-surface-sunken text-xs text-ink-faint">
                 <tr>
-                  <th className="px-4 py-2.5 text-start font-medium">Name</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Type</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Size</th>
-                  <th className="px-4 py-2.5 text-start font-medium">Uploaded</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colName")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colType")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colSize")}</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("colUploaded")}</th>
                   <th className="px-4 py-2.5 text-end font-medium"></th>
                 </tr>
               </thead>
@@ -63,7 +68,7 @@ export default async function FilesPage() {
                         href={`/api/v1/files/${f.id}/download`}
                         className="inline-flex items-center gap-1 text-brand hover:text-brand-hover"
                       >
-                        <Download className="h-3.5 w-3.5" /> Download
+                        <Download className="h-3.5 w-3.5" /> {t("download")}
                       </a>
                     </td>
                   </tr>

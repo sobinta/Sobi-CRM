@@ -20,7 +20,7 @@ export default async function PlatformAdminContentPage() {
 
   return (
     <div>
-      <PageHeader title={t("contentTitle")} description={t("contentDesc")} />
+      <PageHeader title={t("contentTitle")} description={t("contentDesc")} helpTopic="platformAdmin" />
       <div className="mx-auto max-w-3xl px-6 py-6">
         <ContentAdminClient initialValues={initialValues} />
       </div>

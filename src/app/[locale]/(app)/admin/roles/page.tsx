@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ShieldCheck } from "lucide-react";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { db } from "@/core/db";
@@ -7,24 +8,28 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 
 export default async function RolesPage() {
-  const data = await withPlatformContext(async () => {
-    const roles = await db.role.findMany({
-      orderBy: [{ isSystem: "desc" }, { name: "asc" }],
-      include: {
-        permissions: { select: { permission: true } },
-        _count: { select: { members: true } },
-      },
-    });
-    return { roles };
-  });
+  const [data, t] = await Promise.all([
+    withPlatformContext(async () => {
+      const roles = await db.role.findMany({
+        orderBy: [{ isSystem: "desc" }, { name: "asc" }],
+        include: {
+          permissions: { select: { permission: true } },
+          _count: { select: { members: true } },
+        },
+      });
+      return { roles };
+    }),
+    getTranslations("admin"),
+  ]);
 
   if (!data) notFound();
 
   return (
     <div>
       <PageHeader
-        title="Roles & permissions"
-        description="Roles bundle permissions and are assigned to members. System roles are provided; custom roles can be added."
+        title={t("rolesTitle")}
+        description={t("rolesDesc")}
+        helpTopic="roles"
       />
       <div className="mx-auto max-w-4xl space-y-3 px-6 py-6">
         {data.roles.map((role) => (
@@ -38,15 +43,14 @@ export default async function RolesPage() {
                   <h3 className="text-sm font-semibold text-ink">
                     {role.name}
                   </h3>
-                  {role.isAdmin && <Chip tone="brand">Admin</Chip>}
+                  {role.isAdmin && <Chip tone="brand">{t("adminChip")}</Chip>}
                   {role.isSystem && (
                     <Chip tone="neutral" dot={false}>
-                      System
+                      {t("systemChip")}
                     </Chip>
                   )}
                   <span className="text-xs text-ink-faint">
-                    {role._count.members}{" "}
-                    {role._count.members === 1 ? "member" : "members"}
+                    {t("memberCount", { count: role._count.members })}
                   </span>
                 </div>
                 {role.description && (
@@ -65,7 +69,7 @@ export default async function RolesPage() {
                   ))}
                   {role.permissions.length > 8 && (
                     <span className="text-[11px] text-ink-faint">
-                      +{role.permissions.length - 8} more
+                      {t("moreCount", { count: role.permissions.length - 8 })}
                     </span>
                   )}
                 </div>

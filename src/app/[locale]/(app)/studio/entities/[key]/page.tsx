@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/patterns/page-header";
 import { EmptyState } from "@/components/patterns/empty-state";
 import { Link } from "@/i18n/navigation";
 import { labelFor, type FieldDefinition } from "@/core/metadata/types";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { EntityRecordsClient, type ClientField } from "./entity-records-client";
 
 function displayValue(field: FieldDefinition, value: unknown, locale: string): string {
@@ -26,7 +26,7 @@ export default async function EntityRecordsPage({
   params: Promise<{ key: string }>;
 }) {
   const { key } = await params;
-  const locale = await getLocale();
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("studioEntities")]);
 
   const data = await withPlatformContext(async () => {
     const def = await getCustomEntity(key);
@@ -61,7 +61,12 @@ export default async function EntityRecordsPage({
     <div>
       <PageHeader
         title={def.namePlural}
-        description={`${records.length} ${records.length === 1 ? def.nameSingular.toLowerCase() : def.namePlural.toLowerCase()}`}
+        description={t("recordsCount", {
+          count: records.length,
+          singular: def.nameSingular.toLowerCase(),
+          plural: def.namePlural.toLowerCase(),
+        })}
+        helpTopic="entitiesRecords"
         actions={
           <EntityRecordsClient entityKey={def.key} fields={clientFields} title={def.nameSingular} />
         }
@@ -69,14 +74,14 @@ export default async function EntityRecordsPage({
       <div className="px-6 py-4">
         <p className="mb-3 text-xs text-ink-faint">
           <Link href="/studio/entities" className="hover:text-ink-muted">
-            ← Entity builder
+            {t("backToBuilder")}
           </Link>
         </p>
         {records.length === 0 ? (
           <EmptyState
             icon={Database}
-            title={`No ${def.namePlural.toLowerCase()} yet`}
-            description={`Add your first ${def.nameSingular.toLowerCase()} to start collecting records.`}
+            title={t("noRecordsTitle", { plural: def.namePlural.toLowerCase() })}
+            description={t("noRecordsBody", { singular: def.nameSingular.toLowerCase() })}
           />
         ) : (
           <div className="overflow-x-auto rounded-xl border border-line">
@@ -88,7 +93,7 @@ export default async function EntityRecordsPage({
                       {labelFor(f.label, locale)}
                     </th>
                   ))}
-                  <th className="px-4 py-2.5 text-start font-medium">Created</th>
+                  <th className="px-4 py-2.5 text-start font-medium">{t("createdColumn")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">

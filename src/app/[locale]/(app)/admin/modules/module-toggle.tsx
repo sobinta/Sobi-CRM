@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Switch } from "@/components/ui/switch";
 import { Chip } from "@/components/ui/chip";
 import { getModule } from "@/core/module-registry/catalog";
@@ -14,6 +15,8 @@ export function ModuleToggle({
   moduleKey: string;
   initialEnabled: boolean;
 }) {
+  const t = useTranslations("admin");
+  const tCommon = useTranslations("common");
   const mod = getModule(moduleKey);
   const [enabled, setEnabled] = useState(initialEnabled);
   const [pending, startTransition] = useTransition();
@@ -52,10 +55,10 @@ export function ModuleToggle({
           <h3 className="text-sm font-semibold text-ink">{mod.name}</h3>
           {!available && (
             <Chip tone="neutral" dot={false}>
-              Coming soon
+              {tCommon("comingSoon")}
             </Chip>
           )}
-          {available && enabled && <Chip tone="positive">Active</Chip>}
+          {available && enabled && <Chip tone="positive">{t("active")}</Chip>}
         </div>
         <p className="mt-1 text-sm text-ink-muted">{mod.description}</p>
       </div>
@@ -64,7 +67,7 @@ export function ModuleToggle({
           checked={enabled && available}
           disabled={!available || pending}
           onCheckedChange={onToggle}
-          aria-label={`Activate ${mod.name}`}
+          aria-label={t("activateAria", { name: mod.name })}
         />
       </div>
     </div>

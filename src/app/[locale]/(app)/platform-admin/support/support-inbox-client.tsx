@@ -58,7 +58,7 @@ export function SupportInboxClient({ initialTickets }: { initialTickets: Summary
   function send() { if (!detail || !reply.trim()) return; const text = reply.trim(); setReply(""); startTransition(async () => { const result = await replyOperatorTicketAction({ ticketId: detail.id, body: text, clientMessageId: crypto.randomUUID().replaceAll("-", "_") }); if (!result.ok) { setReply(text); setNotice(t("sendFailed")); return; } setNotice(t("replySent")); await reload(); }); }
 
   return <div className="min-h-full">
-    <PageHeader title={t("title")} description={t("description")} />
+    <PageHeader title={t("title")} description={t("description")} helpTopic="platformAdmin" />
     <div className="border-b border-line bg-surface px-6 py-3"><div className="flex flex-wrap items-center gap-2">
       <NativeSelect aria-label={t("statusFilter")} className="w-48" value={status} onChange={(event) => setStatus(event.target.value)}><option value="">{t("allStatuses")}</option>{statuses.map((value) => <option key={value} value={value}>{ts(`status_${value.toLowerCase()}`)}</option>)}</NativeSelect>
       <NativeSelect aria-label={t("priorityFilter")} className="w-40" value={priority} onChange={(event) => setPriority(event.target.value)}><option value="">{t("allPriorities")}</option>{["LOW", "NORMAL", "HIGH", "URGENT"].map((value) => <option key={value} value={value}>{t(`priority_${value.toLowerCase()}`)}</option>)}</NativeSelect>

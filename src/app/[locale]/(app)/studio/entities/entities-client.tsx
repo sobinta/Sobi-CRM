@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/navigation";
 import { Plus, Trash2, Shapes, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ export interface EntityRow {
 }
 
 export function EntitiesClient({ entities }: { entities: EntityRow[] }) {
+  const t = useTranslations("studioEntities");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -71,25 +73,25 @@ export function EntitiesClient({ entities }: { entities: EntityRow[] }) {
       <div className="mb-4 flex justify-end">
         <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
           <Button variant="primary" onClick={() => setOpen(true)}>
-            <Plus className="h-4 w-4" /> New entity
+            <Plus className="h-4 w-4" /> {t("newEntity")}
           </Button>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create a custom entity</DialogTitle>
+              <DialogTitle>{t("createEntityTitle")}</DialogTitle>
             </DialogHeader>
             <DialogBody className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="ns" required>Singular name</Label>
-                  <Input id="ns" value={nameS} onChange={(e) => setNameS(e.target.value)} placeholder="Asset" autoFocus />
+                  <Label htmlFor="ns" required>{t("singularName")}</Label>
+                  <Input id="ns" value={nameS} onChange={(e) => setNameS(e.target.value)} placeholder={t("singularPlaceholder")} autoFocus />
                 </div>
                 <div>
-                  <Label htmlFor="np">Plural name</Label>
-                  <Input id="np" value={nameP} onChange={(e) => setNameP(e.target.value)} placeholder="Assets" />
+                  <Label htmlFor="np">{t("pluralName")}</Label>
+                  <Input id="np" value={nameP} onChange={(e) => setNameP(e.target.value)} placeholder={t("pluralPlaceholder")} />
                 </div>
               </div>
               <div>
-                <Label>Fields</Label>
+                <Label>{t("fields")}</Label>
                 <div className="space-y-2">
                   {fields.map((f, i) => (
                     <div key={i} className="flex gap-2">
@@ -98,7 +100,7 @@ export function EntitiesClient({ entities }: { entities: EntityRow[] }) {
                         onChange={(e) =>
                           setFields((fs) => fs.map((x, idx) => (idx === i ? { ...x, label: e.target.value } : x)))
                         }
-                        placeholder="Field label"
+                        placeholder={t("fieldLabelPlaceholder")}
                         className="h-8"
                       />
                       <NativeSelect
@@ -108,15 +110,15 @@ export function EntitiesClient({ entities }: { entities: EntityRow[] }) {
                         }
                         className="h-8 max-w-32"
                       >
-                        {FIELD_TYPES.map((t) => (
-                          <option key={t} value={t}>{t}</option>
+                        {FIELD_TYPES.map((ft) => (
+                          <option key={ft} value={ft}>{ft}</option>
                         ))}
                       </NativeSelect>
                       {fields.length > 1 && (
                         <button
                           onClick={() => setFields((fs) => fs.filter((_, idx) => idx !== i))}
                           className="rounded p-1 text-ink-faint hover:text-danger"
-                          aria-label="Remove field"
+                          aria-label={t("removeField")}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -130,16 +132,16 @@ export function EntitiesClient({ entities }: { entities: EntityRow[] }) {
                   className="mt-2"
                   onClick={() => setFields((fs) => [...fs, { label: "", type: "text" }])}
                 >
-                  <Plus className="h-3.5 w-3.5" /> Add field
+                  <Plus className="h-3.5 w-3.5" /> {t("addField")}
                 </Button>
               </div>
             </DialogBody>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="ghost" type="button">Cancel</Button>
+                <Button variant="ghost" type="button">{t("cancel")}</Button>
               </DialogClose>
               <Button variant="primary" onClick={create} disabled={pending || !nameS.trim()}>
-                {pending ? "Creating…" : "Create entity"}
+                {pending ? t("creating") : t("createEntity")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -149,8 +151,8 @@ export function EntitiesClient({ entities }: { entities: EntityRow[] }) {
       {entities.length === 0 ? (
         <EmptyState
           icon={Shapes}
-          title="No custom entities yet"
-          description="Create your own entities with custom fields — they get list views, records, and APIs automatically."
+          title={t("noEntitiesTitle")}
+          description={t("noEntitiesBody")}
         />
       ) : (
         <div className="space-y-2.5">
@@ -164,10 +166,10 @@ export function EntitiesClient({ entities }: { entities: EntityRow[] }) {
                   <div className="flex-1">
                     <h3 className="text-sm font-semibold text-ink">{e.namePlural}</h3>
                     <p className="text-xs text-ink-muted">
-                      <code className="font-mono">{e.key}</code> · {e.fieldCount} fields
+                      <code className="font-mono">{e.key}</code> · {t("fieldCount", { count: e.fieldCount })}
                     </p>
                   </div>
-                  <Chip tone="neutral">{e.recordCount} records</Chip>
+                  <Chip tone="neutral">{t("recordCount", { count: e.recordCount })}</Chip>
                 </CardContent>
               </Card>
             </Link>

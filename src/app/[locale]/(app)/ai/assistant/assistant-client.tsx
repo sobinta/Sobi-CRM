@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Send, Sparkles, User, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,14 +12,9 @@ interface ChatMessage {
   content: string;
 }
 
-const SUGGESTIONS = [
-  "امروز چند لید جدید داریم؟",
-  "معاملات بازِ باارزش‌تر از ۲۰ میلیون تومان کدام‌اند؟",
-  "وضعیت کلی پایپ‌لاین فروش چطور است؟",
-  "فعالیت‌های هفته‌ی گذشته را نشان بده",
-];
-
 export function AssistantClient() {
+  const t = useTranslations("aiAssistant");
+  const suggestions = t.raw("suggestions") as string[];
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -45,10 +41,10 @@ export function AssistantClient() {
       });
 
       if (!res.ok || !res.body) {
-        const err = await res.json().catch(() => ({ error: "خطای ارتباط با دستیار." }));
+        const err = await res.json().catch(() => ({ error: t("connectionError") }));
         setMessages((prev) => {
           const copy = [...prev];
-          copy[copy.length - 1] = { role: "assistant", content: err.error ?? "خطایی رخ داد." };
+          copy[copy.length - 1] = { role: "assistant", content: err.error ?? t("genericError") };
           return copy;
         });
         return;
@@ -81,13 +77,13 @@ export function AssistantClient() {
               <Sparkles className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm font-medium text-ink">از داده‌ی واقعی CRM بپرسید</p>
+              <p className="text-sm font-medium text-ink">{t("emptyTitle")}</p>
               <p className="mt-1 text-sm text-ink-muted">
-                دستیار فقط بر اساس داده‌ی موجود پاسخ می‌دهد — هیچ عددی از خودش نمی‌سازد.
+                {t("emptyBody")}
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-2">
-              {SUGGESTIONS.map((s) => (
+              {suggestions.map((s) => (
                 <button
                   key={s}
                   onClick={() => send(s)}
@@ -118,7 +114,7 @@ export function AssistantClient() {
                   : "border border-line bg-surface-raised text-ink",
               )}
             >
-              {m.content || (streaming && i === messages.length - 1 ? "در حال فکر کردن…" : "")}
+              {m.content || (streaming && i === messages.length - 1 ? t("thinking") : "")}
             </div>
           </div>
         ))}
@@ -141,7 +137,7 @@ export function AssistantClient() {
               send(input);
             }
           }}
-          placeholder="سؤال خود را درباره‌ی لیدها، معاملات یا فعالیت‌ها بپرسید…"
+          placeholder={t("inputPlaceholder")}
           rows={1}
           className="flex-1 resize-none"
         />

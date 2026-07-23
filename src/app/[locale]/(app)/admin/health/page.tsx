@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import {
   Activity,
   Zap,
@@ -20,22 +21,26 @@ const catTone: Record<string, ChipProps["tone"]> = {
 };
 
 export default async function HealthPage() {
-  const h = await withPlatformContext(() => getHealthSnapshot());
+  const [h, t] = await Promise.all([
+    withPlatformContext(() => getHealthSnapshot()),
+    getTranslations("admin"),
+  ]);
   if (!h) notFound();
 
   return (
     <div>
       <PageHeader
-        title="System health"
-        description="Live signals from jobs, automation, AI, and integrations."
+        title={t("healthTitle")}
+        description={t("healthDesc")}
+        helpTopic="health"
       />
       <div className="mx-auto max-w-5xl space-y-6 px-6 py-6">
         <StatCards
           stats={[
-            { label: "Jobs pending", value: String(h.jobs.pending), icon: Clock, tone: h.jobs.failed > 0 ? "warning" : "neutral" },
-            { label: "Automation runs (24h)", value: String(h.automation.runs24h), icon: Zap, tone: "brand" },
-            { label: "AI calls (24h)", value: String(h.ai.calls24h), icon: Sparkles, tone: "info" },
-            { label: "Security events (24h)", value: String(h.security.events24h), icon: ShieldAlert, tone: h.security.events24h > 0 ? "danger" : "positive" },
+            { label: t("statJobsPending"), value: String(h.jobs.pending), icon: Clock, tone: h.jobs.failed > 0 ? "warning" : "neutral" },
+            { label: t("statAutomationRuns"), value: String(h.automation.runs24h), icon: Zap, tone: "brand" },
+            { label: t("statAiCalls"), value: String(h.ai.calls24h), icon: Sparkles, tone: "info" },
+            { label: t("statSecurityEvents"), value: String(h.security.events24h), icon: ShieldAlert, tone: h.security.events24h > 0 ? "danger" : "positive" },
           ]}
         />
 
@@ -43,26 +48,26 @@ export default async function HealthPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-ink-muted" /> Automation
+                <Zap className="h-4 w-4 text-ink-muted" /> {t("automationCardTitle")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              <Row label="Runs (24h)" value={String(h.automation.runs24h)} />
-              <Row label="Failed (24h)" value={String(h.automation.failed24h)} tone={h.automation.failed24h > 0 ? "danger" : undefined} />
-              <Row label="Jobs failed" value={String(h.jobs.failed)} tone={h.jobs.failed > 0 ? "danger" : undefined} />
+              <Row label={t("rowRuns24h")} value={String(h.automation.runs24h)} />
+              <Row label={t("rowFailed24h")} value={String(h.automation.failed24h)} tone={h.automation.failed24h > 0 ? "danger" : undefined} />
+              <Row label={t("rowJobsFailed")} value={String(h.jobs.failed)} tone={h.jobs.failed > 0 ? "danger" : undefined} />
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Webhook className="h-4 w-4 text-ink-muted" /> Integrations & AI
+                <Webhook className="h-4 w-4 text-ink-muted" /> {t("integrationsAiCardTitle")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              <Row label="Webhooks" value={String(h.webhooks.total)} />
-              <Row label="Webhooks failing" value={String(h.webhooks.failing)} tone={h.webhooks.failing > 0 ? "warning" : undefined} />
-              <Row label="AI tokens (24h)" value={h.ai.tokens24h.toLocaleString()} />
+              <Row label={t("rowWebhooks")} value={String(h.webhooks.total)} />
+              <Row label={t("rowWebhooksFailing")} value={String(h.webhooks.failing)} tone={h.webhooks.failing > 0 ? "warning" : undefined} />
+              <Row label={t("rowAiTokens")} value={h.ai.tokens24h.toLocaleString()} />
             </CardContent>
           </Card>
         </div>
@@ -70,12 +75,12 @@ export default async function HealthPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-ink-muted" /> Recent security & permission events
+              <Activity className="h-4 w-4 text-ink-muted" /> {t("recentSecurityTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {h.recentErrors.length === 0 ? (
-              <p className="text-sm text-ink-faint">No security events. All clear.</p>
+              <p className="text-sm text-ink-faint">{t("noSecurityEvents")}</p>
             ) : (
               <ul className="divide-y divide-line text-sm">
                 {h.recentErrors.map((e) => (

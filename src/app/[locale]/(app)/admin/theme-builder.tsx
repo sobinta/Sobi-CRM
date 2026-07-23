@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
 import {
   brandTokenCss,
@@ -12,16 +13,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { saveBrandingAction } from "./settings-actions";
 
-const PRESETS: Array<{ name: string; hue: number }> = [
-  { name: "Petrol", hue: 193 },
-  { name: "Indigo", hue: 274 },
-  { name: "Violet", hue: 305 },
-  { name: "Rose", hue: 5 },
-  { name: "Amber", hue: 65 },
-  { name: "Forest", hue: 150 },
+const PRESETS: Array<{ nameKey: string; hue: number }> = [
+  { nameKey: "presetPetrol", hue: 193 },
+  { nameKey: "presetIndigo", hue: 274 },
+  { nameKey: "presetViolet", hue: 305 },
+  { nameKey: "presetRose", hue: 5 },
+  { nameKey: "presetAmber", hue: 65 },
+  { nameKey: "presetForest", hue: 150 },
 ];
 
 export function ThemeBuilder({ initial }: { initial: Branding }) {
+  const t = useTranslations("admin");
   const [branding, setBranding] = useState<Branding>(initial);
   const [saved, setSaved] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -45,20 +47,20 @@ export function ThemeBuilder({ initial }: { initial: Branding }) {
     <Card className="theme-preview">
       <style dangerouslySetInnerHTML={{ __html: previewCss }} />
       <CardHeader>
-        <CardTitle>Brand identity</CardTitle>
+        <CardTitle>{t("brandIdentity")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Hue presets */}
         <div>
           <label className="mb-2 block text-sm font-medium text-ink">
-            Brand color
+            {t("brandColor")}
           </label>
           <div className="flex flex-wrap gap-2">
             {PRESETS.map((p) => {
               const active = Math.abs(branding.hue - p.hue) < 1;
               return (
                 <button
-                  key={p.name}
+                  key={p.nameKey}
                   type="button"
                   onClick={() => update({ hue: p.hue })}
                   className="flex items-center gap-2 rounded-lg border border-line bg-surface px-2.5 py-1.5 text-xs font-medium text-ink outline-none transition-colors hover:border-line-strong focus-visible:outline-2 focus-visible:outline-focus-ring"
@@ -69,7 +71,7 @@ export function ThemeBuilder({ initial }: { initial: Branding }) {
                       background: `oklch(0.55 0.12 ${p.hue})`,
                     }}
                   />
-                  {p.name}
+                  {t(p.nameKey as never)}
                   {active && <Check className="h-3.5 w-3.5 text-brand" />}
                 </button>
               );
@@ -81,7 +83,7 @@ export function ThemeBuilder({ initial }: { initial: Branding }) {
         <div>
           <div className="mb-2 flex items-center justify-between">
             <label htmlFor="hue" className="text-sm font-medium text-ink">
-              Hue
+              {t("hue")}
             </label>
             <span className="tabular text-xs text-ink-muted">
               {Math.round(branding.hue)}°
@@ -106,7 +108,7 @@ export function ThemeBuilder({ initial }: { initial: Branding }) {
         <div>
           <div className="mb-2 flex items-center justify-between">
             <label htmlFor="radius" className="text-sm font-medium text-ink">
-              Corner radius
+              {t("cornerRadius")}
             </label>
             <span className="tabular text-xs text-ink-muted">
               {branding.radius.toFixed(3)}rem
@@ -127,18 +129,18 @@ export function ThemeBuilder({ initial }: { initial: Branding }) {
         {/* Preview swatches + components */}
         <div>
           <p className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-faint">
-            Preview
+            {t("preview")}
           </p>
           <div className="space-y-3 rounded-lg border border-line bg-surface p-4">
             <div className="flex flex-wrap items-center gap-2">
               <Button variant="primary" size="sm">
-                Primary action
+                {t("primaryAction")}
               </Button>
               <Button variant="subtle" size="sm">
-                Subtle
+                {t("subtleAction")}
               </Button>
-              <Chip tone="brand">Brand</Chip>
-              <Chip tone="positive">Active</Chip>
+              <Chip tone="brand">{t("brandChipLabel")}</Chip>
+              <Chip tone="positive">{t("active")}</Chip>
             </div>
             <div className="flex gap-1">
               {[100, 300, 500, 700, 900].map((s) => (
@@ -154,18 +156,18 @@ export function ThemeBuilder({ initial }: { initial: Branding }) {
 
         <div className="flex items-center gap-3">
           <Button variant="primary" onClick={save} disabled={pending}>
-            {pending ? "Saving…" : "Save theme"}
+            {pending ? t("saving") : t("saveTheme")}
           </Button>
           <Button
             variant="ghost"
             onClick={() => update(DEFAULT_BRANDING)}
             disabled={pending}
           >
-            Reset to default
+            {t("resetDefault")}
           </Button>
           {saved && (
             <span className="flex items-center gap-1 text-sm text-positive">
-              <Check className="h-4 w-4" /> Saved
+              <Check className="h-4 w-4" /> {t("saved")}
             </span>
           )}
         </div>

@@ -47,6 +47,7 @@ export default async function CustomizeDashboardPage() {
       <PageHeader
         title={t("customizeTitle")}
         description={session.active.accessMode === "read-only" ? t("customizeDemoDescription") : t("customizeDescription")}
+        helpTopic="dashboardCustomize"
         actions={<Link href="/crm" className="inline-flex min-h-9 items-center gap-1.5 rounded-md px-3 text-sm text-ink-muted hover:bg-surface-sunken hover:text-ink"><ArrowLeft aria-hidden="true" className="h-4 w-4 rtl:rotate-180" />{t("backToDashboard")}</Link>}
       />
       <div className="pt-4">

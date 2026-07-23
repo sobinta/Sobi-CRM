@@ -4,6 +4,7 @@ import { withPlatformContext } from "@/core/auth/with-context";
 import { listEntities, resolveEntity } from "@/core/metadata/registry";
 import { formHistory, loadEditorForm } from "@/engines/forms/service";
 import { Link } from "@/i18n/navigation";
+import { FeatureHelp } from "@/components/patterns/feature-help";
 import { FormBuilder } from "./form-builder";
 import "@/engines/crm/entities";
 
@@ -24,7 +25,10 @@ export default async function FormsPage({ searchParams }: { searchParams: Promis
       <header className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand">{t("eyebrow")}</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-ink">{t("title")}</h1>
+          <div className="mt-1 flex items-center gap-1">
+            <h1 className="text-2xl font-bold tracking-tight text-ink">{t("title")}</h1>
+            <FeatureHelp topicKey="forms" />
+          </div>
           <p className="mt-1 max-w-2xl text-sm text-ink-muted">{t("description")}</p>
         </div>
         <nav aria-label={t("entities")} className="flex max-w-full gap-1 overflow-x-auto rounded-xl border border-line bg-surface-raised p-1">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Plus, Zap, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,26 +35,27 @@ export interface AutomationRow {
   runCount: number;
 }
 
-const EVENT_OPTIONS = [
-  { value: "lead.converted", label: "Lead converted" },
-  { value: "deal.created", label: "Deal created" },
-  { value: "deal.won", label: "Deal won" },
-  { value: "contact.created", label: "Contact created" },
-  { value: "task.completed", label: "Task completed" },
-  { value: "file.uploaded", label: "File uploaded" },
-];
+// Event type values are the raw dotted strings stored on the automation
+// trigger; translation keys can't contain "." (next-intl reserves it for
+// nesting), so each maps to a safe camelCase key under `events.*`.
+const EVENT_TYPE_TO_KEY: Record<string, string> = {
+  "lead.converted": "leadConverted",
+  "deal.created": "dealCreated",
+  "deal.won": "dealWon",
+  "contact.created": "contactCreated",
+  "task.completed": "taskCompleted",
+  "file.uploaded": "fileUploaded",
+};
+const EVENT_TYPES = Object.keys(EVENT_TYPE_TO_KEY);
 
-const ACTION_OPTIONS = [
-  { value: "create_task", label: "Create a task" },
-  { value: "notify_owner", label: "Notify the owner" },
-  { value: "log", label: "Write a log entry" },
-];
+const ACTION_KEYS = ["create_task", "notify_owner", "log"];
 
 export function AutomationsClient({
   automations,
 }: {
   automations: AutomationRow[];
 }) {
+  const t = useTranslations("studioAutomations");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [actionType, setActionType] = useState("create_task");
@@ -88,35 +90,35 @@ export function AutomationsClient({
       <div className="mb-4 flex justify-end">
         <Dialog open={open} onOpenChange={setOpen}>
           <Button variant="primary" onClick={() => setOpen(true)}>
-            <Plus className="h-4 w-4" /> New automation
+            <Plus className="h-4 w-4" /> {t("newAutomation")}
           </Button>
           <DialogContent>
             <form onSubmit={onCreate}>
               <DialogHeader>
-                <DialogTitle>New automation</DialogTitle>
+                <DialogTitle>{t("newAutomation")}</DialogTitle>
               </DialogHeader>
               <DialogBody className="space-y-3">
                 <div>
                   <Label htmlFor="name" required>
-                    Name
+                    {t("name")}
                   </Label>
                   <Input id="name" name="name" required autoFocus />
                 </div>
                 <div>
                   <Label htmlFor="eventType" required>
-                    When this happens
+                    {t("whenThisHappens")}
                   </Label>
                   <NativeSelect id="eventType" name="eventType" defaultValue="lead.converted">
-                    {EVENT_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
+                    {EVENT_TYPES.map((type) => (
+                      <option key={type} value={type}>
+                        {t(`events.${EVENT_TYPE_TO_KEY[type]}` as never)}
                       </option>
                     ))}
                   </NativeSelect>
                 </div>
                 <div>
                   <Label htmlFor="actionType" required>
-                    Do this
+                    {t("doThis")}
                   </Label>
                   <NativeSelect
                     id="actionType"
@@ -124,9 +126,9 @@ export function AutomationsClient({
                     value={actionType}
                     onChange={(e) => setActionType(e.target.value)}
                   >
-                    {ACTION_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
+                    {ACTION_KEYS.map((key) => (
+                      <option key={key} value={key}>
+                        {t(`actionTypes.${key}` as never)}
                       </option>
                     ))}
                   </NativeSelect>
@@ -134,16 +136,16 @@ export function AutomationsClient({
                 <div>
                   <Label htmlFor="actionValue">
                     {actionType === "create_task"
-                      ? "Task title"
-                      : "Message"}
+                      ? t("taskTitle")
+                      : t("message")}
                   </Label>
                   <Input
                     id="actionValue"
                     name="actionValue"
                     placeholder={
                       actionType === "create_task"
-                        ? "Follow up with new lead"
-                        : "Automation ran"
+                        ? t("taskTitlePlaceholder")
+                        : t("messagePlaceholder")
                     }
                   />
                 </div>
@@ -151,11 +153,11 @@ export function AutomationsClient({
               <DialogFooter>
                 <DialogClose asChild>
                   <Button variant="ghost" type="button">
-                    Cancel
+                    {t("cancel")}
                   </Button>
                 </DialogClose>
                 <Button variant="primary" type="submit" disabled={pending}>
-                  {pending ? "Creating…" : "Create automation"}
+                  {pending ? t("creating") : t("createAutomation")}
                 </Button>
               </DialogFooter>
             </form>
@@ -166,8 +168,8 @@ export function AutomationsClient({
       {automations.length === 0 ? (
         <EmptyState
           icon={Zap}
-          title="No automations yet"
-          description="Automate repetitive work: when something happens, do something automatically."
+          title={t("noAutomationsTitle")}
+          description={t("noAutomationsBody")}
         />
       ) : (
         <div className="space-y-2.5">
@@ -181,12 +183,12 @@ export function AutomationsClient({
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-semibold text-ink">{a.name}</h3>
                     <span className="text-xs text-ink-faint">
-                      {a.runCount} runs
+                      {t("runCount", { count: a.runCount })}
                     </span>
                   </div>
                   <div className="mt-1 flex items-center gap-1.5 text-xs text-ink-muted">
                     <Chip tone="info" dot={false}>
-                      {a.eventType}
+                      {EVENT_TYPE_TO_KEY[a.eventType] ? t(`events.${EVENT_TYPE_TO_KEY[a.eventType]}` as never) : a.eventType}
                     </Chip>
                     <ArrowRight className="h-3 w-3 text-ink-faint" />
                     <span>{a.actionSummary}</span>
@@ -195,7 +197,7 @@ export function AutomationsClient({
                 <Switch
                   checked={a.enabled}
                   onCheckedChange={() => toggle(a)}
-                  aria-label="Toggle automation"
+                  aria-label={t("toggleAria")}
                 />
               </CardContent>
             </Card>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ReactFlow,
   Background,
@@ -12,9 +12,9 @@ import {
   Panel,
   useNodesState,
   useEdgesState,
-  addEdge,
   type Node,
   type Edge,
+  type EdgeChange,
   type Connection,
   type NodeProps,
 } from "@xyflow/react";
@@ -22,21 +22,30 @@ import "@xyflow/react/dist/style.css";
 import { Building2, User, Handshake, type LucideIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { useDemoMode } from "@/components/layout/session-context";
 import type { GraphNode, GraphEdge, GraphNodeType } from "@/engines/graph/graph-service";
+import { createRelationshipAction, deleteRelationshipAction } from "./actions";
 
 /**
  * Relationship canvas. Records are draggable blocks laid out as a left-to-right
  * tree (company → its people → their deals), colour-coded by type. Click a block
  * to focus its connections (everything else dims); drag blocks to rearrange;
- * drag from a block's edge to draw a new link. Pan, zoom, minimap, and type
- * filters make a busy account easy to read at a glance — the signature "see the
- * whole relationship at once" view.
+ * drag from a block's edge to draw a new link — which persists as a real
+ * Relationship row, so it's still there next visit. Pan, zoom, minimap, and
+ * type filters make a busy account easy to read at a glance.
  */
 
 const NODE_CONF: Record<GraphNodeType, { color: string; icon: LucideIcon }> = {
   company: { color: "var(--brand)", icon: Building2 },
   contact: { color: "var(--accent)", icon: User },
   deal: { color: "var(--positive)", icon: Handshake },
+};
+
+/** Canonical edge labels from the service, mapped to i18n keys under `graph.*`. */
+const EDGE_LABEL_KEY: Record<string, string> = {
+  "works at": "worksAt",
+  with: "with",
+  linked: "linked",
 };
 
 const COL_W = 300;
@@ -51,6 +60,11 @@ interface RecordData extends Record<string, unknown> {
   contactCount?: number;
   dealCount?: number;
   dimmed?: boolean;
+}
+
+interface EdgeData extends Record<string, unknown> {
+  /** Present only for a manually-drawn link — enables delete-from-canvas. */
+  relationshipId?: string;
 }
 
 /** A single record rendered as a block: type-coloured accent, icon, title, and a fact line. */
@@ -106,6 +120,12 @@ function RecordNode({ data, selected }: NodeProps) {
 }
 
 const nodeTypes = { record: RecordNode };
+
+function parseNodeId(id: string): { type: string; id: string } | null {
+  const i = id.indexOf(":");
+  if (i < 0) return null;
+  return { type: id.slice(0, i), id: id.slice(i + 1) };
+}
 
 /** Left-to-right tree layout: parents (companies) on the left, leaves (deals) on the right, each subtree clustered vertically. */
 function layout(rawNodes: GraphNode[], rawEdges: GraphEdge[]) {
@@ -170,6 +190,7 @@ function layout(rawNodes: GraphNode[], rawEdges: GraphEdge[]) {
     target: e.source,
     label: e.label,
     type: "smoothstep",
+    data: { relationshipId: e.relationshipId } satisfies EdgeData,
   }));
 
   return { nodes, edges };
@@ -177,6 +198,7 @@ function layout(rawNodes: GraphNode[], rawEdges: GraphEdge[]) {
 
 export function GraphView({ nodes: rawNodes, edges: rawEdges }: { nodes: GraphNode[]; edges: GraphEdge[] }) {
   const t = useTranslations("graph");
+  const demo = useDemoMode();
   const initial = useMemo(() => layout(rawNodes, rawEdges), [rawNodes, rawEdges]);
   const [nodes, , onNodesChange] = useNodesState(initial.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initial.edges);
@@ -184,6 +206,19 @@ export function GraphView({ nodes: rawNodes, edges: rawEdges }: { nodes: GraphNo
   const [visible, setVisible] = useState<Set<GraphNodeType>>(
     () => new Set<GraphNodeType>(["company", "contact", "deal"]),
   );
+  const [notice, setNotice] = useState<"demo" | "protected" | null>(null);
+  const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showNotice = useCallback((kind: "demo" | "protected") => {
+    setNotice(kind);
+    if (noticeTimer.current) clearTimeout(noticeTimer.current);
+    noticeTimer.current = setTimeout(() => setNotice(null), 3000);
+  }, []);
+  useEffect(() => () => {
+    if (noticeTimer.current) clearTimeout(noticeTimer.current);
+  }, []);
+
+  const labelFor = useCallback((raw: string) => t(EDGE_LABEL_KEY[raw] ?? "linked"), [t]);
 
   const typeById = useMemo(
     () => new Map(nodes.map((n) => [n.id, (n.data as RecordData).type])),
@@ -201,8 +236,57 @@ export function GraphView({ nodes: rawNodes, edges: rawEdges }: { nodes: GraphNo
   }, [focused, edges]);
 
   const onConnect = useCallback(
-    (c: Connection) => setEdges((eds) => addEdge({ ...c, type: "smoothstep" }, eds)),
-    [setEdges],
+    (c: Connection) => {
+      if (demo) {
+        showNotice("demo");
+        return;
+      }
+      const from = parseNodeId(c.source);
+      const to = parseNodeId(c.target);
+      if (!from || !to) return;
+      void createRelationshipAction({ fromType: from.type, fromId: from.id, toType: to.type, toId: to.id }).then(
+        (res) => {
+          if (!res.ok) return;
+          const edge: Edge = {
+            id: `rel:${res.id}`,
+            source: c.source,
+            target: c.target,
+            type: "smoothstep",
+            label: labelFor("linked"),
+            data: { relationshipId: res.id } satisfies EdgeData,
+          };
+          setEdges((eds) => [...eds, edge]);
+        },
+      );
+    },
+    [demo, showNotice, labelFor, setEdges],
+  );
+
+  // Only manually-drawn links (those with a relationshipId) can be deleted —
+  // every other edge mirrors a real foreign key elsewhere in the CRM, so
+  // "deleting" it here wouldn't make sense. Deletions also persist server-side.
+  const handleEdgesChange = useCallback(
+    (changes: EdgeChange[]) => {
+      const blockedIds = new Set<string>();
+      for (const change of changes) {
+        if (change.type !== "remove") continue;
+        const edge = edges.find((e) => e.id === change.id);
+        const relationshipId = (edge?.data as EdgeData | undefined)?.relationshipId;
+        if (!relationshipId) {
+          blockedIds.add(change.id);
+          showNotice("protected");
+          continue;
+        }
+        if (demo) {
+          blockedIds.add(change.id);
+          showNotice("demo");
+          continue;
+        }
+        void deleteRelationshipAction(relationshipId);
+      }
+      onEdgesChange(blockedIds.size ? changes.filter((c) => !(c.type === "remove" && blockedIds.has(c.id))) : changes);
+    },
+    [edges, onEdgesChange, demo, showNotice],
   );
 
   const isHidden = useCallback(
@@ -227,18 +311,24 @@ export function GraphView({ nodes: rawNodes, edges: rawEdges }: { nodes: GraphNo
     () =>
       edges.map((e) => {
         const active = neighborhood ? neighborhood.has(e.source) && neighborhood.has(e.target) : false;
+        const manual = !!(e.data as EdgeData | undefined)?.relationshipId;
         return {
           ...e,
+          label: typeof e.label === "string" && EDGE_LABEL_KEY[e.label] ? labelFor(e.label) : e.label,
           hidden: isHidden(e.source) || isHidden(e.target),
           animated: active,
-          style: { stroke: active ? "var(--brand)" : "var(--line-strong)", strokeWidth: active ? 2 : 1.5 },
+          style: {
+            stroke: active ? "var(--brand)" : "var(--line-strong)",
+            strokeWidth: active ? 2 : 1.5,
+            strokeDasharray: manual ? "5 4" : undefined,
+          },
           labelStyle: { fill: active ? "var(--brand)" : "var(--ink-faint)", fontSize: 11, fontWeight: 500 },
           labelBgStyle: { fill: "var(--surface-raised)" },
           labelBgPadding: [4, 2] as [number, number],
           labelBgBorderRadius: 4,
         };
       }),
-    [edges, neighborhood, isHidden],
+    [edges, neighborhood, isHidden, labelFor],
   );
 
   const toggleType = (ty: GraphNodeType) =>
@@ -256,13 +346,13 @@ export function GraphView({ nodes: rawNodes, edges: rawEdges }: { nodes: GraphNo
   ];
 
   return (
-    <div dir="ltr" className="h-[calc(100dvh-12rem)] min-h-[480px] overflow-hidden rounded-xl border border-line bg-surface-sunken/30">
+    <div dir="ltr" className="relative h-[calc(100dvh-12rem)] min-h-[480px] overflow-hidden rounded-xl border border-line bg-surface-sunken/30">
       <ReactFlow
         nodes={displayNodes}
         edges={displayEdges}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
+        onEdgesChange={handleEdgesChange}
         onConnect={onConnect}
         onNodeClick={(_, n) => setFocused((cur) => (cur === n.id ? null : n.id))}
         onPaneClick={() => setFocused(null)}
@@ -307,6 +397,15 @@ export function GraphView({ nodes: rawNodes, edges: rawEdges }: { nodes: GraphNo
           </div>
         </Panel>
       </ReactFlow>
+      {notice && (
+        <div
+          role="status"
+          dir="auto"
+          className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-lg border border-line bg-surface-raised px-3.5 py-2 text-xs font-medium text-brand shadow-raised"
+        >
+          {notice === "demo" ? t("demoSimulation") : t("cannotDeleteAuto")}
+        </div>
+      )}
     </div>
   );
 }

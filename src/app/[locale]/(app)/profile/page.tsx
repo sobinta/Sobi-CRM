@@ -21,7 +21,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="pb-8">
-      <PageHeader title={t("profileTitle")} description={t("profileDescription")} />
+      <PageHeader title={t("profileTitle")} description={t("profileDescription")} helpTopic="profile" />
       <div className="mx-auto grid w-full max-w-4xl gap-4 px-4 py-5 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
         <Card>
           <CardHeader>

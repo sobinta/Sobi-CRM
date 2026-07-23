@@ -209,8 +209,19 @@ one-click **"Continue with demo workspace"** button (see
   email, or note against any contact/company/deal/lead found via a type-ahead
   picker — the same entry also appears on that record's own timeline.
 - **Tags & Relationships** — a generic `Relationship` model plus a
-  standalone **Relationship Graph** (React Flow) visualizing connections
-  between any two records.
+  standalone **Relationship Graph** (`/crm/graph`, React Flow): every
+  company, contact, and deal renders as a colour-coded, draggable block
+  (icon + title + a fact line — a company shows its contact/deal counts, a
+  contact shows its company, a deal shows its amount), auto-laid-out as a
+  left-to-right tree so an account's shape reads at a glance. Blocks are
+  freely repositionable; clicking one focuses its connections (neighbours
+  and their links light up, everything else dims); type filter chips
+  show/hide companies, contacts, or deals; a minimap and pan/zoom handle
+  larger graphs. Beyond the connections implied by existing foreign keys,
+  a user can **draw a new link by dragging from one block to another** —
+  it persists as a real `Relationship` row (not just a visual scratchpad)
+  and can be removed again from the canvas; the auto-derived edges (which
+  mirror a real foreign key elsewhere) can't be deleted here, by design.
 - **CSV import/export** for core entities.
 
 ### Lead conversion & AI scoring
@@ -353,15 +364,21 @@ Action Center → Human Approval → AI Audit`.
 
 ### Reports & insights
 
+- **Charts by default** (`/crm/reports`) — four Recharts visualizations open
+  first, so a business sees at a glance what it's actually accomplished: a
+  KPI row (total leads, lead→won conversion, open pipeline, 12-month
+  revenue), a conversion funnel (lead → converted → deal → past-first-stage
+  → won, with % of top-of-funnel), **pipeline value by stage**
+  (color-matched to each stage's tone, so a stage reads the same color here
+  as on the Deals board), lead-source breakdown, and 12-month
+  **Jalali-calendar** revenue (real Jalali month buckets via `jalaali-js`,
+  not relabeled Gregorian ones). Charts render inside a forced LTR plot area
+  regardless of the active locale, so axis/bar geometry never breaks under
+  RTL, while tick labels still display in the reading direction of the
+  active language.
 - **Tabular reports** (deals, pipeline, tasks, contacts) with CSV export,
-  audited.
-- **Visual insights page** (`/crm/reports/insights`) — four Recharts
-  visualizations matching the reference layout: a conversion funnel
-  (lead → converted → deal → past-first-stage → won, with % of top-of-funnel),
-  **pipeline value by stage** (color-matched to each stage's tone, so a
-  stage reads the same color here as on the Deals board), lead-source
-  breakdown, and 12-month **Jalali-calendar** revenue (real Jalali month
-  buckets via `jalaali-js`, not relabeled Gregorian ones).
+  audited — one click away behind a **Charts / Tables toggle** for anyone
+  who wants the raw rows instead of the visual summary.
 - Every label on this page — funnel steps, pipeline stage names, lead
   sources — is a translation key resolved in en/de/fa, not a raw string
   baked into the analytics engine; the same stage names now match exactly
@@ -378,6 +395,9 @@ Action Center → Human Approval → AI Audit`.
 
 ### Files, tasks, calendar, notifications
 
+- **Operations overview** (`/ops`) — a workspace landing page rolling up
+  open/overdue task counts, upcoming calendar events, and stored-file counts
+  into one glance, with quick links into Tasks, Calendar, and Files.
 - **Document/File engine** — secure upload, categories, versions, preview,
   expiry, per-record required-document checklists, signed download URLs.
 - **Tasks** — subtasks, recurrence, dependencies, comments, overdue
@@ -406,7 +426,9 @@ Action Center → Human Approval → AI Audit`.
 
 - **Visual Workflow Builder** — stages/steps, Rules-routed approval chains,
   conditions, timers, SLAs, escalations, required fields/documents,
-  templates, versioning.
+  templates, versioning; every field, stage-tone option, and control is
+  translated in all three locales (this page was fully English-only in an
+  earlier build).
 - **Automation engine** — event/schedule triggers → Rules conditions →
   actions (create task, notify, update field, move stage, send email, call
   webhook, trigger an AI skill), with a full `AutomationRun` log feeding
@@ -458,6 +480,13 @@ data:
 Six additional spec modules (Investment, Legal, Education, Healthcare,
 Service & Maintenance, Project Management) are registered as "coming soon"
 scaffolds in module activation.
+
+Every dashboard, list, and dialog across all eight modules — plus the
+shared booking components used by Barber Shop, Beauty Salon, and
+Restaurant — is fully translated in English, German, and Persian, with
+status/type enums (policy status, loan purpose, property type, visa type,
+appointment status, …) mapped to a safe translation key per value rather
+than shown as a raw code.
 
 ### Low-code studio
 
@@ -536,6 +565,14 @@ scaffolds in module activation.
   state (remembered across sessions) — becomes a slide-in drawer on mobile
   (opened from a Topbar hamburger) with the exact same collapse/expand
   control, and every data table scrolls horizontally instead of clipping.
+- **Collapsed-rail subnav bar** — collapsing the Module Rail to icons hides
+  the accordion sub-pages it would normally list; without a substitute, a
+  user who didn't know to re-expand it would lose easy access to most of a
+  workspace's options. A horizontal sub-navigation bar fills that gap
+  automatically: while the rail is collapsed, the active workspace's full
+  sub-page list (Contacts, Companies, Leads, …) appears as a row at the top
+  of the content area; it disappears again once the rail is expanded, so
+  the same links are never shown twice.
 - **Accordion sidebar navigation** — each workspace's sub-pages (Contacts,
   Companies, Leads, Deals, …) nest directly inside the rail as an expandable
   section instead of a separate top strip; the active section auto-opens. The
@@ -565,12 +602,32 @@ scaffolds in module activation.
   silently falls back to a Latin font for Persian text.
 - Jalali (Shamsi) calendar support for contract numbering and the revenue
   report, via the well-tested `jalaali-js` library.
+- **Every workspace section has a contextual Help button** — a "?" next to
+  the page title (via a shared `PageHeader`/`FeatureHelp` pattern) that opens
+  a short dialog explaining what the feature does and why it's useful, in
+  the active locale. This isn't limited to the built-in CRM screens: it also
+  covers Administration (settings, audit, health, integrations, modules,
+  roles, users), the AI workspace and assistant, every Studio builder
+  (entities, automations, workflows, rules, templates), Support, Billing,
+  Profile, and all eight industry modules — a full pass specifically closed
+  the gaps found during manual QA (Workflow Builder and the Relationship
+  Graph were the two most visible misses before this pass).
+- **No hardcoded-locale strings** — every label, status chip, enum value,
+  and even demo/placeholder content resolves through next-intl for the
+  active locale rather than being baked into one language. This was found
+  and fixed as a real bug in two places during an app-wide audit: the AI
+  assistant page rendered fixed Persian copy regardless of the selected
+  locale, and the Support center's demo ticket did the same — both now
+  translate correctly in all three locales.
+- Wherever a setting or menu label has a natural, commonly-used Persian or
+  German term (rather than an awkward literal translation), the Persian and
+  German translations use that idiomatic term.
 
 ### Demo mode
 
 - A **one-click "Continue with demo workspace"** button on the login page
-  and landing page, signing in as a seeded demo user
-  (`sara@novak.test` / tenant "Novak Insurance Group") — no signup required
+  and landing page, signing in as the read-only public demo account
+  (`public-demo@sobi.local`, workspace "Sobi CRM Demo") — no signup required
   to explore the product.
 - **Gated out of production builds** (`process.env.NODE_ENV !== "production"`)
   — verified to be fully absent, including the credential string, from the

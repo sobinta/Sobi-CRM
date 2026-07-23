@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Home, CheckCircle2, Handshake, Coins } from "lucide-react";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { isModuleEnabled } from "@/core/features/features";
@@ -13,40 +14,43 @@ function money(n: number) {
 }
 
 export default async function RealEstateDashboard() {
-  const data = await withPlatformContext(async () => {
-    if (!(await isModuleEnabled("realestate"))) return { disabled: true as const };
-    const [stats, viewings] = await Promise.all([propertyStats(), upcomingViewings()]);
-    return { stats, viewings };
-  });
+  const [data, t] = await Promise.all([
+    withPlatformContext(async () => {
+      if (!(await isModuleEnabled("realestate"))) return { disabled: true as const };
+      const [stats, viewings] = await Promise.all([propertyStats(), upcomingViewings()]);
+      return { stats, viewings };
+    }),
+    getTranslations("moduleRealestate"),
+  ]);
 
   if (!data) notFound();
   if ("disabled" in data) {
-    return <div className="p-8 text-sm text-ink-muted">The Real Estate module is not active for this workspace.</div>;
+    return <div className="p-8 text-sm text-ink-muted">{t("notActive")}</div>;
   }
 
   const { stats, viewings } = data;
 
   return (
     <div>
-      <PageHeader title="Real Estate" description="Properties, viewings, and listed value." />
+      <PageHeader title={t("title")} description={t("description")} helpTopic="moduleRealestate" />
       <div className="mx-auto max-w-5xl space-y-6 px-6 py-6">
         <StatCards
           stats={[
-            { label: "Available", value: String(stats.available), icon: Home, tone: "info" },
-            { label: "Reserved", value: String(stats.reserved), icon: Handshake, tone: "warning" },
-            { label: "Sold", value: String(stats.sold), icon: CheckCircle2, tone: "positive" },
-            { label: "Listed value", value: money(stats.listedValue), icon: Coins, tone: "brand" },
+            { label: t("statAvailable"), value: String(stats.available), icon: Home, tone: "info" },
+            { label: t("statReserved"), value: String(stats.reserved), icon: Handshake, tone: "warning" },
+            { label: t("statSold"), value: String(stats.sold), icon: CheckCircle2, tone: "positive" },
+            { label: t("statListedValue"), value: money(stats.listedValue), icon: Coins, tone: "brand" },
           ]}
         />
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Home className="h-4 w-4 text-brand" /> Upcoming viewings
+              <Home className="h-4 w-4 text-brand" /> {t("upcomingViewingsHeading")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {viewings.length === 0 ? (
-              <p className="text-sm text-ink-faint">No viewings scheduled.</p>
+              <p className="text-sm text-ink-faint">{t("noViewings")}</p>
             ) : (
               <ul className="divide-y divide-line">
                 {viewings.map((v) => (

@@ -43,6 +43,7 @@ const priorityTone: Record<string, ChipProps["tone"]> = {
 
 export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
   const demoMode = useDemoMode();
+  const t = useTranslations("ops");
   const tShell = useTranslations("shell");
   const router = useRouter();
   const [rows, setRows] = useState(tasks);
@@ -111,42 +112,42 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
       <div className="mb-4 flex justify-end">
         <Dialog open={open} onOpenChange={setOpen}>
           <Button variant="primary" onClick={() => setOpen(true)}>
-            <Plus className="h-4 w-4" /> New task
+            <Plus className="h-4 w-4" /> {t("newTask")}
           </Button>
           <DialogContent>
             <form onSubmit={onCreate}>
               <DialogHeader>
-                <DialogTitle>New task</DialogTitle>
+                <DialogTitle>{t("newTask")}</DialogTitle>
               </DialogHeader>
               <DialogBody className="space-y-3">
                 <div>
                   <Label htmlFor="title" required>
-                    Title
+                    {t("taskTitle")}
                   </Label>
                   <Input id="title" name="title" required autoFocus />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="priority">Priority</Label>
+                    <Label htmlFor="priority">{t("priority")}</Label>
                     <NativeSelect id="priority" name="priority" defaultValue="normal">
-                      <option value="low">Low</option>
-                      <option value="normal">Normal</option>
-                      <option value="high">High</option>
-                      <option value="urgent">Urgent</option>
+                      <option value="low">{t("priorityLow")}</option>
+                      <option value="normal">{t("priorityNormal")}</option>
+                      <option value="high">{t("priorityHigh")}</option>
+                      <option value="urgent">{t("priorityUrgent")}</option>
                     </NativeSelect>
                   </div>
                   <div>
-                    <Label htmlFor="dueAt">Due date</Label>
+                    <Label htmlFor="dueAt">{t("dueDate")}</Label>
                     <Input id="dueAt" name="dueAt" type="date" dir="ltr" />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="recurrence">Repeat</Label>
+                  <Label htmlFor="recurrence">{t("repeat")}</Label>
                   <NativeSelect id="recurrence" name="recurrence" defaultValue="">
-                    <option value="">Never</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
+                    <option value="">{t("repeatNever")}</option>
+                    <option value="daily">{t("repeatDaily")}</option>
+                    <option value="weekly">{t("repeatWeekly")}</option>
+                    <option value="monthly">{t("repeatMonthly")}</option>
                   </NativeSelect>
                 </div>
                 <BusinessCustomFields entityKey="task" onChange={setCustomFields} />
@@ -154,11 +155,11 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
               <DialogFooter>
                 <DialogClose asChild>
                   <Button variant="ghost" type="button">
-                    Cancel
+                    {t("cancel")}
                   </Button>
                 </DialogClose>
                 <Button variant="primary" type="submit" disabled={pending}>
-                  {pending ? "Creating…" : "Create task"}
+                  {pending ? t("creating") : t("createTask")}
                 </Button>
               </DialogFooter>
             </form>
@@ -175,8 +176,8 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
       {rows.length === 0 ? (
         <EmptyState
           icon={CheckCircle2}
-          title="No tasks yet"
-          description="Create a task to track your work and deadlines."
+          title={t("noTasksTitle")}
+          description={t("noTasksBody")}
         />
       ) : (
         <ul className="space-y-1.5">
@@ -192,7 +193,7 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
                 <button
                   onClick={() => toggle(task)}
                   className="shrink-0 text-ink-faint transition-colors hover:text-brand"
-                  aria-label={done ? "Mark incomplete" : "Mark complete"}
+                  aria-label={done ? t("markIncomplete") : t("markComplete")}
                 >
                   {done ? (
                     <CheckCircle2 className="h-5 w-5 text-positive" />
@@ -210,7 +211,7 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
                 </span>
                 {overdue && (
                   <span className="flex items-center gap-1 text-xs text-danger">
-                    <Clock className="h-3.5 w-3.5" /> Overdue
+                    <Clock className="h-3.5 w-3.5" /> {t("overdue")}
                   </span>
                 )}
                 {task.dueAt && !overdue && (
@@ -219,7 +220,7 @@ export function TasksClient({ tasks }: { tasks: TaskRow[] }) {
                   </time>
                 )}
                 <Chip tone={priorityTone[task.priority] ?? "neutral"}>
-                  {task.priority}
+                  {t(`priority${task.priority.charAt(0).toUpperCase()}${task.priority.slice(1)}` as never)}
                 </Chip>
               </li>
             );

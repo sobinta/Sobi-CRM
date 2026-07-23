@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import { createCaseAction } from "../actions";
 import { BusinessCustomFields } from "@/components/patterns/business-custom-fields";
 
 export function NewCaseButton() {
+  const t = useTranslations("moduleImmigration");
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
@@ -46,47 +48,47 @@ export function NewCaseButton() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button variant="primary" onClick={() => setOpen(true)}>
-        <Plus className="h-4 w-4" /> New case
+        <Plus className="h-4 w-4" /> {t("newCase")}
       </Button>
       <DialogContent>
         <form onSubmit={onCreate}>
           <DialogHeader>
-            <DialogTitle>New immigration case</DialogTitle>
+            <DialogTitle>{t("newCaseDialogTitle")}</DialogTitle>
           </DialogHeader>
           <DialogBody className="space-y-3">
             <div>
-              <Label htmlFor="clientName" required>Client name</Label>
+              <Label htmlFor="clientName" required>{t("clientNameLabel")}</Label>
               <Input id="clientName" name="clientName" required autoFocus />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="visaType" required>Visa type</Label>
+                <Label htmlFor="visaType" required>{t("visaTypeLabel")}</Label>
                 <NativeSelect id="visaType" name="visaType" defaultValue="work">
-                  <option value="work">Work</option>
-                  <option value="student">Student</option>
-                  <option value="family">Family</option>
-                  <option value="business">Business</option>
-                  <option value="asylum">Asylum</option>
-                  <option value="permanent">Permanent</option>
+                  <option value="work">{t("visaWork")}</option>
+                  <option value="student">{t("visaStudent")}</option>
+                  <option value="family">{t("visaFamily")}</option>
+                  <option value="business">{t("visaBusiness")}</option>
+                  <option value="asylum">{t("visaAsylum")}</option>
+                  <option value="permanent">{t("visaPermanent")}</option>
                 </NativeSelect>
               </div>
               <div>
-                <Label htmlFor="deadline">Deadline</Label>
+                <Label htmlFor="deadline">{t("deadlineLabel")}</Label>
                 <Input id="deadline" name="deadline" type="date" dir="ltr" />
               </div>
             </div>
             <div>
-              <Label htmlFor="authority">Authority</Label>
-              <Input id="authority" name="authority" placeholder="e.g. BMI Austria" />
+              <Label htmlFor="authority">{t("authorityLabel")}</Label>
+              <Input id="authority" name="authority" placeholder={t("authorityPlaceholder")} />
             </div>
             <BusinessCustomFields entityKey="immigration_case" onChange={setCustomFields} />
           </DialogBody>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="ghost" type="button">Cancel</Button>
+              <Button variant="ghost" type="button">{t("cancel")}</Button>
             </DialogClose>
             <Button variant="primary" type="submit" disabled={pending}>
-              {pending ? "Creating…" : "Create case"}
+              {pending ? t("creating") : t("createCase")}
             </Button>
           </DialogFooter>
         </form>

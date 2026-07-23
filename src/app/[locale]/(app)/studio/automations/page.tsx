@@ -1,11 +1,15 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { listAutomations } from "@/engines/automation/automation-service";
 import { PageHeader } from "@/components/patterns/page-header";
 import { AutomationsClient, type AutomationRow } from "./automations-client";
 
 export default async function AutomationsPage() {
-  const automations = await withPlatformContext(() => listAutomations());
+  const [automations, t] = await Promise.all([
+    withPlatformContext(() => listAutomations()),
+    getTranslations("studioAutomations"),
+  ]);
   if (!automations) notFound();
 
   const rows: AutomationRow[] = automations.map((a) => {
@@ -18,8 +22,10 @@ export default async function AutomationsPage() {
       enabled: a.enabled,
       actionSummary:
         actions.length === 1
-          ? actions[0].type.replace(/_/g, " ")
-          : `${actions.length} actions`,
+          ? t.has(`actionTypes.${actions[0].type}`)
+            ? t(`actionTypes.${actions[0].type}` as never)
+            : actions[0].type.replace(/_/g, " ")
+          : t("actionsCount", { count: actions.length }),
       runCount: a._count.runs,
     };
   });
@@ -27,8 +33,9 @@ export default async function AutomationsPage() {
   return (
     <div>
       <PageHeader
-        title="Automations"
-        description="When something happens, automatically do something else."
+        title={t("title")}
+        description={t("description")}
+        helpTopic="automations"
       />
       <AutomationsClient automations={rows} />
     </div>

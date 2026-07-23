@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Plus, Trash2, ChevronUp, ChevronDown, Check, ShieldCheck, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,15 +26,16 @@ export function WorkflowBuilder({
 }: {
   initial: { key: string; name: string; entityType: string; stages: WorkflowStage[] } | null;
 }) {
+  const t = useTranslations("workflowBuilder");
   const router = useRouter();
-  const [name, setName] = useState(initial?.name ?? "Loan approval");
+  const [name, setName] = useState(initial?.name ?? t("defaultWorkflowName"));
   const [entityType, setEntityType] = useState(initial?.entityType ?? "loan");
   const [stages, setStages] = useState<WorkflowStage[]>(
     initial?.stages ?? [
-      { key: "intake", name: "Intake", tone: "neutral", requiredFields: [], requiredDocs: [] },
-      { key: "review", name: "Review", tone: "info", requiredFields: [], requiredDocs: ["ID", "Payslip"] },
-      { key: "approval", name: "Approval", tone: "warning", requiredFields: [], requiredDocs: [], approvalRoleKey: "manager" },
-      { key: "approved", name: "Approved", tone: "positive", requiredFields: [], requiredDocs: [] },
+      { key: "intake", name: t("defaultStages.intake"), tone: "neutral", requiredFields: [], requiredDocs: [] },
+      { key: "review", name: t("defaultStages.review"), tone: "info", requiredFields: [], requiredDocs: ["ID", "Payslip"] },
+      { key: "approval", name: t("defaultStages.approval"), tone: "warning", requiredFields: [], requiredDocs: [], approvalRoleKey: "manager" },
+      { key: "approved", name: t("defaultStages.approved"), tone: "positive", requiredFields: [], requiredDocs: [] },
     ],
   );
   const [saved, setSaved] = useState(false);
@@ -55,7 +57,7 @@ export function WorkflowBuilder({
   function add() {
     setStages((s) => [
       ...s,
-      { key: `stage-${s.length + 1}`, name: "New stage", tone: "neutral", requiredFields: [], requiredDocs: [] },
+      { key: `stage-${s.length + 1}`, name: t("stageNamePlaceholder"), tone: "neutral", requiredFields: [], requiredDocs: [] },
     ]);
   }
   function remove(i: number) {
@@ -81,24 +83,24 @@ export function WorkflowBuilder({
     <div className="mx-auto max-w-3xl px-6 py-6">
       <div className="mb-4 flex items-end gap-3">
         <div className="flex-1">
-          <Label htmlFor="wf-name">Workflow name</Label>
+          <Label htmlFor="wf-name">{t("workflowName")}</Label>
           <Input id="wf-name" value={name} onChange={(e) => { setName(e.target.value); setSaved(false); }} />
         </div>
         <div className="w-40">
-          <Label htmlFor="wf-entity">Applies to</Label>
+          <Label htmlFor="wf-entity">{t("appliesTo")}</Label>
           <NativeSelect id="wf-entity" value={entityType} onChange={(e) => setEntityType(e.target.value)}>
-            <option value="loan">Loans</option>
-            <option value="policy">Policies</option>
-            <option value="case">Cases</option>
-            <option value="deal">Deals</option>
+            <option value="loan">{t("entityLoans")}</option>
+            <option value="policy">{t("entityPolicies")}</option>
+            <option value="case">{t("entityCases")}</option>
+            <option value="deal">{t("entityDeals")}</option>
           </NativeSelect>
         </div>
         <Button variant="primary" onClick={save} disabled={pending}>
-          {pending ? "Publishing…" : "Publish workflow"}
+          {pending ? t("publishing") : t("publish")}
         </Button>
         {saved && (
           <span className="flex items-center gap-1 pb-2 text-sm text-positive">
-            <Check className="h-4 w-4" /> Published
+            <Check className="h-4 w-4" /> {t("published")}
           </span>
         )}
       </div>
@@ -128,18 +130,18 @@ export function WorkflowBuilder({
                   onChange={(e) => patch(i, { tone: e.target.value })}
                   className="h-8 max-w-32"
                 >
-                  {TONES.map((t) => (
-                    <option key={t} value={t}>{t}</option>
+                  {TONES.map((tone) => (
+                    <option key={tone} value={tone}>{t(`tones.${tone}`)}</option>
                   ))}
                 </NativeSelect>
                 <div className="flex-1" />
-                <button onClick={() => move(i, -1)} className="rounded p-1 text-ink-faint hover:text-ink" aria-label="Up">
+                <button onClick={() => move(i, -1)} className="rounded p-1 text-ink-faint hover:text-ink" aria-label={t("moveUp")}>
                   <ChevronUp className="h-4 w-4" />
                 </button>
-                <button onClick={() => move(i, 1)} className="rounded p-1 text-ink-faint hover:text-ink" aria-label="Down">
+                <button onClick={() => move(i, 1)} className="rounded p-1 text-ink-faint hover:text-ink" aria-label={t("moveDown")}>
                   <ChevronDown className="h-4 w-4" />
                 </button>
-                <button onClick={() => remove(i)} className="rounded p-1 text-ink-faint hover:text-danger" aria-label="Remove">
+                <button onClick={() => remove(i)} className="rounded p-1 text-ink-faint hover:text-danger" aria-label={t("removeStage")}>
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
@@ -147,7 +149,7 @@ export function WorkflowBuilder({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label className="flex items-center gap-1.5 text-xs">
-                    Required documents (comma-separated)
+                    {t("requiredDocs")}
                   </Label>
                   <Input
                     value={stage.requiredDocs.join(", ")}
@@ -160,27 +162,27 @@ export function WorkflowBuilder({
                       })
                     }
                     className="h-8"
-                    placeholder="ID, Payslip"
+                    placeholder={t("requiredDocsPlaceholder")}
                   />
                 </div>
                 <div className="flex gap-3">
                   <div className="flex-1">
                     <Label className="flex items-center gap-1 text-xs">
-                      <ShieldCheck className="h-3 w-3" /> Approval role
+                      <ShieldCheck className="h-3 w-3" /> {t("approvalRole")}
                     </Label>
                     <NativeSelect
                       value={stage.approvalRoleKey ?? ""}
                       onChange={(e) => patch(i, { approvalRoleKey: e.target.value || undefined })}
                       className="h-8"
                     >
-                      <option value="">None</option>
-                      <option value="manager">Manager</option>
-                      <option value="admin">Admin</option>
+                      <option value="">{t("roleNone")}</option>
+                      <option value="manager">{t("roleManager")}</option>
+                      <option value="admin">{t("roleAdmin")}</option>
                     </NativeSelect>
                   </div>
                   <div className="w-24">
                     <Label className="flex items-center gap-1 text-xs">
-                      <Clock className="h-3 w-3" /> SLA (h)
+                      <Clock className="h-3 w-3" /> {t("slaHours")}
                     </Label>
                     <Input
                       type="number"
@@ -199,7 +201,7 @@ export function WorkflowBuilder({
       </div>
 
       <Button variant="secondary" onClick={add} className="mt-3">
-        <Plus className="h-4 w-4" /> Add stage
+        <Plus className="h-4 w-4" /> {t("addStage")}
       </Button>
     </div>
   );

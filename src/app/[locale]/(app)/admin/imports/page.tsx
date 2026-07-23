@@ -24,7 +24,7 @@ export default async function ImportsPage() {
 
   return (
     <div>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader title={t("title")} description={t("description")} helpTopic="imports" />
       <ImportsClient initialRows={rows} />
     </div>
   );

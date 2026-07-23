@@ -14,7 +14,7 @@ export default async function PlatformAdminBrandingPage() {
 
   return (
     <div>
-      <PageHeader title={t("brandingTitle")} description={t("brandingDesc")} />
+      <PageHeader title={t("brandingTitle")} description={t("brandingDesc")} helpTopic="platformAdmin" />
       <div className="mx-auto max-w-2xl px-6 py-6">
         <BrandingAdminClient
           initialLogo={assets.logo ?? ""}

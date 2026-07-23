@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { listWorkflows } from "@/engines/workflow/workflow-service";
 import { PageHeader } from "@/components/patterns/page-header";
@@ -6,7 +7,10 @@ import { WorkflowBuilder } from "./workflow-builder";
 import type { WorkflowStage } from "@/engines/workflow/workflow-service";
 
 export default async function WorkflowsPage() {
-  const workflows = await withPlatformContext(() => listWorkflows());
+  const [workflows, t] = await Promise.all([
+    withPlatformContext(() => listWorkflows()),
+    getTranslations("workflowBuilder"),
+  ]);
   if (!workflows) notFound();
 
   const first = workflows[0];
@@ -21,10 +25,7 @@ export default async function WorkflowsPage() {
 
   return (
     <div>
-      <PageHeader
-        title="Workflow builder"
-        description="Design staged processes with required documents, approvals, and SLAs."
-      />
+      <PageHeader title={t("title")} description={t("description")} helpTopic="workflows" />
       <WorkflowBuilder initial={initial} />
     </div>
   );

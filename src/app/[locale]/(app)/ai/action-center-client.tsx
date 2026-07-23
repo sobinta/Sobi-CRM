@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Check, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ export interface PendingAction {
 }
 
 export function ActionCenter({ actions }: { actions: PendingAction[] }) {
+  const t = useTranslations("aiWorkspace");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -32,8 +34,8 @@ export function ActionCenter({ actions }: { actions: PendingAction[] }) {
     return (
       <EmptyState
         icon={Sparkles}
-        title="No pending AI actions"
-        description="When AI suggests an action, it appears here for your approval before anything changes."
+        title={t("noPendingTitle")}
+        description={t("noPendingBody")}
       />
     );
   }
@@ -66,7 +68,7 @@ export function ActionCenter({ actions }: { actions: PendingAction[] }) {
               onClick={() => decide(a.id, false)}
               disabled={pending}
             >
-              <X className="h-4 w-4" /> Reject
+              <X className="h-4 w-4" /> {t("reject")}
             </Button>
             <Button
               variant="primary"
@@ -74,7 +76,7 @@ export function ActionCenter({ actions }: { actions: PendingAction[] }) {
               onClick={() => decide(a.id, true)}
               disabled={pending}
             >
-              <Check className="h-4 w-4" /> Approve
+              <Check className="h-4 w-4" /> {t("approve")}
             </Button>
           </div>
         </div>

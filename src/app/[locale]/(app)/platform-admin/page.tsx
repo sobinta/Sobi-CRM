@@ -18,7 +18,7 @@ export default async function PlatformAdminPricingPage() {
 
   return (
     <div>
-      <PageHeader title={t("pricingTitle")} description={t("pricingDesc")} />
+      <PageHeader title={t("pricingTitle")} description={t("pricingDesc")} helpTopic="platformAdmin" />
       <div className="mx-auto max-w-4xl px-6 py-6">
         <PricingAdminClient
           initialPlans={(plans ?? []).map((p) => ({

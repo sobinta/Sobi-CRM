@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Scissors, CalendarDays, CheckCircle2, Sparkles } from "lucide-react";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { isModuleEnabled } from "@/core/features/features";
@@ -9,40 +10,44 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 
 export default async function BarberDashboard() {
-  const data = await withPlatformContext(async () => {
-    if (!(await isModuleEnabled("barber"))) return { disabled: true as const };
-    const [stats, appts] = await Promise.all([barberStats(), listBarberAppointments()]);
-    return { stats, upcoming: appts.filter((a) => a.startAt >= new Date()).slice(0, 6) };
-  });
+  const [data, t, tBooking] = await Promise.all([
+    withPlatformContext(async () => {
+      if (!(await isModuleEnabled("barber"))) return { disabled: true as const };
+      const [stats, appts] = await Promise.all([barberStats(), listBarberAppointments()]);
+      return { stats, upcoming: appts.filter((a) => a.startAt >= new Date()).slice(0, 6) };
+    }),
+    getTranslations("moduleBarber"),
+    getTranslations("bookingModules"),
+  ]);
 
   if (!data) notFound();
   if ("disabled" in data) {
-    return <div className="p-8 text-sm text-ink-muted">The Barber Shop module is not active for this workspace.</div>;
+    return <div className="p-8 text-sm text-ink-muted">{t("notActive")}</div>;
   }
 
   const { stats, upcoming } = data;
 
   return (
     <div>
-      <PageHeader title="Barber Shop" description="Appointments, services, and chair schedule." />
+      <PageHeader title={t("title")} description={t("description")} helpTopic="moduleBarber" />
       <div className="mx-auto max-w-5xl space-y-6 px-6 py-6">
         <StatCards
           stats={[
-            { label: "Upcoming", value: String(stats.upcoming), icon: CalendarDays, tone: "info" },
-            { label: "Today", value: String(stats.today), icon: Scissors, tone: "brand" },
-            { label: "Completed", value: String(stats.completed), icon: CheckCircle2, tone: "positive" },
-            { label: "Services", value: String(stats.services), icon: Sparkles, tone: "neutral" },
+            { label: tBooking("statUpcoming"), value: String(stats.upcoming), icon: CalendarDays, tone: "info" },
+            { label: tBooking("statToday"), value: String(stats.today), icon: Scissors, tone: "brand" },
+            { label: tBooking("statCompleted"), value: String(stats.completed), icon: CheckCircle2, tone: "positive" },
+            { label: t("statServices"), value: String(stats.services), icon: Sparkles, tone: "neutral" },
           ]}
         />
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-brand" /> Upcoming appointments
+              <CalendarDays className="h-4 w-4 text-brand" /> {tBooking("upcomingAppointmentsHeading")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {upcoming.length === 0 ? (
-              <p className="text-sm text-ink-faint">No upcoming appointments.</p>
+              <p className="text-sm text-ink-faint">{tBooking("noUpcomingAppointments")}</p>
             ) : (
               <ul className="divide-y divide-line">
                 {upcoming.map((a) => (

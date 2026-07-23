@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { UtensilsCrossed } from "lucide-react";
 import { withPlatformContext } from "@/core/auth/with-context";
 import { listReservations } from "@/modules/restaurant/service";
@@ -9,28 +10,33 @@ import { AppointmentDialog } from "../../_booking/appointment-dialog";
 import { createReservationAction } from "../actions";
 
 export default async function ReservationsPage() {
-  const reservations = await withPlatformContext(() => listReservations());
+  const [reservations, t, tBooking] = await Promise.all([
+    withPlatformContext(() => listReservations()),
+    getTranslations("moduleRestaurant"),
+    getTranslations("bookingModules"),
+  ]);
   if (!reservations) notFound();
 
   return (
     <div>
       <PageHeader
-        title="Reservations"
-        description={`${reservations.length} total`}
+        title={t("reservationsTitle")}
+        description={tBooking("totalCount", { count: reservations.length })}
+        helpTopic="moduleRestaurant"
         actions={
           <AppointmentDialog
             services={[]}
             action={createReservationAction}
-            triggerLabel="New reservation"
-            title="New reservation"
-            customerLabel="Guest name"
+            triggerLabel={t("newReservation")}
+            title={t("newReservation")}
+            customerLabel={t("guestName")}
             showPartySize
           />
         }
       />
       <div className="px-6 py-4">
         {reservations.length === 0 ? (
-          <EmptyState icon={UtensilsCrossed} title="No reservations yet" description="Take the first table reservation." />
+          <EmptyState icon={UtensilsCrossed} title={t("noReservationsTitle")} description={t("noReservationsBody")} />
         ) : (
           <AppointmentsTable rows={reservations} showParty />
         )}

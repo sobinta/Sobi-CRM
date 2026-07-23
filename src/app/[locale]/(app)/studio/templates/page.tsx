@@ -26,7 +26,7 @@ export default async function TemplatesPage() {
 
   return (
     <div>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader title={t("title")} description={t("description")} helpTopic="templates" />
       <TemplatesClient templates={rows} />
     </div>
   );
